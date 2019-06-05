@@ -16,12 +16,40 @@ Change History:
 
 
 from collections import Counter, defaultdict
+import csv
 from json import JSONEncoder
+import re
 
 import networkx as nx
 import numpy as np
 import requests
 
+csv.field_size_limit(10000000)
+
+
+def normalize_parsed_email_csv(file_name='parsed_emails.csv'):
+    email_data = []
+    with open('parsed_emails.csv', 'r') as f:
+        reader = csv.DictReader(f)
+        for i, row in enumerate(reader):
+            row['To'] = re.sub(r'\n\t', '', row['To'])
+            row['EmailID'] = i
+            # If there are multiple email recipients, add an entry for each recipient.
+            if ',' in row['To']:
+                recipients = row['To'].split(',')
+                for recipient in recipients:
+                    email_data.append({
+                        'EmailID': row['EmailID'],
+                        'To': recipient.strip(),
+                        'From': row['From'],
+                        'Body': row['Body'],
+                        'Date': row['Date'],
+                        'Subject': row['Subject']
+                    })
+            else:
+                email_data.append(row)
+
+    return email_data
 
 def person_counts(emails):
     """Counts the number of times each person appears as either a
@@ -51,7 +79,7 @@ def relationship_counts(emails):
     senders & receivers, irrespective of who is the sender or receiver"""
 
     relationships = defaultdict(lambda: 0)
-    for eml in email_data:
+    for eml in emails:
         if eml['To'] != eml['From']:  # Filter out self emails
             key = tuple(sorted([eml['To'], eml['From']]))
             relationships[key] += 1
@@ -59,6 +87,7 @@ def relationship_counts(emails):
     relationship_counts = Counter(relationships)
 
     return relationship_counts
+
 
 def common_inds_and_rels(person_counts, relationship_counts, num_people=100, num_relationships=100):
     """Determines the most common (as indicated by frequency count) individuals and relationships, and then
@@ -99,7 +128,7 @@ def common_inds_and_rels(person_counts, relationship_counts, num_people=100, num
 FREQ_BINS = [0.35, 0.5, 0.5, 0.9]
 
 
-def bin_dict_vals(dict_to_bin, bins):
+def bin_dict_vals(dict_to_bin, bins=FREQ_BINS):
     """Bins the values of a dictionary. """
     vals = np.array(list(dict_to_bin.values()))
     quantiles = np.quantile(vals, bins)
@@ -121,7 +150,6 @@ def build_email_network_graph(relationships):
         graph.add_edge(pair[0], pair[1], length=length)
 
     return graph
-
 
 
 def get_node(node_id, properties):
@@ -180,7 +208,6 @@ def label_payload(i, label):
                "to": "{{{0}}}/labels".format(i),
                "body": label}
     return payload
-
 
 
 def encode_graph(graph, edge_rel_name, label, encoder=JSONEncoder()):
@@ -269,3 +296,13 @@ def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('', ''),
 
     return response
 
+
+def parsed_csv_to_neo4j():
+    """Function to take the parsed_emails.csv file, transform it into the NetworkX graph, and then load that
+    graph into a local neo4j database. For POC use only :)"""
+    email_data = normalize_parsed_email_csv('parsed_emails.csv')
+    relcouns = relationship_counts(email_data)
+    relcounts_binned = bin_dict_vals(relcouns)
+    relcounts_binned = invert_relationship_lengths(relcounts_binned)
+    graph = build_email_network_graph(relcounts_binned)
+    load_graph_to_n4j(graph)
