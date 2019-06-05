@@ -1,4 +1,5 @@
 from flask import Flask, json, jsonify, g, request, session, make_response, send_file
+from flask_cors import CORS, cross_origin
 import os
 from TopicModeling import TopicModeling, DocumentTypeEnum
 
@@ -7,6 +8,9 @@ tm =  TopicModeling()
 
 # The Flask application
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 def json_response(payload, status=200):
     """
@@ -25,14 +29,15 @@ def json_response(payload, status=200):
     return (json.dumps(payload), status, {'content-type': 'application/json'})
 
 
-@app.route("/TM/ListFiles", methods=["GET"])
-def ListFiles():
+@app.route("/TM/archives", methods=["GET"])
+@cross_origin()
+def ListArchives():
     return json_response({'files': os.listdir('./UploadedFiles')})
 
 
-@app.route("/TM/SelectFile", methods=["POST"])
-def SelectFile():
-    file = request.form['file']
+@app.route("/TM/archives/<string:archive_name>", methods=["POST"])
+@cross_origin()
+def SelectArchive(archive_name):
     docType = request.form['type'].lower()
 
     if docType == 'emails':
@@ -42,75 +47,59 @@ def SelectFile():
     else:
         docTypeEnum = DocumentTypeEnum.unknownType
 
-    if ( tm.setFileToProcess(file, docTypeEnum) ):
+    if ( tm.setFileToProcess(archive_name, docTypeEnum) ):
         return json_response({})
     else:
         return json_response({}, 404)
 
 
-@app.route("/TM/FindNumberOfTopics", methods=["POST"])
-def FindNumberOfTopics():
-    tm.startFindNumberOfTopics()
-    return json_response({})
+@app.route("/TM/ldamodel", methods=["GET"])
+@cross_origin()
+def BuildModel():
+    if tm.modelNotBuiltAndNotBuilding():
+        tm.startBuildingModel()
+        return json_response({'modelBuilt': False})
+    else:
+        return json_response({'modelBuilt': tm.getModelBuilt()})
 
 
-@app.route("/TM/GetNumberOfTopics", methods=["GET"])
+@app.route("/TM/topics", methods=["GET"])
+@cross_origin()
 def GetNumberOfTopics():
     success, numTopics = tm.getNumberOfTopics()
     return json_response({'complete': success, 'numberOfTopics': numTopics})
 
 
-@app.route("/TM/StartBuildingModel", methods=["POST"])
-def StartBuildingModel():
-    tm.startBuildingModel()
-    return json_response({})
-
-
-@app.route("/TM/GetModelBuilt", methods=["GET"])
-def GetModelBuilt():
-    return json_response({'modelBuilt': tm.getModelBuilt()})
-
-
-@app.route("/TM/GetWordsForTopic", methods=["GET"])
-def GetWordsForTopic():
-    topicId = int(request.args.get('topicId'))
-    result, words = tm.getWordsForTopic(topicId)
-
-    if not result:
-        return json_response({}, 400)
-    else:
-        return json_response({'words': words})
-
-
-@app.route("/TM/GetWordCloudForTopic", methods=["GET"])
-def GetWordCloudForTopic():
-    topicId = int(request.args.get('topicId'))
-    result, filename = tm.getWordCloudForTopic(topicId)
+@app.route("/TM/topics/<int:topic_id>", methods=["GET"])
+@cross_origin()
+def GetWordCloudForTopic(topic_id):
+    result, encodedImage = tm.getWordCloudForTopic(topic_id)
 
     if not result:
         resp = make_response('', 400)
         resp.headers['mimetype'] = 'image/png'
         return resp
     else:
-        return send_file(filename, mimetype='image/png')
+        return (encodedImage, 200, {'content-type': 'text/plain'})
 
 
-@app.route("/TM/GetTopicDistribution", methods=["GET"])
+@app.route("/TM/topicdistribution", methods=["GET"])
+@cross_origin()
 def GetTopicDistribution():
-    result, filename = tm.getTopicDistribution()
+    result, encodedImage = tm.getTopicDistribution()
 
     if not result:
         resp = make_response('', 400)
         resp.headers['mimetype'] = 'image/png'
         return resp
     else:
-        return send_file(filename, mimetype='image/png')
+        return (encodedImage, 200, {'content-type': 'text/plain'})
 
 
-@app.route("/TM/GetDocIDsForTopic", methods=["GET"])
-def GetDocIDsForTopic():
-    topicId = int(request.args.get('topicId'))
-    result, docIDs = tm.getDocIDsForTopic(topicId)
+@app.route("/TM/topics/<int:topic_id>/documents", methods=["GET"])
+@cross_origin()
+def GetDocIDsForTopic(topic_id):
+    result, docIDs = tm.getDocIDsForTopic(topic_id)
 
     if not result:
         return json_response({}, 400)

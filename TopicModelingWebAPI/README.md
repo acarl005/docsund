@@ -26,24 +26,32 @@ flask run
 
 ## Web API:
 
-The API should be callable using Ajax calls from the website.  The API can also be tested using curl as shown below:
+The API should be callable using REST calls from the website.
 
-**Select the emails.csv to process, and indicate it is an emails file**<br>
-curl -d "file=emails.csv&type=emails" http://127.0.0.1:5000/TM/SelectFile
+**List the archives**<br>
+GET	/tm/archives
 
-**Determine the number of topics.  Repeatedly call GetNumberOfTopics to find out when it is done. In this case, the JSON response will be: {"complete": true, "numberOfTopics": 5}**<br>
-curl -X POST http://127.0.0.1:5000/TM/FindNumberOfTopics<br>
-curl http://127.0.0.1:5000/TM/GetNumberOfTopics
+**Select the archive to process, and indicate its type (emails, documents)**<br>
+POST	/tm/archives/\<name\>
 
-**Build the LDA model. Repeatedly call GetModelBuilt to find out when it is done. In this case, the JSON response will be: {"modelBuilt": true}**<br>
-curl -X POST http://127.0.0.1:5000/TM/StartBuildingModel<br>
-curl http://127.0.0.1:5000/TM/GetModelBuilt
+Example:<br>
+/tm/archives/emails2.csv<br>
+Form data: type=emails
 
-**Get a word cloud for topic 0**<br>
-curl -o wc.png http://127.0.0.1:5000/TM/GetWordCloudForTopic?topicId=0
+**Build the LDA model. Repeatedly call /tm/ldamodel to find out when it is done. In this case, the JSON response will be: {"modelBuilt": true}**<br>
+GET	/tm/ldamodel<br>
+
+**Determine the number of topics.  Repeatedly call /tm/topics to find out when it is done. In this case, the JSON response will be: {"complete": true, "numberOfTopics": 5}**<br>
+GET	/tm/topics<br>
+
+**Get a word cloud for a topic**<br>
+GET	/tm/topics/\<id\>
 
 **Get a visualization of the topic distribution**<br>
-curl -o td.png http://127.0.0.1:5000/TM/GetTopicDistribution
+GET	/tm/topicdistribution<br>
 
-**Get the documents Ids for topic 0**<br>
-curl http://127.0.0.1:5000/TM/GetDocIDsForTopic?topicId=0
+**Get the documents Ids for a topic**<br>
+GET	/tm/topics/\<id\>/documents
+
+Example:<br>
+/tm/topics/0/documents

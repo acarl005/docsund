@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>Topic Modeling Test</title>
+        <script type="text/javascript" src="Script.js"></script>
+    </head>
+    <body>
+        <p>Select an archive:</p>
+        <select name="archivesListBox" id="archivesListBox" size="3" onchange="enableSelectArchiveBtnFn()"></select>
+        <br />
+        <form id="docTypes">
+            <input type="radio" id="emails" name="type" value="emails" checked/>emails
+            <input type="radio" id="documents" name="type" value="documents" />documents
+        </form>
+        <button id="selectArchiveBtn" disabled onclick='selectArchiveFn()'>Select Archive</button>
+        <br />
+        <p>Press 'Create Model' to create the LDA model:</p>
+        <button id="createModelBtn" disabled  onclick='createModelFn()'>Create Model</button>
+        <br />
+        <p>Press 'Get Number of Topics' to get the number of topics:</p>
+        <button id="getNumberOfTopicsBtn" disabled onclick='getNumTopicsFn()'>Get Number of Topics</button>
+        <p id="numTopicsText">0</p>
+        <p>Enter a topic number and press 'Get Word Cloud' to get the word cloud:</p>
+        <button id="getWordCloudBtn" disabled onclick='getWordCloudFn()'>Get Word Cloud</button>
+        <textarea id="chosenTopicIDText" rows="1" draggable="false">0</textarea>
+        <br />
+        <img id="wordCloudImg" src="" width="800" height="500"/>
+        <br />
+        <p>Press 'Get Topic Distribution' to get the topic distribution:</p>
+        <button id="getTopicDistributionBtn" disabled onclick='getTopicDistributionFn()'>Get Topic Distribution</button>
+        <br />
+        <img id="topicDistributionImg" src="" width="800" height="500" />
+        <br />
+        <p>Enter a topic number and press 'Get Document IDs' to get a list of document IDs:</p>
+        <button id="getDocumentIDsBtn" disabled onclick='getDocumentIDsFn()'>Get Document IDs</button>
+        <textarea id="topicIDForDocumentsText" rows="1" draggable="false">0</textarea>
+        <br />
+        <textarea id="documentIDsText" rows="10" cols="50"></textarea>
+    </body>
+</html>

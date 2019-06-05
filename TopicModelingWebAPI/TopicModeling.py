@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import threading
 import time
 from enum import IntEnum
+import base64
 
 from EmailHelperFunctions import get_text_from_email, split_email_addresses, clean_email
 from MDS import cmdscale
@@ -37,14 +38,14 @@ class DocumentTypeEnum(IntEnum):
     emailType = 1           # 'emails'
     documentType = 2        # 'documents'
 
-class findNumTopicsThread (threading.Thread):
+class createModelThread (threading.Thread):
     def __init__(self, tmo):
         threading.Thread.__init__(self)
         self.tm = tmo
         self.mallet_path = ''
 
     def run(self):
-        print('Starting findNumTopicsThread: {}'.format(datetime.datetime.now()))
+        print('Starting createModelThread: {}'.format(datetime.datetime.now()))
 
         #
         # These functions should set the following lists of strings:
@@ -56,7 +57,7 @@ class findNumTopicsThread (threading.Thread):
         elif self.tm.documentType == DocumentTypeEnum.documentType:
             self.process_documents()
         else:
-            print('Error in findNumTopicsThread, document type not specified')
+            print('Error in createModelThread, document type not specified')
             return False;
 
         # Create the dictionary for the model
@@ -82,7 +83,33 @@ class findNumTopicsThread (threading.Thread):
         self.tm.numberOfTopics = x[np.argmax(coherence_values)]
         print('Optimum number of topics is: {}'.format(self.tm.numberOfTopics))
 
-        print('Finished findNumTopicsThread: {}'.format(datetime.datetime.now()))
+        # Create the dictionary and term matrix used by LDA
+        self.tm.dictionary = corpora.Dictionary(self.tm.text_clean)
+        self.tm.text_term_matrix = [self.tm.dictionary.doc2bow(text) for text in self.tm.text_clean]
+
+        # Buid the Gensim LDA model
+        Lda = gensim.models.ldamodel.LdaModel
+
+        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=30)
+
+        #
+        # Get token count proportion statistics for the plot. Also add topic category to sub_df
+        #
+
+        topic_token_count = [0 for i in range(0,self.tm.numberOfTopics)]
+        topicSeries = []
+
+        for i in range(0,sample_size):
+            assignedTopic = self.assigned_topic(self.get_candidate_topics(i))
+            topic_token_count[assignedTopic] += len(self.tm.text_term_matrix[i])
+            topicSeries.append(assignedTopic)
+
+        self.tm.token_count_proportions = np.array(topic_token_count)/sum(topic_token_count)
+        self.tm.sub_df['topic'] = topicSeries
+
+        self.tm.modelBuilt = True
+
+        print('Finished createModelThread: {}'.format(datetime.datetime.now()))
         return True
 
     def process_emails(self):
@@ -131,6 +158,7 @@ class findNumTopicsThread (threading.Thread):
         ]
 
     def process_documents(self):
+        # TODO
         self.tm.text_clean = []
         self.tm.optimum_text_clean = []
 
@@ -161,11 +189,6 @@ class findNumTopicsThread (threading.Thread):
 
         return model_list, coherence_values
 
-class createModelThread (threading.Thread):
-    def __init__(self, tmo):
-        threading.Thread.__init__(self)
-        self.tm = tmo
-
     def assigned_topic(self, candidateTopics):
         largest = (0,0.0)
         for topic in candidateTopics:
@@ -175,36 +198,6 @@ class createModelThread (threading.Thread):
 
     def get_candidate_topics(self, index):
         return self.tm.ldamodel.get_document_topics(self.tm.text_term_matrix[index])
-
-    def run(self):
-        print('Starting createModelThread: {}'.format(datetime.datetime.now()))
-
-        # Create the dictionary and term matrix used by LDA
-        self.tm.dictionary = corpora.Dictionary(self.tm.text_clean)
-        self.tm.text_term_matrix = [self.tm.dictionary.doc2bow(text) for text in self.tm.text_clean]
-
-        # Buid the Gensim LDA model
-        Lda = gensim.models.ldamodel.LdaModel
-
-        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=30)
-
-        #
-        # Get token count proportion statistics for the plot. Also add topic category to sub_df
-        #
-
-        topic_token_count = [0 for i in range(0,self.tm.numberOfTopics)]
-        topicSeries = []
-
-        for i in range(0,sample_size):
-            assignedTopic = self.assigned_topic(self.get_candidate_topics(i))
-            topic_token_count[assignedTopic] += len(self.tm.text_term_matrix[i])
-            topicSeries.append(assignedTopic)
-
-        self.tm.token_count_proportions = np.array(topic_token_count)/sum(topic_token_count)
-        self.tm.sub_df['topic'] = topicSeries
-
-        self.tm.modelBuilt = True
-        print('Finished createModelThread: {}'.format(datetime.datetime.now()))
 
 class TopicModeling:
     def __init__(self):
@@ -218,7 +211,6 @@ class TopicModeling:
         self.numberOfTopics = 0
         self.ldamodel = None
         self.modelBuilt = False
-        self.findNumTopicsThread_ = None
         self.createModelThread_ = None
 
     def setFileToProcess(self, fileToProcess, documentType):
@@ -237,40 +229,32 @@ class TopicModeling:
         print('getFileToProcess')
         return self.fileToProcess
 
-    def startFindNumberOfTopics(self):
-        print('startFindNumberOfTopics')
-
-        if (self.findNumTopicsThread_ != None) and (self.findNumTopicsThread_.isAlive()):
-            return False
-
-        self.numberOfTopics = 0
-        self.findNumTopicsThread_ = findNumTopicsThread(self)
-        self.findNumTopicsThread_.start()
-
-        return True
-
-    def getNumberOfTopics(self):
-        print('getNumberOfToipcs')
-
-        if (self.findNumTopicsThread_ == None) or (self.findNumTopicsThread_.isAlive()):
-            return False, 0
-
-        return True, self.numberOfTopics
-
     def startBuildingModel(self):
         print('startBuildingModel')
-
-        if self.numberOfTopics == 0:
-            return False
 
         if (self.createModelThread_ != None) and (self.createModelThread_.isAlive()):
             return False
 
+        self.numberOfTopics = 0
         self.modelBuilt = False
+
         self.createModelThread_ = createModelThread(self)
         self.createModelThread_.start()
 
         return True
+
+    def modelNotBuiltAndNotBuilding(self):
+        print('modelNotBuiltAndNotBuilding')
+
+        return (self.createModelThread_== None)
+
+    def getNumberOfTopics(self):
+        print('getNumberOfToipcs')
+
+        if (self.createModelThread_ == None) or (self.createModelThread_.isAlive()):
+            return False, 0
+
+        return True, self.numberOfTopics
 
     def getModelBuilt(self):
         print('getModelBuilt')
@@ -301,7 +285,7 @@ class TopicModeling:
             return False, ''
 
         if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
-            return False, []
+            return False, ''
 
         word_frequencies = self.ldamodel.show_topic(topicNumber, 20)
 
@@ -315,7 +299,10 @@ class TopicModeling:
         filePath = os.path.join('./Temp', 'wordcloud.png')
         plt.savefig(filePath)
 
-        return True, filePath
+        with open(filePath, 'rb') as f:
+            image_read = f.read()
+
+        return True, base64.encodestring(image_read)
 
     def getTopicDistribution(self):
         print('getTopicDistribution')
@@ -365,7 +352,10 @@ class TopicModeling:
         filePath = os.path.join('./Temp', 'topicdistribution.png')
         plt.savefig(filePath)
 
-        return True, filePath
+        with open(filePath, 'rb') as f:
+            image_read = f.read()
+
+        return True, base64.encodestring(image_read)
 
     def getDocIDsForTopic(self, topicNumber):
         print('getDocIDsForTopic')
