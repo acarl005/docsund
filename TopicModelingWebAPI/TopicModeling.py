@@ -287,11 +287,15 @@ class TopicModeling:
         if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
             return False, ''
 
-        word_frequencies = self.ldamodel.show_topic(topicNumber, 20)
+        word_frequencies = self.ldamodel.show_topic(topicNumber, 30)
 
         # Generate a word cloud image
         wordFreqDict = dict(word_frequencies)
         wordcloud = WordCloud().fit_words(wordFreqDict)
+        wordcloud.background_color = 'white'
+
+        plt.clf()
+        plt.figure(figsize=(10,8))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
 
@@ -299,6 +303,7 @@ class TopicModeling:
         filePath = os.path.join('./Temp', 'wordcloud.png')
         plt.savefig(filePath)
 
+        # Return file as a base64 encoded string
         with open(filePath, 'rb') as f:
             image_read = f.read()
 
@@ -336,6 +341,7 @@ class TopicModeling:
         # Save the figure to a file
         #
 
+        plt.clf()
         plt.figure(figsize=(10,8))
         plt.axhline(0, color='gray', alpha=0.5)
         plt.axvline(0, color='gray', alpha=0.5)
@@ -352,6 +358,7 @@ class TopicModeling:
         filePath = os.path.join('./Temp', 'topicdistribution.png')
         plt.savefig(filePath)
 
+        # Return file as a base64 encoded string
         with open(filePath, 'rb') as f:
             image_read = f.read()
 
