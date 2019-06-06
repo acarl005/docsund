@@ -1,0 +1,37 @@
+{
+  "name": "docsund-ui",
+  "version": "0.0.0",
+  "description": "The Interactice Web UI for Docsund",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --experimental-modules server.mjs",
+    "dev": "parcel src/index.html",
+    "build": "rm -rf dist && parcel build --public-url /docsund-ui src/index.html",
+    "publish": "npm run build && node --experimental-modules publish.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=12.x"
+  },
+  "author": "Andrew Carlson <acarl005@g.ucla.edu>",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "express": "^4.17.1",
+    "gh-pages": "^2.0.1",
+    "parcel": "^1.12.3"
+  },
+  "dependencies": {
+    "d3": "^3.5.17",
+    "deepmerge": "^3.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-svg-inline": "^2.1.1",
+    "shared": "^0.2.0",
+    "styled-components": "^4.2.0"
+  }
+}

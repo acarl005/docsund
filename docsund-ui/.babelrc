@@ -1,0 +1,18 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": ["last 2 Chrome versions"]
+      }
+    }]
+  ],
+  "plugins": [
+    [
+      "babel-plugin-styled-components",
+      {
+        "displayName": true
+      }
+    ],
+    "@babel/plugin-proposal-class-properties"
+  ]
+}
