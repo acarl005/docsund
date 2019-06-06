@@ -20,7 +20,7 @@ from wordcloud import WordCloud
 
 
 # Set the random seed for reproducability
-np.random.seed(1)
+random.seed(1)
 
 # Set the sample sizes
 optimum_sample_size = 1000
