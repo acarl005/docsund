@@ -1,3 +1,6 @@
+// Set the URL to the topic modeling web service endpoint
+test_url = 'http://127.0.0.1:5000';
+
 function createNode(element) {
     return document.createElement(element);
 }
@@ -5,8 +8,6 @@ function createNode(element) {
 function append(parent, el) {
     return parent.appendChild(el);
 }
-
-test_url = 'http://127.0.0.1:5000';
 
 window.onload = function () {
     var select = document.getElementById("archivesListBox");
@@ -121,7 +122,11 @@ getNumTopicsFn = function () {
 getWordCloudFn = function () {
     var chosenTopicIDText = document.getElementById('chosenTopicIDText');
 
-    fetch(test_url + '/TM/topics/' + chosenTopicIDText.innerHTML, {
+    // From the perspective of the user, topics range from 1 to #topics
+    var chosenTopicNumber = parseInt(chosenTopicIDText.value, 10);
+    chosenTopicNumber -= 1;
+
+    fetch(test_url + '/TM/topics/' + chosenTopicNumber.toString(), {
         mode: 'cors',
         method: 'GET'
     })
@@ -153,7 +158,11 @@ getTopicDistributionFn = function () {
 getDocumentIDsFn = function () {
     var topicIDForDocumentsText = document.getElementById('topicIDForDocumentsText');
 
-    fetch(test_url + '/TM/topics/' + topicIDForDocumentsText.innerHTML + '/documents', {
+    // From the perspective of the user, topics range from 1 to #topics
+    var chosenTopicNumber = parseInt(topicIDForDocumentsText.value, 10);
+    chosenTopicNumber -= 1;
+
+    fetch(test_url + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
         mode: 'cors',
         method: 'GET'
     })
@@ -161,6 +170,8 @@ getDocumentIDsFn = function () {
     .then(function (data) {
         var documentIDsText = document.getElementById('documentIDsText');
         var documentIDArray = data['docIDs'];
+
+        documentIDsText.innerHTML = '';
 
         documentIDArray.map(function (docID) {
             documentIDsText.innerHTML += docID;

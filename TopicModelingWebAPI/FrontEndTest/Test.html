@@ -22,18 +22,18 @@
         <p>Press 'Get Number of Topics' to get the number of topics:</p>
         <button id="getNumberOfTopicsBtn" disabled onclick='getNumTopicsFn()'>Get Number of Topics</button>
         <p id="numTopicsText">0</p>
-        <p>Enter a topic number and press 'Get Word Cloud' to get the word cloud:</p>
-        <button id="getWordCloudBtn" disabled onclick='getWordCloudFn()'>Get Word Cloud</button>
-        <textarea id="chosenTopicIDText" rows="1" draggable="false">0</textarea>
-        <br />
-        <img id="wordCloudImg" src="" width="800" height="500"/>
-        <br />
         <p>Press 'Get Topic Distribution' to get the topic distribution:</p>
         <button id="getTopicDistributionBtn" disabled onclick='getTopicDistributionFn()'>Get Topic Distribution</button>
         <br />
         <img id="topicDistributionImg" src="" width="800" height="500" />
         <br />
-        <p>Enter a topic number and press 'Get Document IDs' to get a list of document IDs:</p>
+        <p>Enter a topic number (1-#topics) and press 'Get Word Cloud' to get the word cloud:</p>
+        <button id="getWordCloudBtn" disabled onclick='getWordCloudFn()'>Get Word Cloud</button>
+        <textarea id="chosenTopicIDText" rows="1" draggable="false">0</textarea>
+        <br />
+        <img id="wordCloudImg" src="" width="800" height="500"/>
+        <br />
+        <p>Enter a topic number (1-#topics) and press 'Get Document IDs' to get a list of document IDs:</p>
         <button id="getDocumentIDsBtn" disabled onclick='getDocumentIDsFn()'>Get Document IDs</button>
         <textarea id="topicIDForDocumentsText" rows="1" draggable="false">0</textarea>
         <br />
