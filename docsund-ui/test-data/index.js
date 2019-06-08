@@ -37,6 +37,7 @@ export function getNeighbours(id) {
 }
 
 export function getInternalRelationships(existingNodeIds, newNodeIds) {
+  existingNodeIds = [...existingNodeIds, ...newNodeIds]
   const relationships = []
   for (let oldId of existingNodeIds) {
     for (let newId of newNodeIds) {
