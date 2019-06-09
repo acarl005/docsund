@@ -22,9 +22,13 @@ def split_email_addresses(line):
         addrs = None
     return addrs
 
-def clean_email(text):
+def clean_email(text, userStopList):
     stop = set(stopwords.words('english'))
     stop.update(("to","cc","subject","from","sent","http","www","com"))
+
+    if userStopList:
+        stop.update(tuple(userStopList))
+
     exclude = set(string.punctuation) 
     lemma = WordNetLemmatizer()
 

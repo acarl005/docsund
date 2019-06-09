@@ -70,6 +70,27 @@ def GetNumberOfTopics():
     return json_response({'complete': success, 'numberOfTopics': numTopics})
 
 
+@app.route("/TM/topics/<int:num_topics>", methods=["POST"])
+@cross_origin()
+def SetNumberOfTopics(num_topics):
+    success = tm.setNumberOfTopics(num_topics)
+    if not success:
+        return json_response({}, 400)
+    else:
+        return json_response({})
+
+
+@app.route("/TM/stopwords", methods=["POST"])
+@cross_origin()
+def SetStopWords():
+    stopWords = request.form['stopWords']
+    success = tm.setUserStopList(stopWords)
+    if not success:
+        return json_response({}, 400)
+    else:
+        return json_response({})
+
+
 @app.route("/TM/topics/<int:topic_id>", methods=["GET"])
 @cross_origin()
 def GetWordCloudForTopic(topic_id):

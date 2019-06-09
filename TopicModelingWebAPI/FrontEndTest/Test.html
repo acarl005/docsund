@@ -7,18 +7,33 @@
         <script type="text/javascript" src="Script.js"></script>
     </head>
     <body>
-        <p>Select an archive:</p>
-        <select name="archivesListBox" id="archivesListBox" size="3" onchange="enableSelectArchiveBtnFn()"></select>
-        <br />
-        <form id="docTypes">
-            <input type="radio" id="emails" name="type" value="emails" checked/>emails
-            <input type="radio" id="documents" name="type" value="documents" />documents
-        </form>
-        <button id="selectArchiveBtn" disabled onclick='selectArchiveFn()'>Select Archive</button>
-        <br />
-        <p>Press 'Create Model' to create the LDA model:</p>
-        <button id="createModelBtn" disabled  onclick='createModelFn()'>Create Model</button>
-        <br />
+        <div style="border-style:solid;border-width:1px;width:350px">
+            <p>Select an archive:</p>
+            <select name="archivesListBox" id="archivesListBox" size="3" onchange="enableSelectArchiveBtnFn()"></select>
+            <br />
+            <form id="docTypes">
+                <input type="radio" id="emails" name="type" value="emails" checked />emails
+                <input type="radio" id="documents" name="type" value="documents" />documents
+            </form>
+            <button id="selectArchiveBtn" disabled onclick='selectArchiveFn()'>Select Archive</button>
+            <br />
+        </div>
+        <div style="border-style:solid;border-width:1px;width:350px">
+            <p>Press 'Create Model' to create the LDA model:</p>
+            <input type="checkbox" id="setNumTopicsChkBx" onclick="setNumTopicsFn(this)">Specify Number of Topics:<br>
+            <textarea id="setNumTopicsText" rows="1" draggable="false">0</textarea>
+            <br />
+            <input type="checkbox" id="setStopWordsChkBx" onclick="setStopWordsFn(this)">Specify Stop Words:<br>
+            <textarea id="stopWordsText" rows="5" cols="20">please
+thanks
+would
+ect
+hou
+            </textarea>
+            <br />
+            <button id="createModelBtn" disabled onclick='createModelFn()'>Create Model</button>
+            <br />
+        </div>
         <p>Press 'Get Number of Topics' to get the number of topics:</p>
         <button id="getNumberOfTopicsBtn" disabled onclick='getNumTopicsFn()'>Get Number of Topics</button>
         <p id="numTopicsText">0</p>
@@ -31,7 +46,7 @@
         <button id="getWordCloudBtn" disabled onclick='getWordCloudFn()'>Get Word Cloud</button>
         <textarea id="chosenTopicIDText" rows="1" draggable="false">0</textarea>
         <br />
-        <img id="wordCloudImg" src="" width="800" height="500"/>
+        <img id="wordCloudImg" src="" width="800" height="500" />
         <br />
         <p>Enter a topic number (1-#topics) and press 'Get Document IDs' to get a list of document IDs:</p>
         <button id="getDocumentIDsBtn" disabled onclick='getDocumentIDsFn()'>Get Document IDs</button>
