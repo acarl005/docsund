@@ -11,17 +11,20 @@ means that each email is a dictionary with has a single sender and recipient, an
 Change History:
     2019-06-02 - RD - Creation; Collected & added comments to functions I wrote previously that processes the
         sender/receiver fields into a NetworkX graph and loads them into a neo4j database.
+    2019-06-10 - RD - Revision; Added more functions to run the full ETL from Kaggle -> neo4j database
 
 """
 
 
 from collections import Counter, defaultdict
 import csv
+from email.parser import Parser
 from json import JSONEncoder
 import re
 
 import networkx as nx
 import numpy as np
+import pandas as pd
 import requests
 
 csv.field_size_limit(10000000)
@@ -260,7 +263,7 @@ PERSON_LABEL = 'PERSON'
 DEFAULT_N4J_HOSTPATH = 'http://localhost:7474/db/data/'
 
 
-def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('', ''),
+def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('neo4j', 'pizza'),
                       relationship_label=RELATIONSHIP_NAME, node_label=PERSON_LABEL, **kwargs):
     """Batch Loads the NetworkX graph to the Neo4j database using the Neo4j
     REST API endpoint.
@@ -281,7 +284,7 @@ def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('', ''),
     Returns
     =======
     response : requests.Response
-        The respost from the bulk load POST request
+        The response from the bulk load POST request
     """
 
     # Retrieve the batch URL for the Neo4j instance
@@ -291,18 +294,50 @@ def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('', ''),
     batch_url = response.json()['batch']
 
     # Batch load via POST request
-    response = requests.post(batch_url, data=graph_encoded,
+    response = requests.post(batch_url, data=graph_encoded, auth=auth,
                              headers={'content-type': 'application/json; charset=utf-8'} , **kwargs)
 
     return response
 
 
-def parsed_csv_to_neo4j():
+def parsed_csv_to_neo4j(csv_path='parsed_emails.csv'):
     """Function to take the parsed_emails.csv file, transform it into the NetworkX graph, and then load that
     graph into a local neo4j database. For POC use only :)"""
-    email_data = normalize_parsed_email_csv('parsed_emails.csv')
+    email_data = normalize_parsed_email_csv(csv_path)
     relcouns = relationship_counts(email_data)
     relcounts_binned = bin_dict_vals(relcouns)
     relcounts_binned = invert_relationship_lengths(relcounts_binned)
     graph = build_email_network_graph(relcounts_binned)
     load_graph_to_n4j(graph)
+
+
+def parse_email(msg):
+    """Parses a raw email string into a dictionary of email fields - To, From, Subject, Body, Date."""
+    eml_dict = defaultdict(lambda x: None)
+    psr = Parser()
+    parsed_eml = psr.parsestr(msg)
+    eml_dict.update(parsed_eml)
+    eml_dict['Body'] = parsed_eml.get_payload()
+    return eml_dict
+
+
+def parse_raw_kaggle_enron_email_csv(csv_path='emails.csv'):
+    """Parses the raw Enron emails CSV file from the Kaggle page into a list of dictionaries."""
+    df = pd.read_csv(csv_path)
+    msgs = df['message'].tolist()
+    parsed_emails = [parse_email(msg) for msg in msgs]
+    eml_df = pd.DataFrame(parsed_emails)
+    COLS_OF_INTEREST = ['To', 'From', 'Subject', 'Body', 'Date']
+    eml_df = (eml_df.loc[:, COLS_OF_INTEREST]
+                  .dropna())
+    return eml_df
+
+
+def raw_to_neo4j_etl():
+    """Runs the full ETL process from Kaggle CSV to neo4j database. Assumes that the emails.csv file from
+    the Kaggle page is in the same directory as this module. Also assumes that you have neo4j installed and
+    a neo4j server started up with a username of neo4j and a password of pizza."""
+    eml_df = parse_raw_kaggle_enron_email_csv()
+    parsed_emails_path = 'parsed_emails.csv'
+    eml_df.to_csv(parsed_emails_path, index=False)
+    parsed_csv_to_neo4j(parsed_emails_path)
