@@ -66,22 +66,27 @@ class createModelThread (threading.Thread):
         # Create the text_term_matrix
         self.tm.text_term_matrix = [self.tm.dictionary.doc2bow(text) for text in self.tm.optimum_text_clean]
 
-        # Set paths needed by Mallet
-        os.environ.update({'MALLET_HOME': mallet_distribution})
-        self.mallet_path =  mallet_binary
+        #
+        # Automatically determine the number of topics if required
+        #
+        if self.tm.numberOfTopics <= 0:
 
-        # Compute the coherence values using Mallet
-        model_list, coherence_values = self.compute_coherence_values(dictionary=self.tm.dictionary,\
-                                                                     corpus=self.tm.text_term_matrix,\
-                                                                     texts=self.tm.optimum_text_clean,\
-                                                                     limit=35,\
-                                                                     start=5,step=5)
+            # Set paths needed by Mallet
+            os.environ.update({'MALLET_HOME': mallet_distribution})
+            self.mallet_path =  mallet_binary
 
-        # Find the optimal number of topics
-        limit=35; start=5; step=5;
-        x = list(range(start, limit, step))
-        self.tm.numberOfTopics = x[np.argmax(coherence_values)]
-        print('Optimum number of topics is: {}'.format(self.tm.numberOfTopics))
+            # Compute the coherence values using Mallet
+            model_list, coherence_values = self.compute_coherence_values(dictionary=self.tm.dictionary,\
+                                                                         corpus=self.tm.text_term_matrix,\
+                                                                         texts=self.tm.optimum_text_clean,\
+                                                                         limit=35,\
+                                                                         start=5,step=5)
+
+            # Find the optimal number of topics
+            limit=35; start=5; step=5;
+            x = list(range(start, limit, step))
+            self.tm.numberOfTopics = x[np.argmax(coherence_values)]
+            print('Optimum number of topics is: {}'.format(self.tm.numberOfTopics))
 
         # Create the dictionary and term matrix used by LDA
         self.tm.dictionary = corpora.Dictionary(self.tm.text_clean)
@@ -150,7 +155,7 @@ class createModelThread (threading.Thread):
 
         # Set the text_clean to be used to create the LDA model
         for text in self.tm.sub_df['content']:
-            self.tm.text_clean.append(clean_email(text).split())
+            self.tm.text_clean.append(clean_email(text, self.tm.userStopList).split())
 
         # Use a smaller sample to find the coherence values in compute_coherence_values()
         self.tm.optimum_text_clean = [
@@ -212,6 +217,8 @@ class TopicModeling:
         self.ldamodel = None
         self.modelBuilt = False
         self.createModelThread_ = None
+        self.manuallySetNumTopics = False
+        self.userStopList = None
 
     def setFileToProcess(self, fileToProcess, documentType):
         fileToProcess = os.path.join('./UploadedFiles', fileToProcess)
@@ -222,6 +229,7 @@ class TopicModeling:
 
         self.fileToProcess = fileToProcess
         self.documentType = documentType
+        self.createModelThread_ = None
 
         return True
 
@@ -235,7 +243,9 @@ class TopicModeling:
         if (self.createModelThread_ != None) and (self.createModelThread_.isAlive()):
             return False
 
-        self.numberOfTopics = 0
+        if not self.manuallySetNumTopics:
+            self.numberOfTopics = 0
+
         self.modelBuilt = False
 
         self.createModelThread_ = createModelThread(self)
@@ -255,6 +265,27 @@ class TopicModeling:
             return False, 0
 
         return True, self.numberOfTopics
+
+    def setNumberOfTopics(self, numTopics):
+        print('setNumberOfTopics')
+
+        if numTopics > 0:
+            self.manuallySetNumTopics = True
+            self.numberOfTopics = numTopics
+        else:
+            self.manuallySetNumTopics = False
+
+        return True
+
+    def setUserStopList(self, userStopList):
+        print('setUserStopList')
+
+        if len(userStopList) > 0:
+            self.userStopList = userStopList.split()
+        else:
+            self.userStopList = None
+
+        return True
 
     def getModelBuilt(self):
         print('getModelBuilt')
@@ -294,14 +325,14 @@ class TopicModeling:
         wordcloud = WordCloud().fit_words(wordFreqDict)
         wordcloud.background_color = 'white'
 
-        plt.clf()
-        plt.figure(figsize=(10,8))
+        fig = plt.figure(figsize=(10,8))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
 
         # Save the image to a temp folder to be sent by Flask
         filePath = os.path.join('./Temp', 'wordcloud.png')
         plt.savefig(filePath)
+        plt.close(fig)
 
         # Return file as a base64 encoded string
         with open(filePath, 'rb') as f:
@@ -341,8 +372,7 @@ class TopicModeling:
         # Save the figure to a file
         #
 
-        plt.clf()
-        plt.figure(figsize=(10,8))
+        fig = plt.figure(figsize=(10,8))
         plt.axhline(0, color='gray', alpha=0.5)
         plt.axvline(0, color='gray', alpha=0.5)
 
@@ -357,6 +387,7 @@ class TopicModeling:
         # Save the image to a temp folder to be sent by Flask
         filePath = os.path.join('./Temp', 'topicdistribution.png')
         plt.savefig(filePath)
+        plt.close(fig)
 
         # Return file as a base64 encoded string
         with open(filePath, 'rb') as f:

@@ -92,6 +92,49 @@ checkIfModelBuiltFn = function () {
 };
 
 createModelFn = function () {
+    // Number of topics
+    var setNumTopicsChkBx = document.getElementById("setNumTopicsChkBx");
+    var url = test_url + '/TM/topics/';
+
+    if (setNumTopicsChkBx.checked) {
+        var numTopicsText = document.getElementById("setNumTopicsText");
+        url += numTopicsText.value;
+    } else {
+        url += '0';
+    }
+
+    fetch(url, {
+        mode: 'cors',
+        method: 'POST'
+    })
+    .catch(function (error) {
+        console.log(JSON.stringify(error));
+        return;
+    });
+
+    // Stop words
+    var setStopWordsChkBx = document.getElementById("setStopWordsChkBx");
+    var stopWordsText = document.getElementById("stopWordsText");
+    var stopWords = '';
+
+    if (setStopWordsChkBx.checked) {
+        stopWords = stopWordsText.value;
+    }
+
+    var formData = new FormData();
+    formData.append('stopWords', stopWords);
+
+    fetch(test_url + '/TM/stopwords', {
+        mode: 'cors',
+        method: 'POST',
+        body: formData
+    })
+    .catch(function (error) {
+        console.log(JSON.stringify(error));
+        return;
+    });
+
+    // Start building the model
     fetch(test_url + '/TM/ldamodel', {
         mode: 'cors',
         method: 'GET'

@@ -38,6 +38,13 @@ Example:<br>
 /tm/archives/emails2.csv<br>
 Form data: type=emails
 
+**Set the number of topics manually**<br>
+POST	/TM/topics/\<num topics\>
+
+**Set the stop words**<br>
+POST	/TM/stopwords
+Form data: stopWords=['word1','word2',...]
+
 **Build the LDA model. Repeatedly call /tm/ldamodel to find out when it is done. In this case, the JSON response will be: {"modelBuilt": true}**<br>
 GET	/tm/ldamodel<br>
 
