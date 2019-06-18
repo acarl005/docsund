@@ -50,8 +50,10 @@ export default class NeoD3Geometry {
 
   setNodeRadii (nodes) {
     return Array.from(nodes).map(
-      node =>
-        (node.radius = parseFloat(this.style.forNode(node).get('diameter')) / 2)
+      node => {
+        const scaleFactor = node.scaleFactor || 1
+        node.radius = parseFloat(this.style.forNode(node).get('diameter')) / 2 * scaleFactor
+      }
     )
   }
 

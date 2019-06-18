@@ -22,7 +22,6 @@ from email.parser import Parser
 from json import JSONEncoder
 import re
 
-import networkx as nx
 import numpy as np
 import pandas as pd
 import requests
@@ -300,7 +299,7 @@ def load_graph_to_n4j(graph, hostname=DEFAULT_N4J_HOSTPATH, auth=('neo4j', 'pizz
     return response
 
 
-def parsed_csv_to_neo4j(csv_path='parsed_emails.csv'):
+def parsed_csv_to_neo4j(csv_path):
     """Function to take the parsed_emails.csv file, transform it into the NetworkX graph, and then load that
     graph into a local neo4j database. For POC use only :)"""
     email_data = normalize_parsed_email_csv(csv_path)
@@ -321,7 +320,7 @@ def parse_email(msg):
     return eml_dict
 
 
-def parse_raw_kaggle_enron_email_csv(csv_path='emails.csv'):
+def parse_raw_kaggle_enron_email_csv(csv_path):
     """Parses the raw Enron emails CSV file from the Kaggle page into a list of dictionaries."""
     df = pd.read_csv(csv_path)
     msgs = df['message'].tolist()
@@ -333,11 +332,14 @@ def parse_raw_kaggle_enron_email_csv(csv_path='emails.csv'):
     return eml_df
 
 
-def raw_to_neo4j_etl():
+def raw_to_neo4j_etl(csv_path='emails.csv', parsed_emails_path='parsed_emails.csv'):
     """Runs the full ETL process from Kaggle CSV to neo4j database. Assumes that the emails.csv file from
     the Kaggle page is in the same directory as this module. Also assumes that you have neo4j installed and
     a neo4j server started up with a username of neo4j and a password of pizza."""
-    eml_df = parse_raw_kaggle_enron_email_csv()
-    parsed_emails_path = 'parsed_emails.csv'
+    eml_df = parse_raw_kaggle_enron_email_csv(csv_path)
     eml_df.to_csv(parsed_emails_path, index=False)
     parsed_csv_to_neo4j(parsed_emails_path)
+
+
+if __name__ == "__main__":
+    raw_to_neo4j_etl()

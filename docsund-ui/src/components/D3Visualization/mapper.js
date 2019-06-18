@@ -18,7 +18,7 @@ export function createGraph (nodes, relationships) {
 
 export function mapNodes (nodes) {
   return nodes.map(
-    node => new Node(node.id, node.labels, mapProperties(node.properties))
+    node => new Node(node.id, node.labels, mapProperties(node.properties), node.scaleFactor)
   )
 }
 
