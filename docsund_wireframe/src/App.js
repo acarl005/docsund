@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Tabs, Row, Col, Menu, Icon, Input, List } from 'antd';
 import './App.css';
+import TopicModelingComponent from "./TopicModelingComponent.js"
 
 const { TabPane } = Tabs;
 
@@ -71,7 +72,7 @@ class App extends Component {
                                 <img src={ require("./images/entity_graph.PNG") } alt=""/>
                             </TabPane>
                             <TabPane tab="Topic Explorer" key="2">
-                                <img src={ require("./images/topics_plot.png") } alt=""/>
+                                <TopicModelingComponent/>
                             </TabPane>
                             <TabPane tab="Money Explorer" key="3">
                                 <img src={ require("./images/dollarsign.jpg") } alt=""/>
