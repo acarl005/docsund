@@ -1,21 +1,3 @@
-"""
-graph.py
-by Ryan Delgado
-
-These are functions for turning parsed email data into a network graph based on the senders and recipients. "Parsed"
-means that each email is a dictionary with has a single sender and recipient, and has at least these three fields:
-    EmailID - unique identifier for an email
-    From - email sender
-    To - email recipient
-
-Change History:
-    2019-06-02 - RD - Creation; Collected & added comments to functions I wrote previously that processes the
-        sender/receiver fields into a NetworkX graph and loads them into a neo4j database.
-    2019-06-10 - RD - Revision; Added more functions to run the full ETL from Kaggle -> neo4j database
-
-"""
-
-
 from collections import Counter, defaultdict
 import csv
 from email.parser import Parser
