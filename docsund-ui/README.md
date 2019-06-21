@@ -12,3 +12,10 @@ visit http://localhost:1234 in web browser
 
 To get the entity explorer to show, make sure the entities API and Neo4J are running.
 For topic modeling, the topic modeling API needs to be running.
+
+## Production Setup
+
+```sh
+npm run build
+npm start
+```
