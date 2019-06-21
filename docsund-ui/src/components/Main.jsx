@@ -1,5 +1,9 @@
 import qs from "querystring"
 import React, { Component } from "react"
+import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
+import TopicModelingComponent from "./TopicModelingComponent"
+const { Header, Content } = Layout
+const { TabPane } = Tabs
 
 import Explorer from "./D3Visualization"
 import {
@@ -19,6 +23,14 @@ function computeScaleFactor(node) {
   }
 }
 
+const data = [
+  'Search Result 1',
+  'Search Result 2',
+  'Search Result 3',
+  'Search Result 4',
+  'Search Result 5',
+]
+
 
 export default class Main extends Component {
   state = {
@@ -27,7 +39,7 @@ export default class Main extends Component {
   }
 
   async componentDidMount() {
-    const response = await fetch(`http://localhost:5000/person/15`)
+    const response = await fetch(`http://localhost:5000/person/36290`)
       .then(res => res.json())
     computeScaleFactor(response)
     this.setState({
@@ -107,17 +119,76 @@ export default class Main extends Component {
       />
     }
     return (
-      <div className="container">
-        <StyledForm onSubmit={this.handleSearch.bind(this)}>
-          <AddonContainer>
-            <AddonLeft><i className="fas fa-search"></i></AddonLeft>
-            <StyledInput name="searchInput" />
-          </AddonContainer>
-        </StyledForm>
-        <div style={{ height: "600px" }}>
-          { maybeExplorer }
-        </div>
-      </div>
+      <Layout>
+        <Header className="header">
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            defaultSelectedKeys={['3']}
+            style={{ lineHeight: '64px', marginBottom: '64px' }}
+          >
+            <Menu.Item key="1">Home</Menu.Item>
+            <Menu.Item key="2">About</Menu.Item>
+            <Menu.Item key="3">Enron Emails</Menu.Item>
+            <Menu.Item key="4">Sony Emails</Menu.Item>
+          </Menu>
+        </Header>
+
+        <Content>
+          <Row>
+            <Col span={18} offset={3}>
+              <div id="searchinput" style={{marginBottom: '16px', marginTop: '30px'}}>
+                <Input addonAfter={<Icon type="search" />} placeholder="Type a search query against the emails..." />
+              </div>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={18} offset={3}>
+              <div id="searchresults" style={{marginBottom: '64px'}}>
+                <List
+                  bordered
+                  dataSource={data}
+                  renderItem={item => (
+                    <List.Item>
+                      {item}
+                    </List.Item>
+                  )}
+                />
+              </div>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={18} offset={3}>
+              <div id="explorer">
+                <Tabs style={{height: '800px', width: '1265px', border: '1px solid grey', borderRadius: '10px'}} type="card">
+                  <TabPane tab="Entity Explorer" key="1">
+                    <StyledForm onSubmit={this.handleSearch.bind(this)}>
+                      <AddonContainer>
+                        <AddonLeft><i className="fas fa-search"></i></AddonLeft>
+                        <StyledInput name="searchInput" />
+                      </AddonContainer>
+                    </StyledForm>
+                    <div style={{ height: "600px" }}>
+                      { maybeExplorer }
+                    </div>
+                  </TabPane>
+                  <TabPane tab="Topic Explorer" key="2">
+                    <TopicModelingComponent/>
+                  </TabPane>
+                  <TabPane tab="Money Explorer" key="3">
+                    <img src={ require("../../assets/dollarsign.jpg") } alt=""/>
+                  </TabPane>
+                  <TabPane tab="Communication Explorer" key="4">
+                    Hey.
+                  </TabPane>
+                </Tabs>
+              </div>
+            </Col>
+          </Row>
+        </Content>
+      </Layout>
     )
   }
 }
