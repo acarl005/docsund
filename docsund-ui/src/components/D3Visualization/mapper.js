@@ -31,7 +31,8 @@ export function mapRelationships (relationships, graph) {
       source,
       target,
       rel.type,
-      mapProperties(rel.properties)
+      mapProperties(rel.properties),
+      rel.scaleFactor
     )
   })
 }

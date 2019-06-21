@@ -14,13 +14,17 @@ import {
 } from "./styled"
 
 
-function computeScaleFactor(node) {
+function computeNodeScaleFactor(node) {
   const messages = node.properties.incoming + node.properties.outgoing
   if (messages <= 1000) {
     node.scaleFactor = 1
   } else {
     node.scaleFactor = 1 + ((messages - 1000) / 1000) ** 0.3
   }
+}
+
+function computeRelationshipScaleFactor(relationship) {
+  relationship.scaleFactor = relationship.properties.count ** 0.4
 }
 
 const data = [
@@ -41,7 +45,7 @@ export default class Main extends Component {
   async componentDidMount() {
     const response = await fetch(`http://localhost:5000/person/36290`)
       .then(res => res.json())
-    computeScaleFactor(response)
+    computeNodeScaleFactor(response)
     this.setState({
       initialNodes: [response]
     })
@@ -52,7 +56,10 @@ export default class Main extends Component {
       .then(res => res.json())
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
-      computeScaleFactor(neighbour)
+      computeNodeScaleFactor(neighbour)
+    }
+    for (let relationship of relationships) {
+      computeRelationshipScaleFactor(relationship)
     }
 
     this.autoCompleteRelationships(this.graph._nodes, neighbours)
@@ -121,6 +128,13 @@ export default class Main extends Component {
     return (
       <Layout>
         <Header className="header">
+          <div className="logo" style={{
+              marginRight: "30px",
+              float: "left",
+              width: "40px"
+            }}>
+            <img src={ require("../../assets/logo.png") } style={{ width: "100%" }} />
+          </div>
           <Menu
             theme="dark"
             mode="horizontal"

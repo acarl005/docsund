@@ -98,8 +98,8 @@ export default class Explorer extends Component {
         }
         callback(null, { nodes: nodes, relationships: result.relationships })
       },
-      () => {
-        callback(null, { nodes: [], relationships: [] })
+      err => {
+        callback(err, { nodes: [], relationships: [] })
       }
     )
   }

@@ -21,12 +21,13 @@
 export default class Relationship {
   isNode = false
   isRelationship = true
-  constructor (id, source, target, type, properties) {
+  constructor (id, source, target, type, properties, scaleFactor = 1) {
     this.id = id
     this.source = source
     this.target = target
     this.type = type
     this.propertyMap = properties
+    this.scaleFactor = scaleFactor
     this.propertyList = (() => {
       const result = []
       for (let key of Object.keys(this.propertyMap || {})) {

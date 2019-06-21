@@ -111,7 +111,10 @@ export class GraphEventHandler {
       err,
       { nodes, relationships }
     ) {
-      if (err) return
+      if (err) {
+        console.error(err)
+        return
+      }
       graph.addExpandedNodes(d, mapNodes(nodes))
       graph.addRelationships(mapRelationships(relationships, graph))
       graphView.update()

@@ -54,6 +54,7 @@ export class GrassEditor extends Component {
   }
 
   updateStyle (selector, styleProp) {
+    console.log({ selector, styleProp })
     this.graphStyle.changeForSelector(selector, styleProp)
     this.props.update(this.graphStyle)
   }
