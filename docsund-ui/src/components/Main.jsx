@@ -10,6 +10,16 @@ import {
 } from "./styled"
 
 
+function computeScaleFactor(node) {
+  const messages = node.properties.incoming + node.properties.outgoing
+  if (messages <= 1000) {
+    node.scaleFactor = 1
+  } else {
+    node.scaleFactor = 1 + ((messages - 1000) / 1000) ** 0.3
+  }
+}
+
+
 export default class Main extends Component {
   state = {
     searchQuery: "",
@@ -19,6 +29,7 @@ export default class Main extends Component {
   async componentDidMount() {
     const response = await fetch(`http://localhost:5000/person/15`)
       .then(res => res.json())
+    computeScaleFactor(response)
     this.setState({
       initialNodes: [response]
     })
@@ -28,6 +39,9 @@ export default class Main extends Component {
     const response = await fetch(`http://localhost:5000/neighbours/${id}`)
       .then(res => res.json())
     const { neighbours, relationships } = response
+    for (let neighbour of neighbours) {
+      computeScaleFactor(neighbour)
+    }
 
     this.autoCompleteRelationships(this.graph._nodes, neighbours)
 

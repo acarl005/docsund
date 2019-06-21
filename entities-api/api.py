@@ -57,10 +57,10 @@ def find_person(id):
 def get_neighbours(id):
     with driver.session() as sesh:
         query = sesh.run("""
-            MATCH (center:Person)-[e:EMAILS_WITH]-(neighbours:Person)
+            MATCH (center:Person)-[e:EMAILS_TO]-(neighbours:Person)
             WHERE ID(center) = $id
             RETURN neighbours, e
-            ORDER BY e.length DESC
+            ORDER BY e.count DESC
             LIMIT 10
         """, id=int(id))
         results = query.values()
