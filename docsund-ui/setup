@@ -1,9 +1,0 @@
-https://hub.docker.com/_/neo4j/
-
-docker run --publish=7474:7474 --publish=7687:7687 --name neo4j --volume=$HOME/neo4j/data:/data neo4j:latest
-
-connect to localhost:7687 using user/pass neo4j/neo4j
-
-visit localhost:7474 in browser
-go thru movie graph tutorial to create the graph, then run this query:
-MATCH (tom {name: "Tom Hanks"}) RETURN tom
