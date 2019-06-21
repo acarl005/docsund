@@ -1,3 +1,4 @@
+# this path is only valid for a MacOS installation via Homebrew
 rm -r /usr/local/var/neo4j/data/databases/docsund
 
 neo4j-admin import --database docsund \
