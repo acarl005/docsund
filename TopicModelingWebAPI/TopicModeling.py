@@ -9,6 +9,8 @@ import time
 from enum import IntEnum
 import base64
 
+from neo4j import GraphDatabase
+
 from EmailHelperFunctions import get_text_from_email, split_email_addresses, clean_email
 from MDS import cmdscale
 
@@ -18,6 +20,10 @@ from gensim.models import CoherenceModel
 
 from wordcloud import WordCloud
 
+# Credentials for Neo4j database	# TODO: move to a config file
+neo_user = 'neo4j'
+neo_pass = 'password'
+neo_url  = 'bolt://localhost:7687'
 
 # Set the random seed for reproducability
 random.seed(1)
@@ -26,19 +32,22 @@ random.seed(1)
 optimum_sample_size = 1000
 sample_size         = 10000     # TODO: this assumes that there are at least 10000 documents in the corpus
 
+# Number of words to include in word cloud
+number_of_topic_words = 30
+
 # Download File: http://mallet.cs.umass.edu/dist/mallet-2.0.8.zip
 # Mallet is Java based, so make sure Java is installed
 
 # Set the paths to Mallet
-mallet_distribution = 'F:/W210/Prototypes/TopicDemo/mallet-2.0.8/'
-mallet_binary = 'F:/W210/Prototypes/TopicDemo/mallet-2.0.8/bin/mallet'
+mallet_distribution = '/home/matt/W210/mallet-2.0.8'
+mallet_binary = '/home/matt/W210/mallet-2.0.8/bin/mallet'
 
 class DocumentTypeEnum(IntEnum):
     unknownType = 0
     emailType = 1           # 'emails'
     documentType = 2        # 'documents'
 
-class createModelThread (threading.Thread):
+class createModelThread(threading.Thread):
     def __init__(self, tmo):
         threading.Thread.__init__(self)
         self.tm = tmo
@@ -58,7 +67,7 @@ class createModelThread (threading.Thread):
             self.process_documents()
         else:
             print('Error in createModelThread, document type not specified')
-            return False;
+            return False
 
         # Create the dictionary for the model
         self.tm.dictionary = corpora.Dictionary(self.tm.optimum_text_clean)
@@ -73,7 +82,7 @@ class createModelThread (threading.Thread):
 
             # Set paths needed by Mallet
             os.environ.update({'MALLET_HOME': mallet_distribution})
-            self.mallet_path =  mallet_binary
+            self.mallet_path = mallet_binary
 
             # Compute the coherence values using Mallet
             model_list, coherence_values = self.compute_coherence_values(dictionary=self.tm.dictionary,\
@@ -83,7 +92,9 @@ class createModelThread (threading.Thread):
                                                                          start=5,step=5)
 
             # Find the optimal number of topics
-            limit=35; start=5; step=5;
+            limit = 35
+            start = 5
+            step = 5
             x = list(range(start, limit, step))
             self.tm.numberOfTopics = x[np.argmax(coherence_values)]
             print('Optimum number of topics is: {}'.format(self.tm.numberOfTopics))
@@ -98,9 +109,9 @@ class createModelThread (threading.Thread):
         self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=30)
 
         #
-        # Get token count proportion statistics for the plot. Also add topic category to sub_df
+        # Get token count proportion statistics for the plot.  Also add topic
+        # category to sub_df
         #
-
         topic_token_count = [0 for i in range(0,self.tm.numberOfTopics)]
         topicSeries = []
 
@@ -109,7 +120,7 @@ class createModelThread (threading.Thread):
             topic_token_count[assignedTopic] += len(self.tm.text_term_matrix[i])
             topicSeries.append(assignedTopic)
 
-        self.tm.token_count_proportions = np.array(topic_token_count)/sum(topic_token_count)
+        self.tm.token_count_proportions = np.array(topic_token_count) / sum(topic_token_count)
         self.tm.sub_df['topic'] = topicSeries
 
         self.tm.modelBuilt = True
@@ -118,46 +129,53 @@ class createModelThread (threading.Thread):
         return True
 
     def process_emails(self):
-        # Read emails from the .csv file
-        emails_df = pd.read_csv(self.tm.fileToProcess)
+        global sample_size
+        global optimum_sample_size
+
+        driver = GraphDatabase.driver(neo_url, auth=(neo_user, neo_pass))
+
+        emails_df = pd.DataFrame(columns=['ID','Date','Message'])
+
+        # Read emails from the Neo4j database
+        with driver.session() as sesh:
+            query = sesh.run("""
+            MATCH(e:Email) return e.emailId, e.date, e.body
+            """)
+
+            for id_, date, message in query:
+                emails_df = emails_df.append({'ID': int(id_), 'Date': pd.to_datetime(str(date)), 'Message': message}, ignore_index=True)
 
         # Parse the emails into a list email objects
-        messages = list(map(email.message_from_string, emails_df['message']))
-        emails_df.drop('message', axis=1, inplace=True)
-
-        # Get fields from parsed email objects
-        keys = messages[0].keys()
-        for key in keys:
-            emails_df[key] = [doc[key] for doc in messages]
+        messages = list(map(email.message_from_string, emails_df['Message']))
 
         # Parse content from emails
         emails_df['content'] = list(map(get_text_from_email, messages))
+        del messages
+        emails_df = emails_df.drop(['Message'], axis=1)
 
         # Remove emails that are HTML
-        emails_df = emails_df[ (emails_df['content'].str.lower()).str.find("<head>") == -1 ]
+        emails_df = emails_df[(emails_df['content'].str.lower()).str.find("<head>") == -1]
 
-        # Split multiple email addresses
-        emails_df['From'] = emails_df['From'].map(split_email_addresses)
-        emails_df['To']   = emails_df['To'].map(split_email_addresses)
+        # Sample emails for topic modeling
 
-        # Extract the root of 'file' as 'user'
-        emails_df['user'] = emails_df['file'].map(lambda x:x.split('/')[0])
+        if sample_size > len(emails_df):
 
-        del messages
+            # In case the hard coded sample size is greater than the number of
+            # emails, then just use the number of emails
+            sample_size = len(emails_df)
 
-        emails_df = emails_df.drop(['file', 'Mime-Version', 'Content-Type', 'Content-Transfer-Encoding'], axis=1)
+            # Use 10% of the sample size when determining the optimal number of
+            # topics
+            optimum_sample_size = round(sample_size * 0.1)
 
-        # Parse datetime
-        emails_df['Date'] = pd.to_datetime(emails_df['Date'], infer_datetime_format=True)
-        emails_df = emails_df[['Message-ID', 'From', 'To', 'Date','content']].dropna()
-        emails_df = emails_df.loc[emails_df['To'].map(len) == 1]
         self.tm.sub_df = emails_df.sample(sample_size, random_state=1)
 
         # Set the text_clean to be used to create the LDA model
         for text in self.tm.sub_df['content']:
             self.tm.text_clean.append(clean_email(text, self.tm.userStopList).split())
 
-        # Use a smaller sample to find the coherence values in compute_coherence_values()
+        # Use a smaller sample to find the coherence values in
+        # compute_coherence_values()
         self.tm.optimum_text_clean = [
             self.tm.text_clean[i] for i in random.sample(range(len(self.tm.text_clean)), optimum_sample_size)
         ]
@@ -206,8 +224,7 @@ class createModelThread (threading.Thread):
 
 class TopicModeling:
     def __init__(self):
-        self.fileToProcess = ''
-        self.documentType = DocumentTypeEnum.unknownType
+        self.documentType = DocumentTypeEnum.emailType		# TODO: Email processing by default
         self.sub_df = None
         self.dictionary = None
         self.text_term_matrix = None
@@ -220,27 +237,10 @@ class TopicModeling:
         self.manuallySetNumTopics = False
         self.userStopList = None
 
-    def setFileToProcess(self, fileToProcess, documentType):
-        fileToProcess = os.path.join('./UploadedFiles', fileToProcess)
-        print('setFileToProcess: {}'.format(fileToProcess))
-
-        if not os.path.isfile(fileToProcess):
-            return False
-
-        self.fileToProcess = fileToProcess
-        self.documentType = documentType
-        self.createModelThread_ = None
-
-        return True
-
-    def getFileToProcess(self):
-        print('getFileToProcess')
-        return self.fileToProcess
-
     def startBuildingModel(self):
         print('startBuildingModel')
 
-        if (self.createModelThread_ != None) and (self.createModelThread_.isAlive()):
+        if self.modelBuilding():
             return False
 
         if not self.manuallySetNumTopics:
@@ -253,15 +253,10 @@ class TopicModeling:
 
         return True
 
-    def modelNotBuiltAndNotBuilding(self):
-        print('modelNotBuiltAndNotBuilding')
-
-        return (self.createModelThread_== None)
-
     def getNumberOfTopics(self):
         print('getNumberOfToipcs')
 
-        if (self.createModelThread_ == None) or (self.createModelThread_.isAlive()):
+        if not self.modelBuilt:
             return False, 0
 
         return True, self.numberOfTopics
@@ -287,11 +282,19 @@ class TopicModeling:
 
         return True
 
+    def modelBuilding(self):
+        print('modelBuilding')
+
+        return ((self.createModelThread_ != None) and (self.createModelThread_.isAlive()))
+
     def getModelBuilt(self):
         print('getModelBuilt')
 
-        if (self.createModelThread_ == None) or (self.createModelThread_.isAlive()):
+        if (self.modelBuilding()):
             return False
+        else:
+            # Reset to None
+            self.createModelThread_ = None
 
         return self.modelBuilt
 
@@ -304,7 +307,7 @@ class TopicModeling:
         if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
             return False, []
 
-        word_frequencies = self.ldamodel.show_topic(topicNumber, 20)
+        word_frequencies = self.ldamodel.show_topic(topicNumber, number_of_topic_words)
         words = [word_pair[0] for word_pair in word_frequencies]
 
         return True, words
@@ -318,7 +321,7 @@ class TopicModeling:
         if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
             return False, ''
 
-        word_frequencies = self.ldamodel.show_topic(topicNumber, 30)
+        word_frequencies = self.ldamodel.show_topic(topicNumber, number_of_topic_words)
 
         # Generate a word cloud image
         wordFreqDict = dict(word_frequencies)
@@ -376,13 +379,14 @@ class TopicModeling:
         plt.axhline(0, color='gray', alpha=0.5)
         plt.axvline(0, color='gray', alpha=0.5)
 
-        # Marker sizes are based on points, and also note that the radius goes up by the n^0.5 of the value for the marker
-        marker_sizes = [ (proportion*100*500) for proportion in self.token_count_proportions]
+        # Marker sizes are based on points, and also note that the radius goes
+        # up by the n^0.5 of the value for the marker
+        marker_sizes = [ (proportion * 100 * 500) for proportion in self.token_count_proportions]
 
         plt.scatter(Y[:,0], -Y[:,1], s=marker_sizes, alpha=0.5, edgecolors='black')
 
         for i in range(0,len(topics)):
-            plt.text(Y[i,0], -Y[i,1], str(i+1), fontsize=9)
+            plt.text(Y[i,0], -Y[i,1], str(i + 1), fontsize=9)
 
         # Save the image to a temp folder to be sent by Flask
         filePath = os.path.join('./Temp', 'topicdistribution.png')
@@ -405,7 +409,7 @@ class TopicModeling:
         messageIDs = self.sub_df[self.sub_df['topic'] == topicNumber]
 
         if self.documentType == DocumentTypeEnum.emailType:
-            return True, messageIDs['Message-ID'].tolist()
+            return True, messageIDs['ID'].tolist()
         else:
             # TODO: return some sort of index for regular documents
             return True, []
