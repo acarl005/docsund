@@ -1,6 +1,7 @@
 import qs from "querystring"
 import React, { Component } from "react"
 import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
+import EmailViewer from "./EmailViewer"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
@@ -35,24 +36,31 @@ const data = [
   'Search Result 5',
 ]
 
+const API_HOST = '10.0.0.21'
 
 export default class Main extends Component {
   state = {
     searchQuery: "",
-    initialNodes: []
+    initialNodes: [],
+    modalEmailsBetween: [36290, 64858]
   }
 
   async componentDidMount() {
-    const response = await fetch(`http://localhost:5000/person/36290`)
-      .then(res => res.json())
-    computeNodeScaleFactor(response)
+    const userNode = await this.getUserNode(36290)
     this.setState({
-      initialNodes: [response]
+      initialNodes: [userNode],
     })
   }
 
+  async getUserNode(id) {
+    const response = await fetch(`http://${API_HOST}:5000/person/${id}`)
+      .then(res => res.json())
+    computeNodeScaleFactor(response)
+    return response
+  }
+
   async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetch(`http://localhost:5000/neighbours/${id}`)
+    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}`)
       .then(res => res.json())
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
@@ -79,19 +87,19 @@ export default class Main extends Component {
   }
 
   async getInternalRelationships(existingNodeIds, newNodeIds) {
-    const url = "http://localhost:5000/internal_relationships?" + qs.stringify({
+    const url = `http://${API_HOST}:5000/internal_relationships?` + qs.stringify({
       existing_ids: existingNodeIds.join(","),
       new_ids: newNodeIds.join(",")
     })
     const response = await fetch(url)
       .then(res => res.json())
-    return response 
+    return response
   }
 
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.elements.searchInput.value.toLowerCase()
-    const searchResults = await fetch("http://localhost:5000/search?" + qs.stringify({
+    const searchResults = await fetch(`http://${API_HOST}:5000/search?` + qs.stringify({
       q: searchQuery
     }))
       .then(res => res.json())
@@ -127,6 +135,10 @@ export default class Main extends Component {
     }
     return (
       <Layout>
+        <EmailViewer
+          toUserId={this.state.modalEmailsBetween[0]}
+          fromUserId={this.state.modalEmailsBetween[1]}
+        />
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
