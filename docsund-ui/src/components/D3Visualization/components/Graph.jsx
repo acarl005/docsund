@@ -2,9 +2,7 @@ import React, { Component } from 'react'
 import { createGraph, mapRelationships, getGraphStats } from '../mapper'
 import { GraphEventHandler } from '../GraphEventHandler'
 import '../lib/visualization/index'
-//import { dim } from 'browser-styles/constants'
 import { StyledZoomHolder, StyledSvgWrapper, StyledZoomButton } from './styled'
-//import { ZoomInIcon, ZoomOutIcon } from 'browser-components/icons/Icons'
 import graphView from '../lib/visualization/components/graphView'
 
 const dim = {
@@ -77,7 +75,8 @@ export class GraphComponent extends Component {
         this.svgElement,
         measureSize,
         this.graph,
-        this.props.graphStyle
+        this.props.graphStyle,
+        this.props.onRelDblClick
       )
       this.graphEH = new GraphEventHandler(
         this.graph,

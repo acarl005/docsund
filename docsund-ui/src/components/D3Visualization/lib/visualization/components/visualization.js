@@ -24,7 +24,7 @@ import * as vizRenderers from '../renders/init'
 import { menu as menuRenderer } from '../renders/menu'
 import vizClickHandler from '../utils/clickHandler'
 
-const vizFn = function (el, measureSize, graph, layout, style) {
+const vizFn = function (el, measureSize, graph, layout, style, onRelDblClick) {
   const viz = { style }
 
   const root = d3.select(el)
@@ -283,6 +283,7 @@ const vizFn = function (el, measureSize, graph, layout, style) {
       .append('g')
       .attr('class', 'relationship')
       .on('mousedown', onRelationshipClick)
+      .on('dblclick', onRelDblClick)
       .on('mouseover', onRelMouseOver)
       .on('mouseout', onRelMouseOut)
 

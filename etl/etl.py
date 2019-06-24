@@ -1,7 +1,6 @@
 import re
 from itertools import count
 from email.parser import Parser
-from collections import defaultdict
 from dateutil.parser import parse
 from pytz import timezone
 
@@ -11,7 +10,7 @@ import pandas as pd
 
 def parse_email(msg):
     """Parses a raw email string into a dictionary of email fields - To, From, Subject, Body, Date."""
-    eml_dict = defaultdict(lambda _: None)
+    eml_dict = {}
     psr = Parser()
     parsed_eml = psr.parsestr(msg)
     eml_dict.update(parsed_eml)
@@ -22,10 +21,9 @@ def parse_email(msg):
 def parse_raw_kaggle_enron_email_csv(csv_path):
     """Parses the raw Enron emails CSV file from the Kaggle page into a list of dictionaries."""
     df = pd.read_csv(csv_path)
-    msgs = df['message'].tolist()
-    parsed_emails = [parse_email(msg) for msg in msgs]
-    eml_df = pd.DataFrame(parsed_emails)
-    cols_of_interest = ['To', 'From', 'Subject', 'Body', 'Date']
+    parsed_emails = df.message.apply(parse_email)
+    eml_df = pd.DataFrame(parsed_emails.tolist())
+    cols_of_interest = ['Message-ID', 'To', 'From', 'Subject', 'Body', 'Date']
     return eml_df.loc[:, cols_of_interest].dropna()
 
 
@@ -46,7 +44,7 @@ def kaggle_to_neo4j_etl(csv_path='emails.csv'):
     email_raw_df = parse_raw_kaggle_enron_email_csv(csv_path)
 
     email_df = pd.DataFrame({
-        "id": email_raw_df.To.apply(lambda _: next(global_id_counter)),
+        "id": email_raw_df["Message-ID"].str.extract(r'<\d+\.(\d+)\.JavaMail.evans@thyme>')[0],
         "to": email_raw_df.To.apply(lambda s: list(set(re.split(r',\s*', re.sub(r'\n\t', '', s))))),
         "from_": email_raw_df.From,
         "subject": email_raw_df.Subject.apply(lambda s: escape_backslashes(s.strip())),

@@ -39,7 +39,8 @@ const data = [
 export default class Main extends Component {
   state = {
     searchQuery: "",
-    initialNodes: []
+    initialNodes: [],
+    modalEmailsBetween: null
   }
 
   async componentDidMount() {
@@ -101,6 +102,11 @@ export default class Main extends Component {
     })
   }
 
+  onRelDblClick(relationship) {
+    const ids = [relationship.source.id, relationship.target.id]
+    this.setState({ modalEmailsBetween: ids })
+  }
+
   setGraph (graph) {
     this.graph = graph
     this.autoCompleteRelationships([], this.graph._nodes)
@@ -123,6 +129,7 @@ export default class Main extends Component {
           this.autoCompleteCallback = callback
         }}
         setGraph={this.setGraph.bind(this)}
+        onRelDblClick={this.onRelDblClick.bind(this)}
       />
     }
     return (
@@ -176,7 +183,7 @@ export default class Main extends Component {
           <Row>
             <Col span={18} offset={3}>
               <div id="explorer">
-                <Tabs style={{height: '800px', width: '1265px', border: '1px solid grey', borderRadius: '10px'}} type="card">
+                <Tabs style={{border: '1px solid grey', borderRadius: '10px'}} type="card">
                   <TabPane tab="Entity Explorer" key="1">
                     <StyledForm onSubmit={this.handleSearch.bind(this)}>
                       <AddonContainer>
