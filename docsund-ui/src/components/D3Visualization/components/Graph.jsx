@@ -97,7 +97,8 @@ export class GraphComponent extends Component {
         measureSize,
         this.graph,
         this.props.graphStyle,
-        this.props.onRelDblClick
+        this.props.onRelDblClick,
+        this.props.onNodeDblClick
       )
       this.graphEH = new GraphEventHandler(
         this.graph,

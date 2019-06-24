@@ -3,6 +3,7 @@ import React, { Component } from "react"
 import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
 import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
+import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
@@ -115,6 +116,11 @@ export default class Main extends Component {
     appStore.toggleModal('email')
   }
 
+  async onNodeDblClick(node) {
+    await appStore.getPersonDetails(node.id)
+    appStore.toggleModal('personDetails')
+  }
+
   setGraph (graph) {
     this.graph = graph
     this.autoCompleteRelationships([], this.graph._nodes)
@@ -138,10 +144,12 @@ export default class Main extends Component {
         }}
         setGraph={this.setGraph.bind(this)}
         onRelDblClick={this.onRelDblClick.bind(this)}
+        onNodeDblClick={this.onNodeDblClick.bind(this)}
       />
     }
     return (
       <Layout>
+        <PersonDetailsModal />
         <EmailModal />
         <Header className="header">
           <div className="logo" style={{

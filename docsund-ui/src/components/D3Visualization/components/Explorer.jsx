@@ -235,6 +235,7 @@ export default class Explorer extends Component {
           getAutoCompleteCallback={this.props.getAutoCompleteCallback}
           setGraph={this.props.setGraph}
           onRelDblClick={this.props.onRelDblClick}
+          onNodeDblClick={this.props.onNodeDblClick}
         />
         <InspectorComponent
           fullscreen={this.props.fullscreen}

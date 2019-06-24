@@ -25,7 +25,7 @@ import * as vizRenderers from '../renders/init'
 import { menu as menuRenderer } from '../renders/menu'
 import vizClickHandler from '../utils/clickHandler'
 
-const vizFn = function (el, measureSize, graph, layout, style, onRelDblClick) {
+const vizFn = function (el, measureSize, graph, layout, style, onRelDblClick, onNodeDblClick) {
   const viz = { style }
 
   const root = d3.select(el)
@@ -62,7 +62,7 @@ const vizFn = function (el, measureSize, graph, layout, style, onRelDblClick) {
     return viz.trigger('nodeClicked', node)
   }
 
-  const onNodeDblClick = node => viz.trigger('nodeDblClicked', node)
+  onNodeDblClick = onNodeDblClick || (node => viz.trigger('nodeDblClicked', node))
 
   const onNodeDragToggle = node => viz.trigger('nodeDragToggle', node)
 

@@ -3,10 +3,12 @@ import { action, computed, observable } from 'mobx'
 class AppStore {
   @observable modalVisibility = {
     email: false,
+    personDetails: false,
   }
   @observable emailModalView = 'list'
   @observable activeEmailId = ''
   @observable emails = []
+  @observable activePerson
 
   @computed
   get activeEmail() {
@@ -18,7 +20,16 @@ class AppStore {
     const response = await fetch(`http://10.0.0.21:5000/emails?between=${toUserId},${fromUserId}`)
       .then(res => res.json())
     this.emails = response
-    return response
+  }
+
+  @action
+  async getPersonDetails(id) {
+    const response = await fetch(`http://10.0.0.21:5000/neighbours/${id}`)
+      .then(res => res.json())
+    this.activePerson = {
+      id,
+      details: response
+    }
   }
 
   @action setEmailModalView(view) {
