@@ -24,15 +24,13 @@ class TopicModelingComponent extends React.Component {
         this.timerId = null;
 
         this.state = {
-            archiveSelected: false,                         // whether the user has selected an archive to process
-            archiveSet: false,                              // whether the archive has been set with the 'Select Archive' button
+            modelBuilding: false,                           // whether the model is building
             modelCreated: false,                            // whether the model has been created
             stopWords: "please\nthanks\nwould\nect\nhou",
             docIDs: []
         };
 
-        this.enableSelectArchiveBtnFn = this.enableSelectArchiveBtnFn.bind(this);
-        this.selectArchiveFn = this.selectArchiveFn.bind(this);
+        this.clearOutputForNewModelFn = this.clearOutputForNewModelFn.bind(this);
         this.checkIfModelBuiltFn = this.checkIfModelBuiltFn.bind(this);
         this.createModelFn = this.createModelFn.bind(this);
         this.getNumTopicsFn = this.getNumTopicsFn.bind(this);
@@ -42,84 +40,41 @@ class TopicModelingComponent extends React.Component {
     }
 
     componentDidMount() {
-
-        //
-        // Show files to process when the component loads
-        //
-        var select = document.getElementById("archivesListBox");
-
-        fetch(test_url + '/TM/archives', {
-            mode: 'cors',
-            method: 'GET'
-        })
-        .then((resp) => resp.json())
-        .then(function (data) {
-
-            var files = data["files"];
-
-            return files.map(function (file) {
-                let option = createNode('option');
-                option.text = option.value = file;
-                select.add(option, 0);
-            })
-        })
-        .catch(function (error) {
-            console.log(JSON.stringify(error));
-        });
     }
 
     //
-    // Sets the state of 'archiveSelected' based on whether the user has selected an archive.
+    // Clear controls which show results for the current model
     //
-    enableSelectArchiveBtnFn() {
-        var select = document.getElementById("archivesListBox");
-        this.setState( { archiveSelected: (select.selectedIndex != -1) } );
-    }
+    clearOutputForNewModelFn() {
+        var numTopicsText = document.getElementById('numTopicsText');
+        numTopicsText.innerHTML = 0;
 
-    //
-    // Calls the web service to specify the archive to use
-    //
-    selectArchiveFn() {
-        var select = document.getElementById("archivesListBox");
-        var selectedFile = select.options[select.selectedIndex].value;
-        var url = test_url + '/TM/archives/';
-        url += selectedFile;
+        var wcImage = document.getElementById('wordCloudImg');
+        wcImage.src = "";
 
-        var documentType = document.querySelector('input[name="type"]:checked').value;
+        var wcImage = document.getElementById('topicDistributionImg');
+        wcImage.src = "";
 
-        var formData = new FormData();
-        formData.append('type', documentType);
-
-        fetch(url, {
-            mode: 'cors',
-            method: 'POST',
-            body: formData
-        })
-        .then( (resp) => {
-            if ((resp.status >= 200) && (resp.status < 300)) {
-                this.setState( { archiveSet: true } );
-            }
-        })
-        .catch(function (error) {
-            console.log(JSON.stringify(error));
-        });
+        this.setState({docIDs: []});
     }
 
     //
     // Checks if the model has been built, and if so, sets the 'modelCreated' state
     //
     checkIfModelBuiltFn () {
+
         fetch(test_url + '/TM/ldamodel', {
             mode: 'cors',
             method: 'GET'
         })
         .then((resp) => resp.json())
         .then((data) => {
-            var modelBuilt = data['modelBuilt'];
 
-            if (modelBuilt) {
+            this.setState( { modelBuilding: data['modelBuilding'] } );
+            this.setState( { modelCreated: data['modelBuilt'] } );
+
+            if (data['modelBuilt']) {
                 clearInterval(this.timerId);
-                this.setState( { modelCreated: true } );
             }
         })
         .catch(function (error) {
@@ -134,6 +89,9 @@ class TopicModelingComponent extends React.Component {
     //  o Starts building the model
     //
     createModelFn () {
+        // Clear output
+        this.clearOutputForNewModelFn();
+
         // Number of topics
         var setNumTopicsChkBx = document.getElementById("setNumTopicsChkBx");
         var url = test_url + '/TM/topics/';
@@ -183,7 +141,7 @@ class TopicModelingComponent extends React.Component {
         // Start building the model
         fetch(test_url + '/TM/ldamodel', {
             mode: 'cors',
-            method: 'GET'
+            method: 'POST'
         })
         .then(() => {
             this.timerId = setInterval(this.checkIfModelBuiltFn, 1000);
@@ -297,17 +255,6 @@ class TopicModelingComponent extends React.Component {
         return (
     <div id="TopicModelingPane">
         <div id="TopicModelingControlBox">
-            <p>Select an archive:</p>
-            <select name="archivesListBox" id="archivesListBox" size="3" onChange={this.enableSelectArchiveBtnFn}></select>
-            <br/>
-            <form id="docTypes">
-                <input type="radio" id="emails" name="type" value="emails" checked />emails
-                <input type="radio" id="documents" name="type" value="documents" />documents
-            </form>
-            <button id="selectArchiveBtn" disabled={!this.state.archiveSelected} onClick={this.selectArchiveFn}>Select Archive</button>
-            <br/>
-        </div>
-        <div id="TopicModelingControlBox">
             <p>Press 'Create Model' to create the LDA model:</p>
             <input type="checkbox" id="setNumTopicsChkBx" />Specify Number of Topics:
             <br/>
@@ -318,7 +265,7 @@ class TopicModelingComponent extends React.Component {
             <textarea id="stopWordsText" rows="5" cols="20" value={this.state.stopWords} onChange={this.handleStopWordChange.bind(this)}>
             </textarea>
             <br/>
-            <button id="createModelBtn" disabled={!this.state.archiveSet} onClick={this.createModelFn}>Create Model</button>
+            <button id="createModelBtn" disabled={this.state.modelBuilding} onClick={this.createModelFn}>Create Model</button>
             <br/>
         </div>
         <p>Press 'Get Number of Topics' to get the number of topics that were found:</p>
