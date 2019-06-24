@@ -1,7 +1,8 @@
 import qs from "querystring"
 import React, { Component } from "react"
 import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
-import EmailViewer from "./EmailViewer"
+import appStore from "../stores/AppStore"
+import EmailModal from "./EmailModal"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
@@ -36,7 +37,7 @@ const data = [
   'Search Result 5',
 ]
 
-const API_HOST = 'localhost'
+const API_HOST = '10.0.0.21'
 
 export default class Main extends Component {
   state = {
@@ -109,9 +110,9 @@ export default class Main extends Component {
     })
   }
 
-  onRelDblClick(relationship) {
-    const ids = [relationship.source.id, relationship.target.id]
-    this.setState({ modalEmailsBetween: ids })
+  async onRelDblClick(relationship) {
+    await appStore.getEmailsBetween(relationship.source.id, relationship.target.id)
+    appStore.toggleModal('email')
   }
 
   setGraph (graph) {
@@ -141,12 +142,7 @@ export default class Main extends Component {
     }
     return (
       <Layout>
-        {this.state.modalEmailsBetween === null ? '' :
-          <EmailViewer
-            toUserId={this.state.modalEmailsBetween[0]}
-            fromUserId={this.state.modalEmailsBetween[1]}
-          />
-        }
+        <EmailModal />
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
