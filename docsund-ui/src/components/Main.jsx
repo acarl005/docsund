@@ -36,7 +36,7 @@ const data = [
   'Search Result 5',
 ]
 
-const API_HOST = '10.0.0.21'
+const API_HOST = 'localhost'
 
 export default class Main extends Component {
   state = {
@@ -141,10 +141,12 @@ export default class Main extends Component {
     }
     return (
       <Layout>
-        <EmailViewer
-          toUserId={this.state.modalEmailsBetween[0]}
-          fromUserId={this.state.modalEmailsBetween[1]}
-        />
+        {this.state.modalEmailsBetween === null ? '' :
+          <EmailViewer
+            toUserId={this.state.modalEmailsBetween[0]}
+            fromUserId={this.state.modalEmailsBetween[1]}
+          />
+        }
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
