@@ -1,6 +1,10 @@
 import React from 'react'
+import { observer } from 'mobx-react'
 import { Modal, Table } from 'antd'
+import appStore from '../stores/AppStore'
+import EmailContentPreview from './EmailContentPreview'
 
+@observer
 export default class EmailViewer extends React.Component {
   state = {
     emails: [],
@@ -35,10 +39,9 @@ export default class EmailViewer extends React.Component {
         <Table
           showHeader={false}
           columns={[
-            {dataIndex: 'properties.from'},
-            {dataIndex: 'properties.subject'},
-            {dataIndex: 'properties.body'},
-            {dataIndex: 'properties.date'},
+            {key: 'from', render: (text, record) => record.properties.from},
+            {key: 'content', render: (text, record) => <EmailContentPreview subject={record.properties.subject} body={record.properties.body} />},
+            {key: 'date', render: (text, record) => record.properties.date},
           ]}
           dataSource={this.state.emails}
         />
