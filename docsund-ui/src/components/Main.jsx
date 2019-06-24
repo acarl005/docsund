@@ -61,7 +61,7 @@ export default class Main extends Component {
   }
 
   async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}`)
+    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}?limit=10`)
       .then(res => res.json())
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {

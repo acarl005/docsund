@@ -53,7 +53,7 @@ def find_person(id):
         """, id=int(id))
         maybe_node = query.single()
         if maybe_node is None:
-            return 'person not found', 404
+            return json_response({"message": 'person not found'}, 404)
         node = neo4j_node_to_dict(maybe_node[0])
     return json_response(node)
 
@@ -61,14 +61,15 @@ def find_person(id):
 @app.route("/neighbours/<id>", methods=["GET"])
 @cross_origin()
 def get_neighbours(id):
+    limit = request.args.get("limit")
     with driver.session() as sesh:
         query = sesh.run("""
             MATCH (center:Person)-[e:EMAILS_TO]-(neighbours:Person)
             WHERE ID(center) = $id
             RETURN neighbours, e
             ORDER BY e.count DESC
-            LIMIT 10
-        """, id=int(id))
+            {}
+        """.format("LIMIT $limit" if limit is not None else ""), id=int(id), limit=int(limit or "0"))
         results = query.values()
         neighbours = [neo4j_node_to_dict(record[0]) for record in results]
         relationships = [neo4j_edge_to_dict(record[1]) for record in results]
@@ -102,7 +103,7 @@ def get_internal_relationships():
 def get_emails_between():
     ids = request.args.get("between").split(",")
     if len(ids) != 2:
-        raise ValueError("invalid format for argument `between`. should be a list of 2 ids")
+        return json_response({"message": "invalid format for argument `between`. should be a list of 2 ids"})
     with driver.session() as sesh:
         query = sesh.run("""
             MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
