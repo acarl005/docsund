@@ -3,7 +3,12 @@ import { Modal, Table } from 'antd'
 
 export default class EmailViewer extends React.Component {
   state = {
-    emails: []
+    emails: [],
+    visible: true
+  }
+
+  hideModal = () => {
+    this.setState({ visible: false })
   }
 
   async componentDidMount() {
@@ -21,7 +26,9 @@ export default class EmailViewer extends React.Component {
   render() {
     return (
       <Modal
-        visible
+        visible={this.state.visible}
+        onCancel={this.hideModal}
+        onOk={this.hideModal}
         width="75%"
         title="Email Viewer"
       >
