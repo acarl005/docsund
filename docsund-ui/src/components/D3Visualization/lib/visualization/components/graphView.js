@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2019 "Neo4j,"
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
  * Neo4j Sweden AB [http://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -17,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import viz from './visualization'
 import layout from './layout'
 

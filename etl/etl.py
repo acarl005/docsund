@@ -70,7 +70,8 @@ def kaggle_to_neo4j_etl(csv_path='emails.csv'):
     persons_df = pd.DataFrame({"incoming": email_unnest_df.to.value_counts(),
                                "outgoing": email_df.from_.value_counts()}).fillna(0).astype(int)
     persons_df["email"] = persons_df.index
-    persons_df["id"] = [next(global_id_counter) for _ in range(len(persons_df))]
+    persons_df = persons_df.sort_values(by=["email"])
+    persons_df["id"] = [str(next(global_id_counter)) for _ in range(len(persons_df))]
     persons_df.index = persons_df.id
     persons_df_n4j = pd.DataFrame({
         "personId:ID": persons_df.id,
