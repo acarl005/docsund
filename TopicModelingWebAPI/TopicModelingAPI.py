@@ -4,7 +4,7 @@ import os
 from TopicModeling import TopicModeling, DocumentTypeEnum
 
 # Topic modeling state
-tm =  TopicModeling()
+tm = TopicModeling()
 
 # The Flask application
 app = Flask(__name__)
@@ -29,38 +29,23 @@ def json_response(payload, status=200):
     return (json.dumps(payload), status, {'content-type': 'application/json'})
 
 
-@app.route("/TM/archives", methods=["GET"])
-@cross_origin()
-def ListArchives():
-    return json_response({'files': os.listdir('./UploadedFiles')})
-
-
-@app.route("/TM/archives/<string:archive_name>", methods=["POST"])
-@cross_origin()
-def SelectArchive(archive_name):
-    docType = request.form['type'].lower()
-
-    if docType == 'emails':
-        docTypeEnum = DocumentTypeEnum.emailType
-    elif docType == 'documents':
-        docTypeEnum = DocumentTypeEnum.documentType
-    else:
-        docTypeEnum = DocumentTypeEnum.unknownType
-
-    if ( tm.setFileToProcess(archive_name, docTypeEnum) ):
-        return json_response({})
-    else:
-        return json_response({}, 404)
-
-
 @app.route("/TM/ldamodel", methods=["GET"])
 @cross_origin()
-def BuildModel():
-    if tm.modelNotBuiltAndNotBuilding():
-        tm.startBuildingModel()
-        return json_response({'modelBuilt': False})
+def GetModel():
+    if tm.modelBuilding():
+        return json_response({'modelBuilt': False, 'modelBuilding': True})
     else:
-        return json_response({'modelBuilt': tm.getModelBuilt()})
+        return json_response({'modelBuilt': tm.getModelBuilt(), 'modelBuilding': False})
+
+
+@app.route("/TM/ldamodel", methods=["POST"])
+@cross_origin()
+def BuildModel():
+    if tm.modelBuilding():
+        return json_response({'modelBuilt': False, 'modelBuilding': True})
+    else:
+        tm.startBuildingModel()
+        return json_response({'modelBuilt': False, 'modelBuilding': True})
 
 
 @app.route("/TM/topics", methods=["GET"])
