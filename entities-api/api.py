@@ -107,7 +107,7 @@ def get_emails_between():
         query = sesh.run("""
             MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
             WHERE (ID(a) = $id_a AND ID(b) = $id_b) OR (ID(b) = $id_a AND ID(a) = $id_b)
-            RETURN e
+            RETURN DISTINCT e
             ORDER BY e.date
         """, id_a=int(ids[0]), id_b=int(ids[1]))
         results = query.values()
