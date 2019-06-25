@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2019 "Neo4j,"
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
  * Neo4j Sweden AB [http://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -24,7 +25,7 @@ import * as vizRenderers from '../renders/init'
 import { menu as menuRenderer } from '../renders/menu'
 import vizClickHandler from '../utils/clickHandler'
 
-const vizFn = function (el, measureSize, graph, layout, style) {
+const vizFn = function (el, measureSize, graph, layout, style, onRelDblClick, onNodeDblClick) {
   const viz = { style }
 
   const root = d3.select(el)
@@ -61,7 +62,7 @@ const vizFn = function (el, measureSize, graph, layout, style) {
     return viz.trigger('nodeClicked', node)
   }
 
-  const onNodeDblClick = node => viz.trigger('nodeDblClicked', node)
+  onNodeDblClick = onNodeDblClick || (node => viz.trigger('nodeDblClicked', node))
 
   const onNodeDragToggle = node => viz.trigger('nodeDragToggle', node)
 
@@ -283,6 +284,7 @@ const vizFn = function (el, measureSize, graph, layout, style) {
       .append('g')
       .attr('class', 'relationship')
       .on('mousedown', onRelationshipClick)
+      .on('dblclick', onRelDblClick)
       .on('mouseover', onRelMouseOver)
       .on('mouseout', onRelMouseOut)
 

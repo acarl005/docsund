@@ -1,5 +1,6 @@
 import json
 from neo4j import GraphDatabase
+from neotime import DateTime
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
@@ -14,10 +15,15 @@ def json_response(payload, status=200):
 
 
 def neo4j_node_to_dict(node):
+    node_dict = dict(node)
+    for key, val in node_dict.items():
+        # the neo4j DateTime cannot be JSON serialized automatically, so we must explicitly coerce to a str
+        if isinstance(val, DateTime):
+            node_dict[key] = val.iso_format()[:19]
     return {
         "id": node.id,
         "labels": list(node.labels),
-        "properties": dict(node),
+        "properties": node_dict
     }
 
 
@@ -47,7 +53,7 @@ def find_person(id):
         """, id=int(id))
         maybe_node = query.single()
         if maybe_node is None:
-            return 'person not found', 404
+            return json_response({"message": 'person not found'}, 404)
         node = neo4j_node_to_dict(maybe_node[0])
     return json_response(node)
 
@@ -55,14 +61,15 @@ def find_person(id):
 @app.route("/neighbours/<id>", methods=["GET"])
 @cross_origin()
 def get_neighbours(id):
+    limit = request.args.get("limit")
     with driver.session() as sesh:
         query = sesh.run("""
             MATCH (center:Person)-[e:EMAILS_TO]-(neighbours:Person)
             WHERE ID(center) = $id
             RETURN neighbours, e
             ORDER BY e.count DESC
-            LIMIT 10
-        """, id=int(id))
+            {}
+        """.format("LIMIT $limit" if limit is not None else ""), id=int(id), limit=int(limit or "0"))
         results = query.values()
         neighbours = [neo4j_node_to_dict(record[0]) for record in results]
         relationships = [neo4j_edge_to_dict(record[1]) for record in results]
@@ -91,6 +98,23 @@ def get_internal_relationships():
     return json_response([neo4j_edge_to_dict(record[0]) for record in results])
 
 
+@app.route("/emails", methods=["GET"])
+@cross_origin()
+def get_emails_between():
+    ids = request.args.get("between").split(",")
+    if len(ids) != 2:
+        return json_response({"message": "invalid format for argument `between`. should be a list of 2 ids"})
+    with driver.session() as sesh:
+        query = sesh.run("""
+            MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
+            WHERE (ID(a) = $id_a AND ID(b) = $id_b) OR (ID(b) = $id_a AND ID(a) = $id_b)
+            RETURN DISTINCT e
+            ORDER BY e.date
+        """, id_a=int(ids[0]), id_b=int(ids[1]))
+        results = query.values()
+    return json_response([neo4j_node_to_dict(record[0]) for record in results])
+
+
 @app.route("/search", methods=["GET"])
 @cross_origin()
 def search_emails():
@@ -106,4 +130,5 @@ def search_emails():
 
 
 if __name__ == '__main__':
-    app.run()
+    print("FUCK")
+    app.run(host='0.0.0.0')

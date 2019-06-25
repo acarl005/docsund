@@ -1,7 +1,9 @@
 import qs from "querystring"
 import React, { Component } from "react"
 import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
-import EmailViewer from "./EmailViewer"
+import appStore from "../stores/AppStore"
+import EmailModal from "./EmailModal"
+import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
@@ -42,7 +44,7 @@ export default class Main extends Component {
   state = {
     searchQuery: "",
     initialNodes: [],
-    modalEmailsBetween: [36290, 64858]
+    modalEmailsBetween: null
   }
 
   async componentDidMount() {
@@ -60,7 +62,7 @@ export default class Main extends Component {
   }
 
   async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}`)
+    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}?limit=10`)
       .then(res => res.json())
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
@@ -109,6 +111,16 @@ export default class Main extends Component {
     })
   }
 
+  async onRelDblClick(relationship) {
+    await appStore.getEmailsBetween(relationship.source.id, relationship.target.id)
+    appStore.toggleModal('email')
+  }
+
+  async onNodeDblClick(node) {
+    await appStore.getPersonDetails(node.id)
+    appStore.toggleModal('personDetails')
+  }
+
   setGraph (graph) {
     this.graph = graph
     this.autoCompleteRelationships([], this.graph._nodes)
@@ -131,14 +143,14 @@ export default class Main extends Component {
           this.autoCompleteCallback = callback
         }}
         setGraph={this.setGraph.bind(this)}
+        onRelDblClick={this.onRelDblClick.bind(this)}
+        onNodeDblClick={this.onNodeDblClick.bind(this)}
       />
     }
     return (
       <Layout>
-        <EmailViewer
-          toUserId={this.state.modalEmailsBetween[0]}
-          fromUserId={this.state.modalEmailsBetween[1]}
-        />
+        <PersonDetailsModal />
+        <EmailModal />
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
@@ -188,7 +200,7 @@ export default class Main extends Component {
           <Row>
             <Col span={18} offset={3}>
               <div id="explorer">
-                <Tabs style={{height: '800px', width: '1265px', border: '1px solid grey', borderRadius: '10px'}} type="card">
+                <Tabs style={{border: '1px solid grey', borderRadius: '10px'}} type="card">
                   <TabPane tab="Entity Explorer" key="1">
                     <StyledForm onSubmit={this.handleSearch.bind(this)}>
                       <AddonContainer>
