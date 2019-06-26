@@ -102,6 +102,17 @@ def GetTopicDistribution():
         return (encodedImage, 200, {'content-type': 'text/plain'})
 
 
+@app.route("/TM/topicdistributiondata", methods=["GET"])
+@cross_origin()
+def GetTopicDistributionData():
+    result, imageData = tm.getTopicDistributionData()
+
+    if not result:
+        return json_response({}, 400)
+    else:
+        return json_response(imageData)
+
+
 @app.route("/TM/topics/<int:topic_id>/documents", methods=["GET"])
 @cross_origin()
 def GetDocIDsForTopic(topic_id):
