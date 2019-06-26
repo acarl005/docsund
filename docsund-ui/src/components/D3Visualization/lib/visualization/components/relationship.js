@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2019 "Neo4j,"
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
  * Neo4j Sweden AB [http://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -21,12 +22,13 @@
 export default class Relationship {
   isNode = false
   isRelationship = true
-  constructor (id, source, target, type, properties) {
+  constructor (id, source, target, type, properties, scaleFactor = 1) {
     this.id = id
     this.source = source
     this.target = target
     this.type = type
     this.propertyMap = properties
+    this.scaleFactor = scaleFactor
     this.propertyList = (() => {
       const result = []
       for (let key of Object.keys(this.propertyMap || {})) {

@@ -1,4 +1,5 @@
-@import "./styles/bootstrap.grid-only.min.css";
+@import "../node_modules/antd/dist/antd.css";
+@import "./components/TopicModelingComponent.css";
 
 * {
   box-sizing: border-box;
@@ -12,7 +13,7 @@ html, body {
 }
 
 body {
-  background: #eee;
+  /*background: #eee;*/
   font-family: 'Nunito Sans', Helvetica, sans-serif;
   font-weight: 300;
 }

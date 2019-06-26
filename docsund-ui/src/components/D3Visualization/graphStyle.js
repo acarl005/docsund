@@ -333,6 +333,7 @@ export default function neoGraphStyle () {
         /^name$/i,
         /^title$/i,
         /^label$/i,
+        /^email$/i,
         /name$/i,
         /description$/i,
         /^.+/

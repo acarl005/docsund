@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2019 "Neo4j,"
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
  * Neo4j Sweden AB [http://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -54,6 +55,7 @@ export class GrassEditor extends Component {
   }
 
   updateStyle (selector, styleProp) {
+    console.log({ selector, styleProp })
     this.graphStyle.changeForSelector(selector, styleProp)
     this.props.update(this.graphStyle)
   }

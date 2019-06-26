@@ -1,3 +1,24 @@
+/*
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
+ * Neo4j Sweden AB [http://neo4j.com]
+ *
+ * This file is part of Neo4j.
+ *
+ * Neo4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React, { Component } from 'react'
 import deepmerge from 'deepmerge'
 import { GraphComponent } from './Graph'
@@ -98,8 +119,8 @@ export default class Explorer extends Component {
         }
         callback(null, { nodes: nodes, relationships: result.relationships })
       },
-      () => {
-        callback(null, { nodes: [], relationships: [] })
+      err => {
+        callback(err, { nodes: [], relationships: [] })
       }
     )
   }
@@ -213,6 +234,8 @@ export default class Explorer extends Component {
           assignVisElement={this.props.assignVisElement}
           getAutoCompleteCallback={this.props.getAutoCompleteCallback}
           setGraph={this.props.setGraph}
+          onRelDblClick={this.props.onRelDblClick}
+          onNodeDblClick={this.props.onNodeDblClick}
         />
         <InspectorComponent
           fullscreen={this.props.fullscreen}
