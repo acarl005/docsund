@@ -5,6 +5,10 @@ import appStore from '../stores/AppStore'
 
 @observer
 export default class PersonDetailsModal extends Component {
+  onOk = () => {
+    appStore.toggleModal('personDetails')
+  }
+
   async onRowClick(neighbourId) {
     await appStore.getEmailsBetween(neighbourId, appStore.activePerson.id)
     appStore.toggleModal("email")
@@ -30,6 +34,8 @@ export default class PersonDetailsModal extends Component {
     }
     return (
       <Modal
+        onCancel={this.onOk}
+        onOk={this.onOk}
         visible={appStore.modalVisibility.personDetails}
         title="Person Details"
       >

@@ -5,6 +5,7 @@ import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
 import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
+import { API_HOST } from "../utils"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
 
@@ -37,8 +38,6 @@ const data = [
   'Search Result 4',
   'Search Result 5',
 ]
-
-const API_HOST = '10.0.0.21'
 
 export default class Main extends Component {
   state = {
