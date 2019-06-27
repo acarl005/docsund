@@ -123,7 +123,7 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
         ":LABEL": "Email"
     })
 
-    email_df_n4j.to_csv("neo4j-csv/spacy_emails.csv", index=False)
+    email_df_n4j.to_csv("neo4j-csv/emails.csv", index=False)
 
     email_unnest_df = unnest(email_df[["id", "to", "from_"]], col="to")
     email_unnest_df = email_unnest_df[email_unnest_df.to != email_unnest_df.from_]
