@@ -20,7 +20,10 @@ spec:
           imagePullPolicy: Never
           env:
             - name: NEO4J_PASSWORD
-              value: neo4j
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-secrets
+                  key: password
           ports:
             - containerPort: 5000
 

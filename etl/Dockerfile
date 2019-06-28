@@ -1,10 +1,11 @@
 FROM neo4j:3.5
 
 RUN apt-get update -yqq
-RUN apt-get install -y python3-dev python3-pip
-RUN pip3 install awscli pandas numpy pytz
+RUN apt-get install -yqq python3-dev python3-pip
+RUN pip3 install awscli
 
 COPY . /etl
 WORKDIR /etl
+RUN pip3 install -r requirements.txt
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["./etl.sh"]

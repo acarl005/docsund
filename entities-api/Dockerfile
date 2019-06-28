@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Andrew Carlson
 
 RUN apt-get update -yqq
-RUN apt-get install -yqq python3-pip python3-setuptools
+RUN apt-get install -yqq python3-pip
 
 COPY . /app
 WORKDIR /app
