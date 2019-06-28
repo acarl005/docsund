@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo4j-database
+  labels:
+    app: neo4j
+spec:
+  selector:
+    matchLabels:
+      app: neo4j
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: neo4j
+    spec:
+      containers:
+        - name: neo4j-database
+          image: neo4j
+          resources:
+            requests:
+              cpu: 2
+              memory: 512Mi
+              ephemeral-storage: 4Gi
+          ports:
+            - containerPort: 7474
+              name: admin
+            - containerPort: 7687
+              name: main
+          volumeMounts:
+            - name: neo4j-volume
+              mountPath: /data
+      volumes:
+        - name: neo4j-volume
+          persistentVolumeClaim:
+            claimName: neo4j-volume
