@@ -16,6 +16,15 @@ def unnest(df, col):
     return unnested.join(df.drop(col, 1), how="left")
 
 
+def get_entity_df(df, entity_col):
+    melted = pd.melt(df, id_vars=['id'], value_vars=[entity_col])
+    melted = melted.loc[melted['value'] != '']
+    stacked = melted.set_index(['id'])['value'].apply(pd.Series).stack()
+    stacked = stacked.reset_index()
+    stacked.columns = ['emailId','drop',entity_col]
+    return stacked[['emailId', entity_col]]
+
+
 def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     # generator for globally unique IDs in neo4j
     global_id_counter = count()
@@ -106,43 +115,29 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
 
     ### Entity_Person
 
-    # person_unnest_df = unnest(email_df[["id", "to", "from_"]], col="to")
-    # email_unnest_df = email_unnest_df[email_unnest_df.to != email_unnest_df.from_]
+    person_entity_df = get_entity_df(email_df, 'person')
 
-    person_entity_df = pd.DataFrame({"incoming": email_unnest_df.to.value_counts(),
-                               "outgoing": email_df.from_.value_counts()}).fillna(0).astype(int)
-    person_entity_df["email"] = person_entity_df.index
-    persons_df = persons_df.sort_values(by=["email"])
-    persons_df["id"] = [str(next(global_id_counter)) for _ in range(len(persons_df))]
-    persons_df.index = persons_df.id
-    persons_df_n4j = pd.DataFrame({
-        "personId:ID": persons_df.id,
-        "email": persons_df.email,
-        "incoming:int": persons_df.incoming,
-        "outgoing:int": persons_df.outgoing,
-        ":LABEL": "Person"
-    })
-    persons_df_n4j.to_csv("neo4j-csv/persons.csv", index=False)
-
-    email_to_person_id_map = persons_df.index.to_series()
-    email_to_person_id_map.index = persons_df.email
-
-    rel_counts_df = email_unnest_df.groupby(["from_", "to"], as_index=False).count().rename(columns={"id": "counts"})
-    rel_counts_df_n4j = pd.DataFrame({
-        ":START_ID": email_to_person_id_map[rel_counts_df.from_].values,
-        ":END_ID": email_to_person_id_map[rel_counts_df.to].values,
-        "count:int": list(rel_counts_df.counts),
-        ":TYPE": "EMAILS_TO"
+    person_entity_df = pd.DataFrame(person_entity_df.groupby('emailId')['person'].value_counts())
+    person_entity_df = person_entity_df.reset_index(level='emailId')
+    person_entity_df.columns = ['emailId', 'mentions']
+    person_entity_df = person_entity_df.reset_index()
+    person_entity_df = person_entity_df.sort_values(by=["emailId"])
+    person_entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(person_entity_df))]
+    person_entity_df.index = person_entity_df.id
+    persons_entity_df_n4j = pd.DataFrame({
+        "entityPersonId:ID": person_entity_df.id,
+        "emailId": person_entity_df.emailId,
+        "name": person_entity_df.person,
+        "mentions:int": person_entity_df.mentions,
+        ":LABEL": "Entity_Person"
     })
 
-    rel_counts_df_n4j.to_csv("neo4j-csv/emails_to.csv", index=False)
+    persons_entity_df_n4j.to_csv("neo4j-csv/entity_person.csv", index=False)
 
-
-
+    email_to_entity_person_id_map = person_entity_df.index.to_series()
+    email_to_entity_person_id_map.index = person_entity_df.emailId
 
 
 if __name__ == '__main__':
-    base_df = load_processed_data(nrows=500)
-    processed_df = parallelize_df(base_df, process_emails)
-    parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
+    spacy_to_neo4j_etl()
 
