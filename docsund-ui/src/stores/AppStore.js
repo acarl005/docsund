@@ -1,5 +1,4 @@
 import { action, computed, observable } from 'mobx'
-import { API_HOST } from '../utils'
 
 class AppStore {
   @observable modalVisibility = {
@@ -18,14 +17,14 @@ class AppStore {
 
   @action
   async getEmailsBetween(toUserId, fromUserId) {
-    const response = await fetch(`http://${API_HOST}:5000/emails?between=${toUserId},${fromUserId}`)
+    const response = await fetch(`${API_URL}/emails?between=${toUserId},${fromUserId}`)
       .then(res => res.json())
     this.emails = response
   }
 
   @action
   async getPersonDetails(id) {
-    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}`)
+    const response = await fetch(`${API_URL}/neighbours/${id}`)
       .then(res => res.json())
     this.activePerson = {
       id,

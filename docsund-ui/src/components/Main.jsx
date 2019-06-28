@@ -5,7 +5,6 @@ import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
 import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
-import { API_HOST } from "../utils"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
 
@@ -54,14 +53,14 @@ export default class Main extends Component {
   }
 
   async getUserNode(id) {
-    const response = await fetch(`http://${API_HOST}:5000/person/${id}`)
+    const response = await fetch(`${API_URL}/person/${id}`)
       .then(res => res.json())
     computeNodeScaleFactor(response)
     return response
   }
 
   async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetch(`http://${API_HOST}:5000/neighbours/${id}?limit=10`)
+    const response = await fetch(`${API_URL}/neighbours/${id}?limit=10`)
       .then(res => res.json())
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
@@ -88,7 +87,7 @@ export default class Main extends Component {
   }
 
   async getInternalRelationships(existingNodeIds, newNodeIds) {
-    const url = `http://${API_HOST}:5000/internal_relationships?` + qs.stringify({
+    const url = `${API_URL}/internal_relationships?` + qs.stringify({
       existing_ids: existingNodeIds.join(","),
       new_ids: newNodeIds.join(",")
     })
@@ -100,7 +99,7 @@ export default class Main extends Component {
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.elements.searchInput.value.toLowerCase()
-    const searchResults = await fetch(`http://${API_HOST}:5000/search?` + qs.stringify({
+    const searchResults = await fetch(`${API_URL}/search?` + qs.stringify({
       q: searchQuery
     }))
       .then(res => res.json())

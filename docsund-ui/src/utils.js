@@ -1,7 +1,5 @@
 import moment from 'moment'
 
-export const API_HOST = 'localhost'
-
 export const optionalToString = v =>
   ![null, undefined].includes(v) && typeof v.toString === 'function'
     ? v.toString()

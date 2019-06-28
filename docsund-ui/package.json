@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --experimental-modules server.mjs",
     "dev": "parcel src/index.html",
-    "build": "rm -rf dist && parcel build --public-url /docsund-ui src/index.html",
+    "build": "rm -rf dist && API_URL=/api parcel build src/index.html",
     "publish": "npm run build && node --experimental-modules publish.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -31,6 +31,7 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
     "d3": "^3.5.17",
     "deepmerge": "^3.2.0",
+    "http-proxy-middleware": "^0.19.1",
     "mobx": "^5.10.1",
     "mobx-react": "^6.1.1",
     "moment": "^2.24.0",
