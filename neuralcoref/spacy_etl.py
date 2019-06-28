@@ -5,6 +5,9 @@ from itertools import count
 from dateutil.parser import parse
 from pytz import timezone
 
+ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
+                        'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
+
 
 def escape_backslashes(s):
     return re.sub(r'\\', r'\\\\', s)
@@ -19,10 +22,18 @@ def unnest(df, col):
 def get_entity_df(df, entity_col):
     melted = pd.melt(df, id_vars=['id'], value_vars=[entity_col])
     melted = melted.loc[melted['value'] != '']
-    stacked = melted.set_index(['id'])['value'].apply(pd.Series).stack()
-    stacked = stacked.reset_index()
-    stacked.columns = ['emailId','drop',entity_col]
-    return stacked[['emailId', entity_col]]
+    stacked = pd.concat([pd.Series(row['id'], row['value'].split(','))
+                    for _, row in melted.iterrows()]).reset_index()
+    stacked.columns = ['name', 'emailId']
+    stacked['name'] = stacked.name.apply(lambda s: escape_backslashes(s.strip()))
+    return stacked
+
+
+def entity_list_to_string(df):
+    for i in df.index:
+        for entity in ENTITIES_OF_INTEREST:
+            df[entity][i] = ', '.join(df[entity][i])
+    return df
 
 
 def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
@@ -30,6 +41,7 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     global_id_counter = count()
 
     spacy_raw_df = pd.read_pickle(pkl_path)
+    spacy_raw_df = entity_list_to_string(spacy_raw_df)
 
     email_df = pd.DataFrame({
         "id": spacy_raw_df["Message-ID"].str.extract(r'<\d+\.(\d+)\.JavaMail.evans@thyme>')[0],
@@ -117,7 +129,7 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
 
     person_entity_df = get_entity_df(email_df, 'person')
 
-    person_entity_df = pd.DataFrame(person_entity_df.groupby('emailId')['person'].value_counts())
+    person_entity_df = pd.DataFrame(person_entity_df.groupby('emailId')['name'].value_counts())
     person_entity_df = person_entity_df.reset_index(level='emailId')
     person_entity_df.columns = ['emailId', 'mentions']
     person_entity_df = person_entity_df.reset_index()
@@ -126,24 +138,46 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     person_entity_df.index = person_entity_df.id
     persons_entity_df_n4j = pd.DataFrame({
         "entityPersonId:ID": person_entity_df.id,
-        "emailId": person_entity_df.emailId,
-        "name": person_entity_df.person,
+        "name": person_entity_df.name,
         "mentions:int": person_entity_df.mentions,
         ":LABEL": "Entity_Person"
     })
 
     persons_entity_df_n4j.to_csv("neo4j-csv/entity_person.csv", index=False)
 
-    email_to_entity_person_id_map = person_entity_df.index.to_series()
-    email_to_entity_person_id_map.index = person_entity_df.emailId
-
-    # COME BACK THIS DOESN'T MAKE SENSE
     person_mentions_n4j = pd.DataFrame({
-        ":START_ID": email_df.id,
-        ":END_ID": email_to_entity_person_id_map[email_df.id].values,
+        ":START_ID": person_entity_df.emailId,
+        ":END_ID": person_entity_df.id,
         ":TYPE": "MENTION"
     })
-    person_mentions_n4j.to_csv("neo4j-csv/mentions.csv", index=False)
+    person_mentions_n4j.to_csv("neo4j-csv/mentions_person.csv", index=False)
+
+    ### Entity_Org
+
+    org_entity_df = get_entity_df(email_df, 'org')
+
+    org_entity_df = pd.DataFrame(org_entity_df.groupby('emailId')['name'].value_counts())
+    org_entity_df = org_entity_df.reset_index(level='emailId')
+    org_entity_df.columns = ['emailId', 'mentions']
+    org_entity_df = org_entity_df.reset_index()
+    org_entity_df = org_entity_df.sort_values(by=["emailId"])
+    org_entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(org_entity_df))]
+    org_entity_df.index = org_entity_df.id
+    org_entity_df_n4j = pd.DataFrame({
+        "entityPersonId:ID": org_entity_df.id,
+        "name": org_entity_df.name,
+        "mentions:int": org_entity_df.mentions,
+        ":LABEL": "Entity_Org"
+    })
+
+    org_entity_df_n4j.to_csv("neo4j-csv/entity_org.csv", index=False)
+
+    org_mentions_n4j = pd.DataFrame({
+        ":START_ID": org_entity_df.emailId,
+        ":END_ID": org_entity_df.id,
+        ":TYPE": "MENTION"
+    })
+    org_mentions_n4j.to_csv("neo4j-csv/mentions_org.csv", index=False)
 
 if __name__ == '__main__':
     spacy_to_neo4j_etl()
