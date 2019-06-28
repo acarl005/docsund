@@ -137,6 +137,13 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     email_to_entity_person_id_map = person_entity_df.index.to_series()
     email_to_entity_person_id_map.index = person_entity_df.emailId
 
+    # COME BACK THIS DOESN'T MAKE SENSE
+    person_mentions_n4j = pd.DataFrame({
+        ":START_ID": email_df.id,
+        ":END_ID": email_to_entity_person_id_map[email_df.id].values,
+        ":TYPE": "MENTION"
+    })
+    person_mentions_n4j.to_csv("neo4j-csv/mentions.csv", index=False)
 
 if __name__ == '__main__':
     spacy_to_neo4j_etl()
