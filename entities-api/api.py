@@ -1,13 +1,28 @@
+import os
 import json
+import logging
+
 from neo4j import GraphDatabase
 from neotime import DateTime
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
+
+# set up the app config
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", "neo4j"))
+logging.basicConfig(format="%(asctime)s - %(levelname)s:%(message)s", level=logging.INFO)
+
+neo4j_host = os.getenv("NEO4J_DATABASE_SERVICE_HOST", "localhost")
+neo4j_port = os.getenv("NEO4J_DATABASE_SERVICE_PORT_MAIN", "7687")
+neo4j_url = "bolt://{}:{}".format(neo4j_host, neo4j_port)
+neo4j_user = os.getenv("NEO4J_DATABASE_USER", "neo4j")
+neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j")
+
+logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
+
+driver = GraphDatabase.driver(neo4j_url, auth=(neo4j_user, neo4j_password))
 
 
 def json_response(payload, status=200):
@@ -130,5 +145,4 @@ def search_emails():
 
 
 if __name__ == '__main__':
-    print("FUCK")
     app.run(host='0.0.0.0')
