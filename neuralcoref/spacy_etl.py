@@ -36,6 +36,35 @@ def entity_list_to_string(df):
     return df
 
 
+def create_entity_node_relationships(df, entity_name, global_id_counter):
+    entity_df = get_entity_df(df, entity_name)
+    entity_df = pd.DataFrame(entity_df.groupby('emailId')['name'].value_counts())
+    entity_df = entity_df.reset_index(level='emailId')
+    entity_df.columns = ['emailId', 'mentions']
+    entity_df = entity_df.reset_index()
+    entity_df = entity_df.sort_values(by=["emailId"])
+    entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(entity_df))]
+    entity_df.index = entity_df.id
+    entity_df_n4j = pd.DataFrame({
+        "entity{entity}Id:ID".format(entity=entity_name.capitalize()): entity_df.id,
+        "name": entity_df.name,
+        "mentions:int": entity_df.mentions,
+        ":LABEL": "Entity_{entity}".format(entity=entity_name.capitalize())
+    })
+
+    save_node = "neo4j-csv/entity_{entity}.csv".format(entity=entity_name)
+    entity_df_n4j.to_csv(save_node, index=False)
+
+    mentions_n4j = pd.DataFrame({
+        ":START_ID": entity_df.emailId,
+        ":END_ID": entity_df.id,
+        ":TYPE": "MENTION"
+    })
+
+    save_relationship = "neo4j-csv/mentions_{entity}.csv".format(entity=entity_name)
+    mentions_n4j.to_csv(save_relationship, index=False)
+
+
 def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     # generator for globally unique IDs in neo4j
     global_id_counter = count()
@@ -125,59 +154,10 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     })
     to_df_n4j.to_csv("neo4j-csv/to.csv", index=False)
 
-    ### Entity_Person
-
-    person_entity_df = get_entity_df(email_df, 'person')
-
-    person_entity_df = pd.DataFrame(person_entity_df.groupby('emailId')['name'].value_counts())
-    person_entity_df = person_entity_df.reset_index(level='emailId')
-    person_entity_df.columns = ['emailId', 'mentions']
-    person_entity_df = person_entity_df.reset_index()
-    person_entity_df = person_entity_df.sort_values(by=["emailId"])
-    person_entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(person_entity_df))]
-    person_entity_df.index = person_entity_df.id
-    persons_entity_df_n4j = pd.DataFrame({
-        "entityPersonId:ID": person_entity_df.id,
-        "name": person_entity_df.name,
-        "mentions:int": person_entity_df.mentions,
-        ":LABEL": "Entity_Person"
-    })
-
-    persons_entity_df_n4j.to_csv("neo4j-csv/entity_person.csv", index=False)
-
-    person_mentions_n4j = pd.DataFrame({
-        ":START_ID": person_entity_df.emailId,
-        ":END_ID": person_entity_df.id,
-        ":TYPE": "MENTION"
-    })
-    person_mentions_n4j.to_csv("neo4j-csv/mentions_person.csv", index=False)
-
-    ### Entity_Org
-
-    org_entity_df = get_entity_df(email_df, 'org')
-
-    org_entity_df = pd.DataFrame(org_entity_df.groupby('emailId')['name'].value_counts())
-    org_entity_df = org_entity_df.reset_index(level='emailId')
-    org_entity_df.columns = ['emailId', 'mentions']
-    org_entity_df = org_entity_df.reset_index()
-    org_entity_df = org_entity_df.sort_values(by=["emailId"])
-    org_entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(org_entity_df))]
-    org_entity_df.index = org_entity_df.id
-    org_entity_df_n4j = pd.DataFrame({
-        "entityPersonId:ID": org_entity_df.id,
-        "name": org_entity_df.name,
-        "mentions:int": org_entity_df.mentions,
-        ":LABEL": "Entity_Org"
-    })
-
-    org_entity_df_n4j.to_csv("neo4j-csv/entity_org.csv", index=False)
-
-    org_mentions_n4j = pd.DataFrame({
-        ":START_ID": org_entity_df.emailId,
-        ":END_ID": org_entity_df.id,
-        ":TYPE": "MENTION"
-    })
-    org_mentions_n4j.to_csv("neo4j-csv/mentions_org.csv", index=False)
+    ### Entities
+    entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc']
+    for entity in entity_list:
+        create_entity_node_relationships(email_df, entity, global_id_counter)
 
 if __name__ == '__main__':
     spacy_to_neo4j_etl()
