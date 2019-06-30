@@ -53,8 +53,11 @@ GET	/tm/topics<br>
 **Get a word cloud for a topic**<br>
 GET	/tm/topics/\<id\>
 
-**Get a visualization of the topic distribution**<br>
+**Get a visualization of the topic distribution. Returns an image.**<br>
 GET	/tm/topicdistribution<br>
+
+**Get a visualization of the topic distribution data. Returns a JSON array of data points representing the topic distribution.**<br>
+GET	/tm/topicdistributiondata<br>
 
 **Get the documents Ids for a topic**<br>
 GET	/tm/topics/\<id\>/documents

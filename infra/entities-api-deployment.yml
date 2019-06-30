@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: entities-api
+  labels:
+    app: entities-api
+spec:
+  selector:
+    matchLabels:
+      app: entities-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: entities-api
+    spec:
+      containers:
+        - name: docsund-entities-api
+          image: docsund-entities-api
+          imagePullPolicy: Never
+          env:
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-secrets
+                  key: password
+          ports:
+            - containerPort: 5000
+

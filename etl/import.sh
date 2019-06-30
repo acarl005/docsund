@@ -1,7 +1,4 @@
-# this path is only valid for a MacOS installation via Homebrew
-rm -r /usr/local/var/neo4j/data/databases/docsund
-
-neo4j-admin import --database docsund \
+neo4j-admin import --database graph.db \
                    --multiline-fields true \
                    --nodes neo4j-csv/persons.csv \
                    --nodes neo4j-csv/emails.csv \

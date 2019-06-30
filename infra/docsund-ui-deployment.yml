@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsund-ui
+  labels:
+    app: docsund-ui
+spec:
+  selector:
+    matchLabels:
+      app: docsund-ui
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: docsund-ui
+    spec:
+      containers:
+        - name: docsund-ui
+          image: docsund-ui
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 1234

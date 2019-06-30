@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: etl
+spec:
+  template:
+    spec:
+      containers:
+        - name: docsund-etl
+          image: docsund-etl
+          imagePullPolicy: Never
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret_access_key
+            - name: AWS_S3_CSV_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: s3_csv_path
+          volumeMounts:
+            - name: neo4j-volume
+              mountPath: /data
+      volumes:
+        - name: neo4j-volume
+          persistentVolumeClaim:
+            claimName: neo4j-volume
+      restartPolicy: Never
+      
+

@@ -8,6 +8,7 @@ import threading
 import time
 from enum import IntEnum
 import base64
+import json
 
 from neo4j import GraphDatabase
 
@@ -343,11 +344,8 @@ class TopicModeling:
 
         return True, base64.encodestring(image_read)
 
-    def getTopicDistribution(self):
-        print('getTopicDistribution')
-
-        if not self.modelBuilt:
-            return False, ''
+    def getScaledJensenShannonDistance(self):
+        print('getScaledJensenShannonDistance')
 
         #
         # Determine Jensen-Shannon distances
@@ -371,22 +369,30 @@ class TopicModeling:
         #
         Y,e = cmdscale(distance_matrix)
 
+        return Y[:,0], -Y[:,1], [ proportion for proportion in self.token_count_proportions]
+
+    def getTopicDistribution(self):
+        print('getTopicDistribution')
+
+        if not self.modelBuilt:
+            return False, ''
+
         #
-        # Save the figure to a file
+        # Determine scaled Jensen-Shannon distances
         #
+        x_values, y_values, marker_area = self.getScaledJensenShannonDistance()
 
         fig = plt.figure(figsize=(10,8))
         plt.axhline(0, color='gray', alpha=0.5)
         plt.axvline(0, color='gray', alpha=0.5)
 
-        # Marker sizes are based on points, and also note that the radius goes
-        # up by the n^0.5 of the value for the marker
-        marker_sizes = [ (proportion * 100 * 500) for proportion in self.token_count_proportions]
+        # Marker sizes are based on points, and also note that the radius goes up by the n^0.5 of the value for the marker
+        marker_sizes = [area*(100*500) for area in marker_area]
 
-        plt.scatter(Y[:,0], -Y[:,1], s=marker_sizes, alpha=0.5, edgecolors='black')
+        plt.scatter(x_values, y_values, s=marker_sizes, alpha=0.5, edgecolors='black')
 
-        for i in range(0,len(topics)):
-            plt.text(Y[i,0], -Y[i,1], str(i + 1), fontsize=9)
+        for i in range(len(x_values)):
+            plt.text(x_values[i], y_values[i], str(i+1), fontsize=9)
 
         # Save the image to a temp folder to be sent by Flask
         filePath = os.path.join('./Temp', 'topicdistribution.png')
@@ -398,6 +404,23 @@ class TopicModeling:
             image_read = f.read()
 
         return True, base64.encodestring(image_read)
+
+    def getTopicDistributionData(self):
+        print('getTopicDistributionData')
+
+        if not self.modelBuilt:
+            return False, ''
+
+        #
+        # Determine scaled Jensen-Shannon distances
+        #
+        x_values, y_values, marker_area = self.getScaledJensenShannonDistance()
+
+        data = []
+        for i in range(len(x_values)):
+            data.append({'topic': i+1, 'x': x_values[i], 'y': y_values[i], 'size': marker_area[i]})
+
+        return True, json.dumps(data)
 
     def getDocIDsForTopic(self, topicNumber):
         print('getDocIDsForTopic')

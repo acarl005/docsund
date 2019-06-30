@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docsund-ui
+  labels:
+    app: docsund-ui
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 1234
+  selector:
+    app: docsund-ui
