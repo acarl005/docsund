@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Topic Modeling Viz</title>
+    <script type="text/javascript" src="d3.v5.min.js"></script>
+</head>
+<body>
+    <script>
+
+        var my_viz_lib = my_viz_lib || {};
+
+        var width = 500,
+            height = 500;
+
+        var margin = {
+            left: 50,
+            right: 50,
+            top: 50,
+            bottom: 50
+        };
+
+        svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        var data = [
+            {"topic": 1,"x": -0.013199529053397304,"y": -0.05484060954508288,"size": 0.035364190701623485},
+            {"topic": 2,"x": 0.10021404309352784,"y": 0.10881047305796461,"size": 0.004914194560938586},
+            {"topic": 3,"x": -0.010244095758715079,"y": -0.13746851718645173,"size": 0.08579257467774719},
+            // {"topic": 4,"x": 0.008571874965882504,"y": 0.006836417853620403,"size": 0.041925026371986515},
+            // {"topic": 5,"x": -0.13702910267739393,"y": 0.043320996340778954,"size": 0.061453160779067074},
+            {"topic": 6,"x": 0.13563807839685796,"y": -0.08190515793704295,"size": 0.02136774127151568},
+            {"topic": 7,"x": 0.05936489559919886,"y": 0.03431166612993404,"size": 0.039802403066869066},
+            // {"topic": 8,"x": -0.02214809318903516,"y": -0.03073018497048292,"size": 0.030231301618339465},
+            // {"topic": 9,"x": 0.039580923195451825,"y": -0.0026096845660233143,"size": 0.01632490287390331},
+            {"topic": 10,"x": -0.04255177054633387,"y": 0.07057388836727965,"size": 0.031582061903414206},
+            {"topic": 11,"x": -0.11008208125689978,"y": 0.03723908561189587,"size": 0.03490107288959786},
+            // {"topic": 12,"x": -0.00796609638096967,"y": 0.007387118967890901,"size": 0.026384850901793294},
+            {"topic": 13,"x": 0.10293097734897762,"y": -0.06919338469192214,"size": 0.02599891939177194},
+            // {"topic": 14,"x": 0.030320646338092068,"y": 0.02995728048455502,"size": 0.02531710705740088},
+            // {"topic": 15,"x": 0.02338576670381201,"y": 0.005238007420570323,"size": 0.02556153034708107},
+            // {"topic": 16,"x": -0.020631247201431124,"y": -0.05396314107377174,"size": 0.05087863740448195},
+            {"topic": 17,"x": -0.14765356083402184,"y": -0.0077332532143400395,"size": 0.09190315691975197},
+            {"topic": 18,"x": -0.044469697073368696,"y": -0.1250031072694123,"size": 0.07903877325237348},
+            {"topic": 19,"x": -0.15827216726762042,"y": 0.04243581883494225,"size": 0.09857977204312142},
+            // {"topic": 20,"x": 0.028577259811199348,"y": 0.010097346799443152,"size": 0.021586435793861117},
+            {"topic": 21,"x": -0.07336979463026112,"y": 0.06600495875118596,"size": 0.03867033730413976},
+            {"topic": 22,"x": 0.2213168201478831,"y": 0.223336662573317,"size": 0.019219389199063474},
+            {"topic": 23,"x": 0.02922068794400411,"y": 0.020522204845539186,"size": 0.019528134407080556},
+            {"topic": 24,"x": 0.13121963432767522,"y": -0.1948689052290377,"size": 0.03809144003910773},
+            // {"topic": 25,"x": -0.12272437200311488,"y": 0.05224401964465021,"size": 0.03558288522396892}
+        ];
+
+        var calcRadius = function(area) {
+            return Math.sqrt(area / Math.PI);
+        };
+
+        var xScale = d3.scaleLinear()
+            .domain(d3.extent(data, d => d.x))
+            .range([margin.left, width - margin.right]);
+
+        var yScale = d3.scaleLinear()
+            .domain(d3.extent(data, d => d.y))
+            .range([height - margin.bottom, margin.top]);
+
+        var radScale = d3.scaleLinear()
+            .domain(d3.extent(data, d => calcRadius(d.size)))
+            .range([10, 40]);
+
+
+        var elem = svg.selectAll("g topicCircles")
+            .data(data);
+
+        var elemEnter = elem.enter()
+            .append("g")
+            .attr("transform", d => "translate("+xScale(d.x)+","+yScale(d.y)+")");
+
+        // Draw the topic circles
+        var transitionDuration = 100;
+        var topicCircles = elemEnter.append("circle")
+            .attr("r", d => radScale(calcRadius(d.size)))
+            .style("stroke", "#10885C")
+            .style("fill", "#20C78A")
+            .style("opacity", 0.8)
+            .style("stroke-width", 1.5)
+            .on("mouseover", function(d) {
+                var boundingCircle = d3.select(this);
+                boundingCircle.transition()
+                    .duration(transitionDuration)
+                    .style("stroke-width", 6)
+                    .style("stroke", "#4995D6");
+            })
+            .on("mouseout", function(d) {
+                var boundingCircle = d3.select(this);
+                boundingCircle.transition()
+                    .duration(transitionDuration)
+                    .style("stroke-width", 1.5)
+                    .style("stroke", "#10885C");
+            });
+
+        // Write in the topic circle labels
+        elemEnter.append("text")
+            .attr("text-anchor", "middle")
+            .attr("font-family", "sans-serif")
+            .attr("font-size", "10px")
+            .text(d => d.topic);
+
+    </script>
+</body>
+</html>
