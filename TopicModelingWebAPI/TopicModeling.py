@@ -30,8 +30,8 @@ neo_url  = 'bolt://localhost:7687'
 random.seed(1)
 
 # Set the sample sizes
-optimum_sample_size = 1000
-sample_size         = 10000     # TODO: this assumes that there are at least 10000 documents in the corpus
+optimum_sample_size = 100
+sample_size         = 1000     # TODO: this assumes that there are at least 10000 documents in the corpus
 
 # Number of words to include in word cloud
 number_of_topic_words = 30
@@ -343,6 +343,21 @@ class TopicModeling:
             image_read = f.read()
 
         return True, base64.encodestring(image_read)
+
+    def getWordsForTopic(self, topicNumber):
+        print('getWordsForTopic: {}'.format(topicNumber))
+
+        if not self.modelBuilt:
+            return False, ''
+
+        if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
+            return False, ''
+
+        word_probabilities = self.ldamodel.show_topic(topicNumber, number_of_topic_words)
+
+        data = [{'word': word_pair[0], 'probability': str(word_pair[1])} for word_pair in word_probabilities]
+ 
+        return True, json.dumps(data)
 
     def getScaledJensenShannonDistance(self):
         print('getScaledJensenShannonDistance')

@@ -53,6 +53,9 @@ GET	/tm/topics<br>
 **Get a word cloud for a topic**<br>
 GET	/tm/topics/\<id\>
 
+**Get top n word probabilities for a topic**<br>
+GET	/tm/topics/\<id\>/words
+
 **Get a visualization of the topic distribution. Returns an image.**<br>
 GET	/tm/topicdistribution<br>
 

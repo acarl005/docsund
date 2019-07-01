@@ -89,6 +89,17 @@ def GetWordCloudForTopic(topic_id):
         return (encodedImage, 200, {'content-type': 'text/plain'})
 
 
+@app.route("/TM/topics/<int:topic_id>/words", methods=["GET"])
+@cross_origin()
+def GetWordsForTopic(topic_id):
+    result, wordData = tm.getWordsForTopic(topic_id)
+
+    if not result:
+        return json_response({}, 400)
+    else:
+        return json_response(wordData)
+
+
 @app.route("/TM/topicdistribution", methods=["GET"])
 @cross_origin()
 def GetTopicDistribution():
