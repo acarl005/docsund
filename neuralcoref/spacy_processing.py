@@ -7,14 +7,14 @@ import neuralcoref
 import pandas as pd
 import multiprocessing as mp
 import numpy as np
-
+import time
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
                         'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
 NLP = spacy.load('en_core_web_sm')
 
-def load_processed_data(data="emails_processed.csv", nrows=5000):
-    base_df = pd.read_csv(data, nrows=nrows)
+def load_data(data="emails_processed.csv", nrows=5000, skiprows=0):
+    base_df = pd.read_csv(data, nrows=nrows, skiprows=skiprows)
     cols = ['Message-ID', 'To', 'From', 'Subject', 'content', 'Date']
     return base_df.loc[:, cols].dropna()
 
@@ -58,7 +58,7 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
     new_cols.append('processed_content')
     for col in new_cols:
         if col not in df:
-            df[col] = None
+            df[col] = ''
 
     for i, rows in df.iterrows():
         df.at[i, 'processed_content'] = nlp(df.at[i, 'content'])
@@ -70,7 +70,8 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
 
 
 if __name__ == '__main__':
-    base_df = load_processed_data(nrows=500)
+    start_time = time.time()
+    base_df = load_data(nrows=5000) #, skiprows=range(1,5000))
     processed_df = parallelize_df(base_df, process_emails)
     parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
-
+    print('Time elapsed: {} min'.format((time.time() - start_time)/60))
