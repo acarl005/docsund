@@ -69,9 +69,14 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
     return df
 
 
-if __name__ == '__main__':
+def main(neuralcoref=False):
     start_time = time.time()
-    base_df = load_data(nrows=5000) #, skiprows=range(1,5000))
+    base_df = load_data(nrows=500)  # , skiprows=range(1,5000))
     processed_df = parallelize_df(base_df, process_emails)
-    parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
-    print('Time elapsed: {} min'.format((time.time() - start_time)/60))
+    if neuralcoref:
+        parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
+    print('Time elapsed: {} min'.format((time.time() - start_time) / 60))
+    return processed_df
+
+if __name__ == '__main__':
+    main()

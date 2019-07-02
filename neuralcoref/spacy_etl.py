@@ -4,6 +4,8 @@ import re
 from itertools import count
 from dateutil.parser import parse
 from pytz import timezone
+from collections import defaultdict
+from fuzzywuzzy import process
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
                         'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
@@ -36,13 +38,44 @@ def entity_list_to_string(df):
     return df
 
 
-def create_entity_node_relationships(df, entity_name, global_id_counter):
-    entity_df = get_entity_df(df, entity_name)
-    entity_df = pd.DataFrame(entity_df.groupby('emailId')['name'].value_counts())
-    entity_df = entity_df.reset_index(level='emailId')
-    entity_df.columns = ['emailId', 'mentions']
+def levenstein_entities(entity_df, threshold=90):
+    names = entity_df.groupby('name').count()
+    names = names.sort_values(['emailId'], ascending=False)
+    names = names.reset_index()
+
+    quantile_breaks = []
+    for x in range(1, 11):
+        quantile_breaks.append(names.emailId.quantile(x / 10))
+
+    unique_quantiles = list(set(quantile_breaks))
+
+    choices = defaultdict(list)
+    for i, row in names.iterrows():
+        if row['emailId'] >= max(unique_quantiles):
+            holding = process.extract(row['name'], names['name'],
+                                      limit=unique_quantiles.index(max(unique_quantiles)) * 3)
+            for x in range(len(holding)):
+                if holding[x][1] >= threshold:
+                    if holding[x][0] not in choices.items():
+                        choices[row['name']].append(holding[x][0])
+        else:
+            unique_quantiles.pop()
+
+    for i, row in entity_df.iterrows():
+        for key, values in choices.items():
+            if row['name'] in values:
+                row['name'] = key
+
+    return entity_df
+
+
+def create_entity_node_relationships(df, entity_name, global_id_counter, levenstein=False):
+    raw_entity_df = get_entity_df(df, entity_name)
+    if levenstein:
+        raw_entity_df = levenstein_entities(raw_entity_df)
+    entity_df = pd.DataFrame(raw_entity_df['name'].value_counts())
     entity_df = entity_df.reset_index()
-    entity_df = entity_df.sort_values(by=["emailId"])
+    entity_df.columns = ['name', 'mentions']
     entity_df["id"] = [str(next(global_id_counter)) for _ in range(len(entity_df))]
     entity_df.index = entity_df.id
     entity_df_n4j = pd.DataFrame({
@@ -55,9 +88,12 @@ def create_entity_node_relationships(df, entity_name, global_id_counter):
     save_node = "neo4j-csv/entity_{entity}.csv".format(entity=entity_name)
     entity_df_n4j.to_csv(save_node, index=False)
 
+    relationship_df = pd.merge(entity_df, raw_entity_df, on='name')
+    relationship_df = relationship_df[['id', 'emailId']]
+
     mentions_n4j = pd.DataFrame({
-        ":START_ID": entity_df.emailId,
-        ":END_ID": entity_df.id,
+        ":START_ID": relationship_df.emailId,
+        ":END_ID": relationship_df.id,
         ":TYPE": "MENTION"
     })
 
