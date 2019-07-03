@@ -86,14 +86,15 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
         for entity in entity_list:
             if entity in [ent.label_ for ent in list(df.at[i, 'processed_body'].ents)]:
                 df.at[i, entity] = [e.text for e in list(df.at[i, 'processed_body'].ents) if e.label_ == entity]
-            df[entity] = df[entity].apply(lambda s: clean_enron_list(s))
+            if entity in ['PERSON', 'ORG', 'FAC']:
+                df[entity] = df[entity].apply(lambda s: clean_enron_list(s))
 
     return df
 
 
 def main(neuralcoref=False):
     start_time = time.time()
-    base_df = load_data(nrows=1000)
+    base_df = load_data(nrows=500)
     processed_df = parallelize_df(base_df, process_emails)
     if neuralcoref:
         parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
