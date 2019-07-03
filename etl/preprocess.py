@@ -3,6 +3,7 @@ from dateutil.parser import parse
 from email.parser import Parser
 import pandas as pd
 from pytz import timezone
+import csv
 
 
 def parse_email(msg):
@@ -40,7 +41,7 @@ def kaggle_preprocess(csv_path='emails.csv'):
         "date": email_raw_df.Date.apply(lambda s: parse(s).astimezone(timezone("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ"))
     })
 
-    email_df.to_csv("enron.csv", index=False)
+    email_df.to_csv("enron.csv", index=False, quoting=csv.QUOTE_ALL)
 
 
 if __name__ == "__main__":

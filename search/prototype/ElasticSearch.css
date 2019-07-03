@@ -1,11 +1,29 @@
 #results {
     max-width: 1000px;
+    height: 300px;
+    overflow: auto;
 }
 
 #indexValue {
     color: blue;
 }
 
-#messageValue {
+#toValue {
+}
+
+#fromValue {
+}
+
+#subjectalue {
+}
+
+#dateValue {
+}
+
+#bodyValue {
+}
+
+.messageField {
     color: black;
+    font-weight: bold;
 }
