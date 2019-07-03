@@ -196,6 +196,10 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False
     ### Entities
     entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc']
     for entity in entity_list:
+        if entity in ['person', 'org']:
+            levenstein = True
+        else:
+            levenstein = False
         create_entity_node_relationships(email_df, entity, global_id_counter, levenstein)
 
 if __name__ == '__main__':
