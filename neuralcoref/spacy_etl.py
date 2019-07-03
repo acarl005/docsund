@@ -6,6 +6,7 @@ from dateutil.parser import parse
 from pytz import timezone
 from collections import defaultdict
 from fuzzywuzzy import process
+import time
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
                         'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
@@ -32,9 +33,8 @@ def get_entity_df(df, entity_col):
 
 
 def entity_list_to_string(df):
-    for i in df.index:
-        for entity in ENTITIES_OF_INTEREST:
-            df[entity][i] = ', '.join(df[entity][i])
+    for entity in ENTITIES_OF_INTEREST:
+         df[entity] =  df[entity].apply(lambda s: ', '.join(s))
     return df
 
 
@@ -101,20 +101,23 @@ def create_entity_node_relationships(df, entity_name, global_id_counter, levenst
     mentions_n4j.to_csv(save_relationship, index=False)
 
 
-def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
+def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False):
     # generator for globally unique IDs in neo4j
     global_id_counter = count()
 
     spacy_raw_df = pd.read_pickle(pkl_path)
+    spacy_raw_df["to"] = spacy_raw_df.to.apply(lambda s: s.strip().split(","))
+    spacy_raw_df["subject"] = spacy_raw_df.subject.fillna("").apply(lambda s: escape_backslashes(s.strip()))
+    spacy_raw_df["body"] = spacy_raw_df.body.fillna("").apply(lambda s: escape_backslashes(s.strip()))
     spacy_raw_df = entity_list_to_string(spacy_raw_df)
 
     email_df = pd.DataFrame({
-        "id": spacy_raw_df["Message-ID"].str.extract(r'<\d+\.(\d+)\.JavaMail.evans@thyme>')[0],
-        "to": spacy_raw_df.To.apply(lambda s: list(set(re.split(r',\s*', re.sub(r'\n\t', '', s))))),
-        "from_": spacy_raw_df.From,
-        "subject": spacy_raw_df.Subject.apply(lambda s: escape_backslashes(s.strip())),
-        "body": spacy_raw_df.content.apply(lambda s: escape_backslashes(s.strip())),
-        "resolved_body": spacy_raw_df.neuralcoref_content.apply(lambda s: escape_backslashes(s.strip())),
+        "id": spacy_raw_df.id,
+        "to": spacy_raw_df.to,
+        "from_": spacy_raw_df['from'],
+        "subject": spacy_raw_df.subject,
+        "body": spacy_raw_df.body,
+        #"resolved_body": spacy_raw_df.neuralcoref_content.apply(lambda s: escape_backslashes(s.strip())),
         "person": spacy_raw_df.PERSON.apply(lambda s: escape_backslashes(s.strip())),
         "org": spacy_raw_df.ORG.apply(lambda s: escape_backslashes(s.strip())),
         "money": spacy_raw_df.MONEY.apply(lambda s: escape_backslashes(s.strip())),
@@ -122,7 +125,7 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
         "fac": spacy_raw_df.FAC.apply(lambda s: escape_backslashes(s.strip())),
         "gpe": spacy_raw_df.GPE.apply(lambda s: escape_backslashes(s.strip())),
         "loc": spacy_raw_df.LOC.apply(lambda s: escape_backslashes(s.strip())),
-        "date": spacy_raw_df.Date.apply(lambda s: parse(s).astimezone(timezone("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ"))
+        "date": spacy_raw_df.date.apply(lambda s: parse(s).astimezone(timezone("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ"))
     }).set_index("id", drop=False)
 
     email_df_n4j = pd.DataFrame({
@@ -131,7 +134,7 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
         "from": email_df.from_,
         "subject": email_df.subject,
         "body": email_df.body,
-        "resolved_body": email_df.resolved_body,
+       # "resolved_body": email_df.resolved_body,
         "person": email_df.person, 
         "org": email_df.org,
         "money": email_df.money,
@@ -193,8 +196,10 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails.pkl'):
     ### Entities
     entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc']
     for entity in entity_list:
-        create_entity_node_relationships(email_df, entity, global_id_counter)
+        create_entity_node_relationships(email_df, entity, global_id_counter, levenstein)
 
 if __name__ == '__main__':
-    spacy_to_neo4j_etl()
+    start_time = time.time()
+    spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False)
+    print('Time elapsed: {} min'.format((time.time() - start_time) / 60))
 

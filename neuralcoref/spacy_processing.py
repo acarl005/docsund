@@ -19,19 +19,15 @@ def escape_backslashes(s):
 
 
 def load_data(data="enron.csv", nrows=5000, skiprows=0):
-    email_df = pd.read_csv(data, nrows=nrows, skiprows=skiprows).set_index("id", drop=False)
-    email_df["to"] = email_df.to.apply(lambda s: s.strip().split(","))
-    email_df["subject"] = email_df.subject.fillna("").apply(lambda s: escape_backslashes(s.strip()))
-    email_df["body"] = email_df.body.fillna("").apply(lambda s: escape_backslashes(s.strip()))
+    email_df = pd.read_csv(data, nrows=nrows, skiprows=skiprows)
     return email_df
 
 
 def clean_threads(subject_df, subject_col='subject'):
     subject_df = subject_df.astype(str)
-
-    for index, row in subject_df.iterrows():
-        row[subject_col] = row[subject_col].replace('Re:', '')
-        row[subject_col] = row[subject_col].replace('re:', '')
+    subject_df[subject_col] = subject_df[subject_col].apply(lambda s: s.replace('Re:', ''))
+    subject_df[subject_col] = subject_df[subject_col].apply(lambda s: s.replace('re:', ''))
+    subject_df[subject_col] = subject_df[subject_col].apply(lambda s: s.replace('RE:', ''))
 
 
 def parallelize_df(df, func, save=False, save_file_name=''):
@@ -54,10 +50,28 @@ def process_neuralcoref(df, nlp=NLP):
     if neuralcoref not in nlp.pipeline:
         neuralcoref.add_to_pipe(nlp)
 
-    for idx, email in zip(df.index, nlp.pipe(df['content'].tolist(), batch_size=75)):
+    for idx, email in zip(df.index, nlp.pipe(df['body'].tolist(), batch_size=75)):
         df.at[idx, 'neuralcoref_body'] = email._.coref_resolved
 
     return df
+
+
+def clean_enron_list(entity_list):
+    for x in range(len(entity_list)):
+        entity_list[x] = entity_list[x].replace('ENRONDEVELOPMENT', '')
+        entity_list[x] = entity_list[x].replace('ENRON', '')
+        entity_list[x] = entity_list[x].replace('Contract', '')
+        entity_list[x] = entity_list[x].replace('Forward', '')
+        entity_list[x] = entity_list[x].replace('Accepted', '')
+        entity_list[x] = entity_list[x].replace('Login', '')
+        entity_list[x] = entity_list[x].replace('URGENT OWA', '')
+        entity_list[x] = re.sub(r'r?\n|\r/', '', entity_list[x])
+        entity_list[x] = re.sub(r'/[^/]*$', '', entity_list[x])
+        entity_list[x] = re.sub(r'/[^-]*$', '', entity_list[x])
+        entity_list[x] = re.sub(' +', ' ', entity_list[x])
+        entity_list[x] = re.sub(r'[^a-zA-Z ]+', '', entity_list[x])
+        entity_list[x] = entity_list[x].strip()
+    return(entity_list)
 
 
 def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
@@ -72,6 +86,7 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
         for entity in entity_list:
             if entity in [ent.label_ for ent in list(df.at[i, 'processed_body'].ents)]:
                 df.at[i, entity] = [e.text for e in list(df.at[i, 'processed_body'].ents) if e.label_ == entity]
+            df[entity] = df[entity].apply(lambda s: clean_enron_list(s))
 
     return df
 
