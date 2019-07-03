@@ -55,8 +55,8 @@ def levenstein_entities(entity_df, threshold=90):
             holding = process.extract(row['name'], names['name'],
                                       limit=unique_quantiles.index(max(unique_quantiles)) * 3)
             for x in range(len(holding)):
-                if holding[x][1] >= threshold:
-                    if holding[x][0] not in choices.items():
+                if holding[x][1] >= (100-unique_quantiles.index(max(unique_quantiles)) * 3):
+                    if holding[x][0] not in [item for sublist in list(choices.values()) for item in sublist]:
                         choices[row['name']].append(holding[x][0])
         else:
             unique_quantiles.pop()
@@ -200,6 +200,6 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False
 
 if __name__ == '__main__':
     start_time = time.time()
-    spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False)
+    spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=True)
     print('Time elapsed: {} min'.format((time.time() - start_time) / 60))
 

@@ -93,7 +93,7 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
 
 def main(neuralcoref=False):
     start_time = time.time()
-    base_df = load_data(nrows=500)
+    base_df = load_data(nrows=1000)
     processed_df = parallelize_df(base_df, process_emails)
     if neuralcoref:
         parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
