@@ -18,7 +18,7 @@ neo4j_host = os.getenv("NEO4J_DATABASE_SERVICE_HOST", "localhost")
 neo4j_port = os.getenv("NEO4J_DATABASE_SERVICE_PORT_MAIN", "7687")
 neo4j_url = "bolt://{}:{}".format(neo4j_host, neo4j_port)
 neo4j_user = os.getenv("NEO4J_DATABASE_USER", "neo4j")
-neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j")
+neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j").strip()
 
 logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
 

@@ -19,7 +19,7 @@ spec:
           image: neo4j
           resources:
             requests:
-              cpu: 2
+              cpu: 1.5
               memory: 512Mi
               ephemeral-storage: 4Gi
           ports:

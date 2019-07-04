@@ -7,8 +7,7 @@ spec:
     spec:
       containers:
         - name: docsund-etl
-          image: docsund-etl
-          imagePullPolicy: Never
+          image: acarl005/docsund-etl:0.1.0
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:

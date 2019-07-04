@@ -7,7 +7,6 @@
     "start": "node --experimental-modules server.mjs",
     "dev": "parcel src/index.html",
     "build": "rm -rf dist && API_URL=/api parcel build src/index.html",
-    "publish": "npm run build && node --experimental-modules publish.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -20,25 +19,23 @@
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-proposal-decorators": "^7.4.4",
     "@babel/preset-react": "^7.0.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-preset-env": "^1.7.0",
-    "express": "^4.17.1",
-    "gh-pages": "^2.0.1",
-    "parcel": "^1.12.3"
-  },
-  "dependencies": {
     "antd": "^3.19.6",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-preset-env": "^1.7.0",
     "d3": "^3.5.17",
     "deepmerge": "^3.2.0",
-    "http-proxy-middleware": "^0.19.1",
     "mobx": "^5.10.1",
     "mobx-react": "^6.1.1",
     "moment": "^2.24.0",
+    "parcel": "^1.12.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-svg-inline": "^2.1.1",
-    "shared": "^0.2.0",
     "styled-components": "^4.2.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^0.19.1"
   }
 }
