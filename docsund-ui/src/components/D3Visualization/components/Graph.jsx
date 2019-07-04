@@ -20,10 +20,11 @@
  */
 
 import React, { Component } from 'react'
+import { Button, Icon } from 'antd'
 import { createGraph, mapRelationships, getGraphStats } from '../mapper'
 import { GraphEventHandler } from '../GraphEventHandler'
 import '../lib/visualization/index'
-import { StyledZoomHolder, StyledSvgWrapper, StyledZoomButton } from './styled'
+import { StyledZoomHolder, StyledSvgWrapper } from './styled'
 import graphView from '../lib/visualization/components/graphView'
 
 const dim = {
@@ -148,26 +149,21 @@ export class GraphComponent extends Component {
 
   zoomButtons () {
     if (this.props.fullscreen) {
+      const ButtonGroup = Button.Group
       return (
         <StyledZoomHolder>
-          <StyledZoomButton
-            className={
-              this.state.zoomInLimitReached ? 'faded zoom-in' : 'zoom-in'
-            }
-            onClick={this.zoomInClicked.bind(this)}
-          >
-            {/*<ZoomInIcon />*/}
-            <span>zoom in</span>
-          </StyledZoomButton>
-          <StyledZoomButton
-            className={
-              this.state.zoomOutLimitReached ? 'faded zoom-out' : 'zoom-out'
-            }
+          <ButtonGroup>
+            <Button
+              icon='zoom-in'
+              disabled={this.state.zoomInLimitReached}
+              onClick={this.zoomInClicked.bind(this)}
+            />
+            <Button
+              icon='zoom-out'
+              disabled={this.state.zoomOutLimitReached}
             onClick={this.zoomOutClicked.bind(this)}
-          >
-            {/*<ZoomOutIcon />*/}
-            <span>zoom out</span>
-          </StyledZoomButton>
+            />
+          </ButtonGroup>
         </StyledZoomHolder>
       )
     }
