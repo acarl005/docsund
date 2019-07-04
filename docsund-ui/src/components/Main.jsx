@@ -39,6 +39,14 @@ const data = [
   'Search Result 5',
 ]
 
+const fullscreenStyle = {
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  position: 'fixed',
+}
+
 @observer
 export default class Main extends Component {
   state = {
@@ -148,7 +156,7 @@ export default class Main extends Component {
         getNeighbours={this.getNeighbours.bind(this)}
         nodes={this.state.initialNodes}
         relationships={[]}
-        fullscreen={false}
+        fullscreen={appStore.explorerFullscreen}
         frameHeight={this.props.frameHeight}
         assignVisElement={this.props.assignVisElement}
         getAutoCompleteCallback={callback => {
@@ -220,7 +228,7 @@ export default class Main extends Component {
                         <StyledInput name="searchInput" />
                       </AddonContainer>
                     </StyledForm>
-                    <div style={{ height: "600px" }}>
+                    <div style={appStore.explorerFullscreen ? fullscreenStyle : { height: "600px" }}>
                       { maybeExplorer }
                     </div>
                   </TabPane>

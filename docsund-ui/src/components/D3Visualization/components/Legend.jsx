@@ -20,6 +20,9 @@
  */
 
 import React, { Component } from 'react'
+import { observer } from 'mobx-react'
+import { Icon } from 'antd'
+import appStore from "../../../stores/AppStore"
 import {
   legendRowHeight,
   StyledLegendRow,
@@ -33,6 +36,7 @@ import {
 } from './styled'
 import { RowExpandToggleComponent } from './RowExpandToggle'
 
+@observer
 export class LegendComponent extends Component {
   constructor (props) {
     super(props)
@@ -76,6 +80,7 @@ export class LegendComponent extends Component {
                 className='token token-label'
               >
                 {legendItemKey}
+
                 <StyledTokenCount className='count'>{`(${
                   labels[legendItemKey].count
                 })`}</StyledTokenCount>
@@ -92,17 +97,12 @@ export class LegendComponent extends Component {
             className='list-inline'
             ref={this.setLabelRowELem.bind(this)}
           >
-            <RowExpandToggleComponent
-              contracted={this.state.labelRowContracted}
-              rowElem={this.state.labelRowELem}
-              containerHeight={legendRowHeight}
-              onClick={() => {
-                this.setState({
-                  labelRowContracted: !this.state.labelRowContracted
-                })
-              }}
-            />
             {labelList}
+            <Icon
+              type={appStore.explorerFullscreen ? 'fullscreen-exit' : 'fullscreen'}
+              style={{ float: 'right', cursor: 'pointer' }}
+              onClick={() => {appStore.toggleExplorerFullscreen()}}
+            />
           </StyledLegendInlineList>
         </StyledLegendRow>
       )

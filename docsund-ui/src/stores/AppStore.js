@@ -9,6 +9,7 @@ class AppStore {
   @observable activeEmailId = ''
   @observable activeRelationship
   @observable activePerson
+  @observable explorerFullscreen = false
 
   @computed
   get activeEmail() {
@@ -46,6 +47,10 @@ class AppStore {
 
   @action toggleModal(modalName) {
     this.modalVisibility[modalName] = !this.modalVisibility[modalName]
+  }
+
+  @action toggleExplorerFullscreen() {
+    this.explorerFullscreen = !this.explorerFullscreen
   }
 }
 
