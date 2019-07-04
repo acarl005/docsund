@@ -9,8 +9,8 @@ export default class PersonDetailsModal extends Component {
     appStore.toggleModal('personDetails')
   }
 
-  async onRowClick(neighbourId) {
-    await appStore.getEmailsBetween(neighbourId, appStore.activePerson.id)
+  async onRowClick(neighbour) {
+    await appStore.getEmailsBetween(neighbour, appStore.activePerson)
     appStore.toggleModal("email")
   }
 
@@ -36,8 +36,8 @@ export default class PersonDetailsModal extends Component {
       <Modal
         onCancel={this.onOk}
         onOk={this.onOk}
-        visible={appStore.modalVisibility.personDetails}
-        title="Person Details"
+        visible
+        title={`Emails of ${appStore.activePerson.email}`}
       >
         <List
           pagination={{
@@ -46,7 +46,7 @@ export default class PersonDetailsModal extends Component {
           dataSource={this.formattedPersonDetails()}
           renderItem={item => (
             <List.Item
-              onClick={() => this.onRowClick(item.id)}
+              onClick={() => this.onRowClick({ id: item.id, email: item.email })}
             >
               <List.Item.Meta
                 title={item.email}

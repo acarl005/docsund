@@ -35,13 +35,18 @@ export default class EmailModal extends React.Component {
   }
 
   render() {
+    if (appStore.activeRelationship === undefined) {
+      return null;
+    }
+
+    const { fromUser, toUser } = appStore.activeRelationship
     return (
       <Modal
-        visible={appStore.modalVisibility.email}
+        visible
         onCancel={this.onOk}
         onOk={this.onOk}
         width="75%"
-        title="Email Viewer"
+        title={`Emails between ${fromUser.email} and ${toUser.email}`}
       >
         {
           appStore.emailModalView === 'list'

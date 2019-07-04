@@ -7,27 +7,31 @@ class AppStore {
   }
   @observable emailModalView = 'list'
   @observable activeEmailId = ''
-  @observable emails = []
+  @observable activeRelationship
   @observable activePerson
 
   @computed
   get activeEmail() {
-    return this.emails.find((email) => email.id === this.activeEmailId)
+    return this.activeRelationship.emails.find((email) => email.id === this.activeEmailId)
   }
 
   @action
-  async getEmailsBetween(toUserId, fromUserId) {
-    const response = await fetch(`${API_URL}/emails?between=${toUserId},${fromUserId}`)
+  async getEmailsBetween(toUser, fromUser) {
+    const response = await fetch(`${API_URL}/emails?between=${toUser.id},${fromUser.id}`)
       .then(res => res.json())
-    this.emails = response
+    this.activeRelationship = {
+      toUser,
+      fromUser,
+      emails: response,
+    }
   }
 
   @action
-  async getPersonDetails(id) {
-    const response = await fetch(`${API_URL}/neighbours/${id}`)
+  async getPersonDetails(person) {
+    const response = await fetch(`${API_URL}/neighbours/${person.id}`)
       .then(res => res.json())
     this.activePerson = {
-      id,
+      ...person,
       details: response
     }
   }

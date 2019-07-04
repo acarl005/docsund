@@ -1,5 +1,6 @@
 import qs from "querystring"
 import React, { Component } from "react"
+import { observer } from 'mobx-react'
 import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
 import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
@@ -38,6 +39,7 @@ const data = [
   'Search Result 5',
 ]
 
+@observer
 export default class Main extends Component {
   state = {
     searchQuery: "",
@@ -110,12 +112,24 @@ export default class Main extends Component {
   }
 
   async onRelDblClick(relationship) {
-    await appStore.getEmailsBetween(relationship.source.id, relationship.target.id)
+    const source = {
+      id: relationship.source.id,
+      email: relationship.source.propertyMap.email,
+    }
+    const target = {
+      id: relationship.target.id,
+      email: relationship.target.propertyMap.email,
+    }
+    await appStore.getEmailsBetween(source, target)
     appStore.toggleModal('email')
   }
 
   async onNodeDblClick(node) {
-    await appStore.getPersonDetails(node.id)
+    const person = {
+      id: node.id,
+      email: node.propertyMap.email,
+    }
+    await appStore.getPersonDetails(person)
     appStore.toggleModal('personDetails')
   }
 
@@ -147,8 +161,8 @@ export default class Main extends Component {
     }
     return (
       <Layout>
-        <PersonDetailsModal />
-        <EmailModal />
+        {appStore.modalVisibility.email && <EmailModal />}
+        {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",

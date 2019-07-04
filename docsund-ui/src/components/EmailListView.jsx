@@ -17,6 +17,7 @@ export default class EmailListView extends React.Component {
   render() {
     return (
       <Table
+        scroll={{ x: true }}
         onRow={(record, rowIndex) => {
           return {
             onClick: this.onRowClick(record, rowIndex)
@@ -28,7 +29,7 @@ export default class EmailListView extends React.Component {
           {key: 'content', render: (text, record) => <EmailContentPreview subject={record.properties.subject} body={record.properties.body} />},
           {key: 'date', render: (text, record) => formatDate(record.properties.date)},
         ]}
-        dataSource={appStore.emails}
+        dataSource={appStore.activeRelationship.emails}
       />
     )
   }
