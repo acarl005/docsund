@@ -33,7 +33,7 @@ class AppStore {
       .then(res => res.json())
     this.activePerson = {
       ...person,
-
+      details: response
     }
   }
 
