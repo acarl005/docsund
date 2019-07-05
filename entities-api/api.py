@@ -4,6 +4,7 @@ import logging
 
 from neo4j import GraphDatabase
 from neotime import DateTime
+from elasticsearch import Elasticsearch
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 
@@ -23,6 +24,14 @@ neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j").strip()
 logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
 
 driver = GraphDatabase.driver(neo4j_url, auth=(neo4j_user, neo4j_password))
+
+es_host = os.getenv("ELASTICSEARCH_SERVICE_HOST", "localhost")
+es_port = os.getenv("ELASTICSEARCH_SERVICE_PORT_MAIN", "9200")
+es_url = "http://{}:{}".format(es_host, es_port)
+
+logging.info("connecting to %s", es_url)
+
+es = Elasticsearch([es_url])
 
 
 def json_response(payload, status=200):
@@ -57,7 +66,7 @@ def health_check():
     return 'pong'
 
 
-@app.route("/person/<id>", methods=["GET"])
+@app.route("/person/<int:id>", methods=["GET"])
 @cross_origin()
 def find_person(id):
     with driver.session() as sesh:
@@ -65,7 +74,7 @@ def find_person(id):
             MATCH (p:Person)
             WHERE ID(p) = $id
             RETURN p
-        """, id=int(id))
+        """, id=id)
         maybe_node = query.single()
         if maybe_node is None:
             return json_response({"message": 'person not found'}, 404)
@@ -73,10 +82,10 @@ def find_person(id):
     return json_response(node)
 
 
-@app.route("/neighbours/<id>", methods=["GET"])
+@app.route("/neighbours/<int:id>", methods=["GET"])
 @cross_origin()
 def get_neighbours(id):
-    limit = request.args.get("limit")
+    limit = request.args.get("limit", type=int)
     with driver.session() as sesh:
         query = sesh.run("""
             MATCH (center:Person)-[e:EMAILS_TO]-(neighbours:Person)
@@ -84,7 +93,7 @@ def get_neighbours(id):
             RETURN neighbours, e
             ORDER BY e.count DESC
             {}
-        """.format("LIMIT $limit" if limit is not None else ""), id=int(id), limit=int(limit or "0"))
+        """.format("LIMIT $limit" if limit is not None else ""), id=id, limit=int(limit or 0))
         results = query.values()
         neighbours = [neo4j_node_to_dict(record[0]) for record in results]
         relationships = [neo4j_edge_to_dict(record[1]) for record in results]
@@ -132,7 +141,7 @@ def get_emails_between():
 
 @app.route("/search", methods=["GET"])
 @cross_origin()
-def search_emails():
+def neo4j_search_emails():
     search_terms = request.args.get("q").strip().split()
     with driver.session() as sesh:
         db_query = sesh.run("""
@@ -142,6 +151,40 @@ def search_emails():
         """, search_terms=search_terms)
         results = db_query.values()
     return json_response([neo4j_node_to_dict(record[0]) for record in results])
+
+PAGE_SIZE = 25
+
+@app.route("/elasticsearch", methods=["GET"])
+@cross_origin()
+def es_search_emails():
+    search_query = request.args.get("q").strip()
+    page_num = request.args.get("page_num", default=1, type=int)
+    search_body = {
+        "_source": {
+            "includes": ["id", "to", "from", "subject", "body"]
+        },
+        "query": {
+            "query_string": {
+                "query": search_query
+            }
+        },
+        "from": (page_num - 1) * PAGE_SIZE,
+        "size": PAGE_SIZE,
+        "highlight": {
+            "type": "unified",
+            "pre_tags": "<mark>",
+            "post_tags": "</mark>",
+            "fields": {
+                "id": {},
+                "to": {},
+                "from": {},
+                "subject": {},
+                "body": {}
+            }
+        }
+    }
+    results = es.search(index="emails", body=search_body)
+    return json_response(results["hits"])
 
 
 if __name__ == '__main__':
