@@ -10,6 +10,8 @@ class AppStore {
   @observable activeRelationship
   @observable activePerson
   @observable explorerFullscreen = false
+  @observable emailSearchTerm = ''
+  @observable emailSearchResults = []
 
   @computed
   get activeEmail() {
@@ -35,6 +37,14 @@ class AppStore {
       ...person,
       details: response
     }
+  }
+
+  @action
+  async submitEmailSearch(searchTerm) {
+    const response = await fetch(`${API_URL}/elasticsearch?q=${searchTerm}`)
+      .then(res => res.json())
+    this.emailSearchTerm = searchTerm
+    this.emailSearchResults = response.hits.map(hit => hit.highlight)
   }
 
   @action setEmailModalView(view) {

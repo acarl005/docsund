@@ -1,9 +1,10 @@
 import qs from "querystring"
 import React, { Component } from "react"
 import { observer } from 'mobx-react'
-import { Layout, Tabs, Row, Col, Menu, Icon, Input, List } from 'antd'
+import { Layout, Tabs, Row, Col, Menu, Icon, List } from 'antd'
 import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
+import EmailSearch from "./EmailSearch"
 import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
@@ -30,14 +31,6 @@ function computeNodeScaleFactor(node) {
 function computeRelationshipScaleFactor(relationship) {
   relationship.scaleFactor = relationship.properties.count ** 0.4
 }
-
-const data = [
-  'Search Result 1',
-  'Search Result 2',
-  'Search Result 3',
-  'Search Result 4',
-  'Search Result 5',
-]
 
 const fullscreenStyle = {
   top: 0,
@@ -193,30 +186,7 @@ export default class Main extends Component {
         </Header>
 
         <Content>
-          <Row>
-            <Col span={18} offset={3}>
-              <div id="searchinput" style={{marginBottom: '16px', marginTop: '30px'}}>
-                <Input addonAfter={<Icon type="search" />} placeholder="Type a search query against the emails..." />
-              </div>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col span={18} offset={3}>
-              <div id="searchresults" style={{marginBottom: '64px'}}>
-                <List
-                  bordered
-                  dataSource={data}
-                  renderItem={item => (
-                    <List.Item>
-                      {item}
-                    </List.Item>
-                  )}
-                />
-              </div>
-            </Col>
-          </Row>
-
+          <EmailSearch />
           <Row>
             <Col span={18} offset={3}>
               <div id="explorer">
