@@ -6,6 +6,7 @@ import appStore from "../stores/AppStore"
 import EmailModal from "./EmailModal"
 import PersonDetailsModal from "./PersonDetailsModal"
 import TopicModelingComponent from "./TopicModelingComponent"
+import SearchComponent from "./SearchComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
 
@@ -193,29 +194,8 @@ export default class Main extends Component {
         </Header>
 
         <Content>
-          <Row>
-            <Col span={18} offset={3}>
-              <div id="searchinput" style={{marginBottom: '16px', marginTop: '30px'}}>
-                <Input addonAfter={<Icon type="search" />} placeholder="Type a search query against the emails..." />
-              </div>
-            </Col>
-          </Row>
 
-          <Row>
-            <Col span={18} offset={3}>
-              <div id="searchresults" style={{marginBottom: '64px'}}>
-                <List
-                  bordered
-                  dataSource={data}
-                  renderItem={item => (
-                    <List.Item>
-                      {item}
-                    </List.Item>
-                  )}
-                />
-              </div>
-            </Col>
-          </Row>
+          <SearchComponent />
 
           <Row>
             <Col span={18} offset={3}>
