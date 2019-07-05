@@ -5,7 +5,7 @@
 	- This process also performs some basic preprocessing and clean-up to PERSON, ORG, and FAC entities.
 	- For development purposes, the number of rows of `enron.csv` being read in is set to 5000 in the `main`; update as needed.
 3. Run `python spacy_etl.py` to convert the processed .pkl file into the format expected by the `neo4j-admin import` command, documented [here](https://neo4j.com/docs/operations-manual/current/tools/import/).
-    - This uses the `fuzzywuzzy` package to do some basic entity linking; right now, this is only for the **person** entity type because it's pretty slow.
+    - This uses the `fuzzywuzzy` package to do some basic entity linking (Levenshtein distance); right now, this is only for the **person** entity type because it's pretty slow.
 4. Run `./import.sh` to ingest those CSVs into Neo4j in a database named "docsund" (or, if you're stuck in Windows hell like me, `neo4j-admin import --f=import.txt`).
 5. Change the active database to "docsund" by editing the [Neo4j config](https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/) file. The location of this file depends on your installation. If on MacOS and installed via Homebrew, it would be at something like `/usr/local/Cellar/neo4j/$VERSION/libexec/conf/neo4j.conf`.
 6. Start up Neo4J.

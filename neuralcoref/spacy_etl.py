@@ -39,7 +39,7 @@ def entity_list_to_string(df):
     return df
 
 
-def levenstein_entities(entity_df):
+def levenshtein_entities(entity_df):
     entity_df['name'] = entity_df.name.apply(lambda x: (HumanName(x).first + ' ' + HumanName(x).last).strip())
     names = entity_df.groupby('name').count()
     names = names.sort_values(['emailId'], ascending=False)
@@ -71,10 +71,10 @@ def levenstein_entities(entity_df):
     return entity_df
 
 
-def create_entity_node_relationships(df, entity_name, global_id_counter, levenstein=False):
+def create_entity_node_relationships(df, entity_name, global_id_counter, levenshtein=False):
     raw_entity_df = get_entity_df(df, entity_name)
-    if levenstein:
-        raw_entity_df = levenstein_entities(raw_entity_df)
+    if levenshtein:
+        raw_entity_df = levenshtein_entities(raw_entity_df)
     entity_df = pd.DataFrame(raw_entity_df['name'].value_counts())
     entity_df = entity_df.reset_index()
     entity_df.columns = ['name', 'mentions']
@@ -205,9 +205,9 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl'):
     entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc', 'date', 'time', 'quantity']
     for entity in entity_list:
         if entity == 'person':
-            create_entity_node_relationships(email_df, entity, global_id_counter, levenstein=True)
+            create_entity_node_relationships(email_df, entity, global_id_counter, levenshtein=True)
         else:
-            create_entity_node_relationships(email_df, entity, global_id_counter, levenstein=False)
+            create_entity_node_relationships(email_df, entity, global_id_counter, levenshtein=False)
 
 
 if __name__ == '__main__':
