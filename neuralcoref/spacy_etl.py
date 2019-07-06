@@ -45,21 +45,26 @@ def levenshtein_entities(entity_df):
     names = names.sort_values(['emailId'], ascending=False)
     names = names.reset_index()
 
-    quantile_breaks = []
-    for x in range(1, 11):
-        quantile_breaks.append(names.emailId.quantile(x / 10))
+    # quantile_breaks = []
+    quantile_breaks = [names.emailId.quantile(x / 10) for x in range(1,11)]
+    # for x in range(1, 11):
+    #     quantile_breaks.append(names.emailId.quantile(x / 10))
 
     unique_quantiles = list(set(quantile_breaks))
 
     choices = defaultdict(list)
     for i, row in names.iterrows():
         if row['emailId'] >= max(unique_quantiles):
-            holding = process.extract(row['name'], names['name'],
+            holding = process.extract(row['name'], names['name'][i:len(names)],
                                       limit=unique_quantiles.index(max(unique_quantiles)) * 3)
-            for x in range(len(holding)):
-                if holding[x][1] >= (100-unique_quantiles.index(max(unique_quantiles)) * 3):
-                    if holding[x][0] not in [item for sublist in list(choices.values()) for item in sublist]:
-                        choices[row['name']].append(holding[x][0])
+            choices[row['name']] = [holding[x][0] for x in range(len(holding)) if
+                                    (holding[x][0] not in [item for sublist in list(choices.values()) for item in
+                                                           sublist])
+                                    & (holding[x][1] >= (100-unique_quantiles.index(max(unique_quantiles)) * 3))]
+            # for x in range(len(holding)):
+            #     if holding[x][1] >= (100-unique_quantiles.index(max(unique_quantiles)) * 3):
+            #         if holding[x][0] not in [item for sublist in list(choices.values()) for item in sublist]:
+            #             choices[row['name']].append(holding[x][0])
         else:
             unique_quantiles.pop()
 
