@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: topics-api
+  labels:
+    app: topics-api
+spec:
+  selector:
+    matchLabels:
+      app: topics-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: topics-api
+    spec:
+      containers:
+        - name: docsund-topics-api
+          image: acarl005/docsund-topics-api:0.1.0
+          imagePullPolicy: Never
+          env:
+            - name: NEO4J_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-secrets
+                  key: password
+          ports:
+            - containerPort: 5000
+
