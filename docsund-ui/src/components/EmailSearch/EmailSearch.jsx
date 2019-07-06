@@ -2,6 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import { Input, List, Row, Col } from 'antd'
 import appStore from '../../stores/AppStore'
+import Card from '../Card'
 import EmailSearchResultItem from './EmailSearchResultItem'
 
 const { Search } = Input
@@ -19,39 +20,28 @@ export default class EmailSearch extends React.Component {
 
   render() {
     return (
-      <>
-        <Row>
-          <Col span={18} offset={3}>
-            <div style={{marginBottom: '16px', marginTop: '30px'}}>
-              <Search
-                placeholder="Type a search query against the emails..."
-                onSearch={this.onSearch}
-              />
-            </div>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col span={18} offset={3}>
-            <div style={{marginBottom: '64px'}}>
-              <List
-                bordered
-                dataSource={appStore.emailSearchResults}
-                renderItem={item => (
-                  <List.Item>
-                    <EmailSearchResultItem
-                      id={item.id}
-                      highlight={item.highlight}
-                      properties={item.properties}
-                      onItemClick={this.onItemClick}
-                    />
-                  </List.Item>
-                )}
-              />
-            </div>
-          </Col>
-        </Row>
-      </>
+      <Card>
+        <Search
+          placeholder="Type a search query against the emails..."
+          onSearch={this.onSearch}
+        />
+        <div style={{margin: '16px 0'}}>
+          <List
+            bordered
+            dataSource={appStore.emailSearchResults}
+            renderItem={item => (
+              <List.Item>
+                <EmailSearchResultItem
+                  id={item.id}
+                  highlight={item.highlight}
+                  properties={item.properties}
+                  onItemClick={this.onItemClick}
+                />
+              </List.Item>
+            )}
+          />
+        </div>
+      </Card>
     )
   }
 }
