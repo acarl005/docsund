@@ -1,4 +1,5 @@
 import os, sys, email, re
+import logging
 import numpy as np 
 import pandas as pd
 import datetime
@@ -21,10 +22,17 @@ from gensim.models import CoherenceModel
 
 from wordcloud import WordCloud
 
-# Credentials for Neo4j database	# TODO: move to a config file
-neo_user = 'neo4j'
-neo_pass = 'password'
-neo_url  = 'bolt://localhost:7687'
+logging.basicConfig(format="%(asctime)s - %(levelname)s:%(message)s", level=logging.INFO)
+
+neo4j_host = os.getenv("NEO4J_DATABASE_SERVICE_HOST", "localhost")
+neo4j_port = os.getenv("NEO4J_DATABASE_SERVICE_PORT_MAIN", "7687")
+neo4j_url = "bolt://{}:{}".format(neo4j_host, neo4j_port)
+neo4j_user = os.getenv("NEO4J_DATABASE_USER", "neo4j")
+neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j").strip()
+
+logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
+driver = GraphDatabase.driver(neo4j_url, auth=(neo4j_user, neo4j_password))
+logging.info("connected")
 
 # Set the random seed for reproducability
 random.seed(1)
@@ -132,8 +140,6 @@ class createModelThread(threading.Thread):
     def process_emails(self):
         global sample_size
         global optimum_sample_size
-
-        driver = GraphDatabase.driver(neo_url, auth=(neo_user, neo_pass))
 
         emails_df = pd.DataFrame(columns=['ID','Date','Message'])
 

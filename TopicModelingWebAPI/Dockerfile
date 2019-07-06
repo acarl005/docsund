@@ -1,0 +1,15 @@
+FROM ubuntu:latest
+
+MAINTAINER Andrew Carlson
+
+RUN apt-get update -yqq
+RUN apt-get install -yqq python3-pip
+
+COPY . /app
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+
+EXPOSE 5000 
+
+CMD python3 TopicModelingAPI.py
+

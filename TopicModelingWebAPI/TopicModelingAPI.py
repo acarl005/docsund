@@ -11,7 +11,6 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-
 def json_response(payload, status=200):
     """
     Returns the payload encoded as JSON to the client, and sets the HTTP status code.
@@ -133,3 +132,6 @@ def GetDocIDsForTopic(topic_id):
         return json_response({}, 400)
     else:
         return json_response({'docIDs': docIDs})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001)
