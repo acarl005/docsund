@@ -12,6 +12,11 @@ export default class EmailSearch extends React.Component {
     appStore.submitEmailSearch(val)
   }
 
+  onItemClick = (id) => {
+    appStore.setActiveSearchEmail(id)
+    appStore.toggleModal('emailSearchResult')
+  }
+
   render() {
     return (
       <>
@@ -38,6 +43,7 @@ export default class EmailSearch extends React.Component {
                       id={item.id}
                       highlight={item.highlight}
                       properties={item.properties}
+                      onItemClick={this.onItemClick}
                     />
                   </List.Item>
                 )}

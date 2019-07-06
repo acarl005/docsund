@@ -6,9 +6,9 @@ import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
 @observer
-export default class EmailModal extends React.Component {
+export default class EmailsBetweenModal extends React.Component {
   onOk = () => {
-    appStore.toggleModal('email')
+    appStore.toggleModal('emailsBetween')
     appStore.setEmailModalView('list')
   }
 

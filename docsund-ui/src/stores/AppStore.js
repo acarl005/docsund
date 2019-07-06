@@ -2,13 +2,15 @@ import { action, computed, observable } from 'mobx'
 
 class AppStore {
   @observable modalVisibility = {
-    email: false,
+    emailsBetween: false,
+    emailSearchResult: false,
     personDetails: false,
   }
   @observable emailModalView = 'list'
   @observable activeEmailId = ''
   @observable activeRelationship
   @observable activePerson
+  @observable activeSearchEmailId = ''
   @observable explorerFullscreen = false
   @observable emailSearchTerm = ''
   @observable emailSearchResults = []
@@ -16,7 +18,11 @@ class AppStore {
   @computed
   get activeEmail() {
     return this.activeRelationship.emails.find((email) => email.id === this.activeEmailId)
-        || this.emailSearchResults.find((email) => email.id === this.activeEmailId)
+  }
+
+  @computed
+  get activeSearchEmail() {
+    return this.emailSearchResults.find((email) => email.id === this.activeSearchEmailId)
   }
 
   @action
@@ -64,6 +70,10 @@ class AppStore {
 
   @action setActiveEmail(id) {
     this.activeEmailId = id
+  }
+
+  @action setActiveSearchEmail(id) {
+    this.activeSearchEmailId = id
   }
 
   @action toggleModal(modalName) {

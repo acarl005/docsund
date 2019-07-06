@@ -11,7 +11,7 @@ export default class PersonDetailsModal extends Component {
 
   async onRowClick(neighbour) {
     await appStore.getEmailsBetween(neighbour, appStore.activePerson)
-    appStore.toggleModal("email")
+    appStore.toggleModal('emailsBetween')
   }
 
   formattedPersonDetails() {

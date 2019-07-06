@@ -34,7 +34,6 @@ import {
   StyledTokenCount,
   StyledLegendInlineList
 } from './styled'
-import { RowExpandToggleComponent } from './RowExpandToggle'
 
 @observer
 export class LegendComponent extends Component {
@@ -150,16 +149,6 @@ export class LegendComponent extends Component {
             className='list-inline'
             ref={this.setTypeRowELem.bind(this)}
           >
-            <RowExpandToggleComponent
-              contracted={this.state.typeRowContracted}
-              rowElem={this.state.typeRowElem}
-              containerHeight={legendRowHeight}
-              onClick={() => {
-                this.setState({
-                  typeRowContracted: !this.state.typeRowContracted
-                })
-              }}
-            />
             {relTypeList}
           </StyledLegendInlineList>
         </StyledLegendRow>

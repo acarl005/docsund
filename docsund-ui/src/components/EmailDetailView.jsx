@@ -30,12 +30,14 @@ const Body = styled.div`
 export default class EmailDetailView extends React.Component {
   render() {
     const { date, from, to, body, subject, onListViewClick } = this.props;
+    const toAsString = typeof to === 'object' ? to.join(', ') : to
     return (
       <Wrapper>
-        <Button onClick={onListViewClick} icon='arrow-left'>Back to List</Button>
+        {this.onListViewClick && <Button onClick={onListViewClick} icon='arrow-left'>Back to List</Button>}
+        <div style={{textAlign: 'right'}}>{date}</div>
         <Subject>{subject}</Subject>
         <div>From: {from}</div>
-        <Collapse>To: {to.join(', ')}</Collapse>
+        <Collapse>To: {toAsString}</Collapse>
         <Body>{body}</Body>
       </Wrapper>
     )

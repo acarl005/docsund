@@ -1,7 +1,5 @@
 import React from 'react'
-import { observer } from 'mobx-react'
 import styled from 'styled-components'
-import appStore from '../../stores/AppStore'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -32,13 +30,7 @@ const originalText = (key, val) => (
   </div>
 )
 
-@observer
 export default class EmailSearchResultItem extends React.Component {
-  onClick = () => {
-    appStore.setActiveEmail(this.props.id)
-    appStore.toggleModal('email')
-  }
-
   renderByKey = (key) => {
     const { highlight, properties } = this.props;
     return key in highlight
@@ -49,7 +41,7 @@ export default class EmailSearchResultItem extends React.Component {
   render() {
     return (
       <Wrapper
-        onClick={this.onClick}
+        onClick={() => this.props.onItemClick(this.props.id)}
       >
         <div style={{ textAlign: 'right' }}>{this.props.properties.date}</div>
         {this.renderByKey('from')}

@@ -3,9 +3,10 @@ import React, { Component } from "react"
 import { observer } from 'mobx-react'
 import { Layout, Tabs, Row, Col, Menu, Icon, List } from 'antd'
 import appStore from "../stores/AppStore"
-import EmailModal from "./EmailModal"
-import EmailSearch from "./EmailSearch"
+import EmailsBetweenModal from "./EmailsBetweenModal"
 import PersonDetailsModal from "./PersonDetailsModal"
+import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
+import EmailSearch from "./EmailSearch"
 import TopicModelingComponent from "./TopicModelingComponent"
 const { Header, Content } = Layout
 const { TabPane } = Tabs
@@ -122,7 +123,7 @@ export default class Main extends Component {
       email: relationship.target.propertyMap.email,
     }
     await appStore.getEmailsBetween(source, target)
-    appStore.toggleModal('email')
+    appStore.toggleModal('emailsBetween')
   }
 
   async onNodeDblClick(node) {
@@ -162,7 +163,8 @@ export default class Main extends Component {
     }
     return (
       <Layout>
-        {appStore.modalVisibility.email && <EmailModal />}
+        {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
+        {appStore.modalVisibility.emailsBetween && <EmailsBetweenModal />}
         {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
         <Header className="header">
           <div className="logo" style={{
