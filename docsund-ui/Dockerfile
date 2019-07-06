@@ -1,5 +1,7 @@
 FROM node:12-alpine
 
+MAINTAINER Andrew Carlson
+
 COPY . /app
 WORKDIR /app
 RUN npm install

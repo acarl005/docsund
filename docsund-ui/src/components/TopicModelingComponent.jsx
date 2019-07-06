@@ -1,9 +1,6 @@
 import React from "react";
 
 
-// Set the URL to the topic modeling web service endpoint
-var test_url = 'http://127.0.0.1:5000';
-
 function createNode(element) {
     return document.createElement(element);
 };
@@ -63,7 +60,7 @@ class TopicModelingComponent extends React.Component {
     //
     checkIfModelBuiltFn () {
 
-        fetch(test_url + '/TM/ldamodel', {
+        fetch(TOPIC_API_URL + '/TM/ldamodel', {
             mode: 'cors',
             method: 'GET'
         })
@@ -94,7 +91,7 @@ class TopicModelingComponent extends React.Component {
 
         // Number of topics
         var setNumTopicsChkBx = document.getElementById("setNumTopicsChkBx");
-        var url = test_url + '/TM/topics/';
+        var url = TOPIC_API_URL + '/TM/topics/';
 
         if (setNumTopicsChkBx.checked) {
             var numTopicsText = document.getElementById("setNumTopicsText");
@@ -128,7 +125,7 @@ class TopicModelingComponent extends React.Component {
         var formData = new FormData();
         formData.append('stopWords', stopWords);
 
-        fetch(test_url + '/TM/stopwords', {
+        fetch(TOPIC_API_URL + '/TM/stopwords', {
             mode: 'cors',
             method: 'POST',
             body: formData
@@ -139,7 +136,7 @@ class TopicModelingComponent extends React.Component {
         });
 
         // Start building the model
-        fetch(test_url + '/TM/ldamodel', {
+        fetch(TOPIC_API_URL + '/TM/ldamodel', {
             mode: 'cors',
             method: 'POST'
         })
@@ -155,7 +152,7 @@ class TopicModelingComponent extends React.Component {
     // Sets the input field to the server's value for the number of topics to find
     //
     getNumTopicsFn () {
-        fetch(test_url + '/TM/topics', {
+        fetch(TOPIC_API_URL + '/TM/topics', {
             mode: 'cors',
             method: 'GET'
         })
@@ -180,7 +177,7 @@ class TopicModelingComponent extends React.Component {
         var chosenTopicNumber = parseInt(chosenTopicIDText.value, 10);
         chosenTopicNumber -= 1;
 
-        fetch(test_url + '/TM/topics/' + chosenTopicNumber.toString(), {
+        fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString(), {
             mode: 'cors',
             method: 'GET'
         })
@@ -199,7 +196,7 @@ class TopicModelingComponent extends React.Component {
     // the data for this image.
     //
     getTopicDistributionFn () {
-        fetch(test_url + '/TM/topicdistribution', {
+        fetch(TOPIC_API_URL + '/TM/topicdistribution', {
             mode: 'cors',
             method: 'GET'
         })
@@ -224,7 +221,7 @@ class TopicModelingComponent extends React.Component {
         var chosenTopicNumber = parseInt(topicIDForDocumentsText.value, 10);
         chosenTopicNumber -= 1;
 
-        fetch(test_url + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
+        fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
             mode: 'cors',
             method: 'GET'
         })

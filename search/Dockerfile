@@ -1,5 +1,7 @@
 FROM logstash:7.2.0
 
+MAINTAINER Andrew Carlson
+
 USER root
 
 RUN yum install -y epel-release

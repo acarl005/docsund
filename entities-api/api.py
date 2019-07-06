@@ -22,16 +22,16 @@ neo4j_user = os.getenv("NEO4J_DATABASE_USER", "neo4j")
 neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j").strip()
 
 logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
-
 driver = GraphDatabase.driver(neo4j_url, auth=(neo4j_user, neo4j_password))
+logging.info("connected")
 
 es_host = os.getenv("ELASTICSEARCH_SERVICE_HOST", "localhost")
 es_port = os.getenv("ELASTICSEARCH_SERVICE_PORT_MAIN", "9200")
 es_url = "http://{}:{}".format(es_host, es_port)
 
 logging.info("connecting to %s", es_url)
-
 es = Elasticsearch([es_url])
+logging.info("connected")
 
 
 def json_response(payload, status=200):
