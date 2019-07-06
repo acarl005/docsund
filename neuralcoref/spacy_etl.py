@@ -6,6 +6,7 @@ from dateutil.parser import parse
 from pytz import timezone
 from collections import defaultdict
 from fuzzywuzzy import process
+from nameparser import HumanName
 import time
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
@@ -38,7 +39,8 @@ def entity_list_to_string(df):
     return df
 
 
-def levenstein_entities(entity_df, threshold=90):
+def levenshtein_entities(entity_df):
+    entity_df['name'] = entity_df.name.apply(lambda x: (HumanName(x).first + ' ' + HumanName(x).last).strip())
     names = entity_df.groupby('name').count()
     names = names.sort_values(['emailId'], ascending=False)
     names = names.reset_index()
@@ -69,10 +71,10 @@ def levenstein_entities(entity_df, threshold=90):
     return entity_df
 
 
-def create_entity_node_relationships(df, entity_name, global_id_counter, levenstein=False):
+def create_entity_node_relationships(df, entity_name, global_id_counter, levenshtein=False):
     raw_entity_df = get_entity_df(df, entity_name)
-    if levenstein:
-        raw_entity_df = levenstein_entities(raw_entity_df)
+    if levenshtein:
+        raw_entity_df = levenshtein_entities(raw_entity_df)
     entity_df = pd.DataFrame(raw_entity_df['name'].value_counts())
     entity_df = entity_df.reset_index()
     entity_df.columns = ['name', 'mentions']
@@ -101,7 +103,7 @@ def create_entity_node_relationships(df, entity_name, global_id_counter, levenst
     mentions_n4j.to_csv(save_relationship, index=False)
 
 
-def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False):
+def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl'):
     # generator for globally unique IDs in neo4j
     global_id_counter = count()
 
@@ -125,7 +127,10 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False
         "fac": spacy_raw_df.FAC.apply(lambda s: escape_backslashes(s.strip())),
         "gpe": spacy_raw_df.GPE.apply(lambda s: escape_backslashes(s.strip())),
         "loc": spacy_raw_df.LOC.apply(lambda s: escape_backslashes(s.strip())),
-        "date": spacy_raw_df.date.apply(lambda s: parse(s).astimezone(timezone("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ"))
+        "date": spacy_raw_df.DATE.apply(lambda s: escape_backslashes(s.strip())),
+        "time": spacy_raw_df.TIME.apply(lambda s: escape_backslashes(s.strip())),
+        "quantity": spacy_raw_df.QUANTITY.apply(lambda s: escape_backslashes(s.strip())),
+        "email_date": spacy_raw_df.date.apply(lambda s: parse(s).astimezone(timezone("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ"))
     }).set_index("id", drop=False)
 
     email_df_n4j = pd.DataFrame({
@@ -142,7 +147,10 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False
         "fac": email_df.fac,
         "gpe": email_df.gpe,
         "loc": email_df.loc,
-        "date:datetime": email_df.date,
+        "date": email_df.date,
+        "time": email_df.time,
+        "quantity": email_df.quantity,
+        "email_date:datetime": email_df.email_date,
         ":LABEL": "Email"
     })
 
@@ -194,16 +202,16 @@ def spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=False
     to_df_n4j.to_csv("neo4j-csv/to.csv", index=False)
 
     ### Entities
-    entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc']
+    entity_list = ['person', 'org', 'money', 'norp', 'fac', 'gpe', 'loc', 'date', 'time', 'quantity']
     for entity in entity_list:
-        if entity in ['person', 'org']:
-            levenstein = True
+        if entity == 'person':
+            create_entity_node_relationships(email_df, entity, global_id_counter, levenshtein=True)
         else:
-            levenstein = False
-        create_entity_node_relationships(email_df, entity, global_id_counter, levenstein)
+            create_entity_node_relationships(email_df, entity, global_id_counter, levenshtein=False)
+
 
 if __name__ == '__main__':
     start_time = time.time()
-    spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl', levenstein=True)
+    spacy_to_neo4j_etl(pkl_path='processed_emails_nocoref.pkl')
     print('Time elapsed: {} min'.format((time.time() - start_time) / 60))
 
