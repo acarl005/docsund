@@ -2,7 +2,7 @@ eksctl create cluster --name docsund \
                       --version 1.13 \
                       --nodegroup-name kube-workers \
                       --node-type t3.medium \
-                      --nodes 3 \
+                      --nodes 4 \
                       --nodes-min 1 \
                       --nodes-max 4 \
                       --node-ami auto \
