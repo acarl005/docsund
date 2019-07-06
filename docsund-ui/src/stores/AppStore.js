@@ -16,6 +16,7 @@ class AppStore {
   @computed
   get activeEmail() {
     return this.activeRelationship.emails.find((email) => email.id === this.activeEmailId)
+        || this.emailSearchResults.find((email) => email.id === this.activeEmailId)
   }
 
   @action
@@ -44,7 +45,17 @@ class AppStore {
     const response = await fetch(`${API_URL}/elasticsearch?q=${searchTerm}`)
       .then(res => res.json())
     this.emailSearchTerm = searchTerm
-    this.emailSearchResults = response.hits.map(hit => hit.highlight)
+    this.emailSearchResults = response.hits.map(hit => ({
+      id: hit._source.id,
+      highlight: hit.highlight,
+      properties: {
+        date: hit._source.date,
+        subject: hit._source.subject,
+        body: hit._source.body,
+        to: hit._source.to,
+        from: hit._source.from,
+      }
+    }))
   }
 
   @action setEmailModalView(view) {

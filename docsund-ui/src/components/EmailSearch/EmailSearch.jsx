@@ -1,7 +1,8 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Input, List, Row, Col } from 'antd'
-import appStore from '../stores/AppStore'
+import appStore from '../../stores/AppStore'
+import EmailSearchResultItem from './EmailSearchResultItem'
 
 const { Search } = Input
 
@@ -32,11 +33,11 @@ export default class EmailSearch extends React.Component {
                 bordered
                 dataSource={appStore.emailSearchResults}
                 renderItem={item => (
-                  <List.Item
-                    style={{wordBreak: 'break-all'}}
-                  >
-                    <div
-                      dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
+                  <List.Item>
+                    <EmailSearchResultItem
+                      id={item.id}
+                      highlight={item.highlight}
+                      properties={item.properties}
                     />
                   </List.Item>
                 )}

@@ -34,6 +34,15 @@ export default class EmailModal extends React.Component {
     ]
   }
 
+  onListViewClick = () => {
+    appStore.setEmailModalView('list')
+  }
+
+  onDetailViewClick = (email) => {
+    appStore.setActiveEmail(email.id)
+    appStore.setEmailModalView('detail')
+  }
+
   render() {
     if (appStore.activeRelationship === undefined) {
       return null;
@@ -49,9 +58,19 @@ export default class EmailModal extends React.Component {
         title={`Emails between ${fromUser.email} and ${toUser.email}`}
       >
         {
-          appStore.emailModalView === 'list'
-            ? <EmailListView />
-            : <EmailDetailView />
+          appStore.emailModalView === 'list' ?
+            <EmailListView
+              emails={appStore.activeRelationship.emails}
+              onDetailViewClick={this.onDetailViewClick}
+            /> :
+            <EmailDetailView
+              date={appStore.activeEmail.properties.date}
+              from={appStore.activeEmail.properties.from}
+              to={appStore.activeEmail.properties.to}
+              body={appStore.activeEmail.properties.body}
+              subject={appStore.activeEmail.properties.subject}
+              onListViewClick={this.onListViewClick}
+            />
         }
       </Modal>
     )

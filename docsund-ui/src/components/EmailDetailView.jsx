@@ -1,8 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { observer } from 'mobx-react'
 import { Button } from 'antd'
-import appStore from '../stores/AppStore'
 import Collapse from './Collapse'
 
 const Wrapper = styled.div`
@@ -29,17 +27,12 @@ const Body = styled.div`
   color: black;
 `
 
-@observer
 export default class EmailDetailView extends React.Component {
-  onClick = () => {
-    appStore.setEmailModalView('list')
-  }
-
   render() {
-    const { date, from, to, body, subject } = appStore.activeEmail.properties
+    const { date, from, to, body, subject, onListViewClick } = this.props;
     return (
       <Wrapper>
-        <Button onClick={this.onClick} icon='arrow-left'>Back to List</Button>
+        <Button onClick={onListViewClick} icon='arrow-left'>Back to List</Button>
         <Subject>{subject}</Subject>
         <div>From: {from}</div>
         <Collapse>To: {to.join(', ')}</Collapse>
