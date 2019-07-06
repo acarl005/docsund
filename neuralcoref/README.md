@@ -1,6 +1,6 @@
 # SpaCy Processing & ETL
 
-1. **This is meant to be run after the `python processing.py` script in docsund\etl.**
+1. **This is meant to be run after the `python preprocess.py` script in docsund\etl.**
 2. Run `python spacy_processing.py` to process the raw CSV with SpaCy; it will identify and extract all entities by type (see the [SpaCy named entity documentation] (https://spacy.io/api/annotation#named-entities). It will optionally apply the `neuralcoref` model to perform coreference resolution *within* each email. However, this is a very computationally heavy task, so proceed with caution if you opt to enable that when running the script.
 	- This process also performs some basic preprocessing and clean-up to PERSON, ORG, and FAC entities.
 	- For development purposes, the number of rows of `enron.csv` being read in is set to 5000 in the `main`; update as needed.
