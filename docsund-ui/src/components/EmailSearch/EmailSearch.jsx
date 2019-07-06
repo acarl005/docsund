@@ -7,8 +7,9 @@ import EmailSearchResultItem from './EmailSearchResultItem'
 
 @observer
 export default class EmailSearch extends React.Component {
-  onSearch = (val) => {
-    appStore.submitEmailSearch(val)
+  onSearch = (e) => {
+    const { value } = e.target
+    appStore.submitEmailSearch(value)
   }
 
   onItemClick = (id) => {
