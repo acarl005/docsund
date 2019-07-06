@@ -1,11 +1,9 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Input, List, Row, Col } from 'antd'
+import { Icon, Input, List, Row, Col } from 'antd'
 import appStore from '../../stores/AppStore'
 import Card from '../Card'
 import EmailSearchResultItem from './EmailSearchResultItem'
-
-const { Search } = Input
 
 @observer
 export default class EmailSearch extends React.Component {
@@ -21,9 +19,10 @@ export default class EmailSearch extends React.Component {
   render() {
     return (
       <Card>
-        <Search
+        <Input
+          prefix={<Icon type="search" />}
           placeholder="Type a search query against the emails..."
-          onSearch={this.onSearch}
+          onPressEnter={this.onSearch}
         />
         <div style={{margin: '16px 0'}}>
           <List

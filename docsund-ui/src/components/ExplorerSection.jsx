@@ -1,18 +1,11 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Layout, Tabs } from 'antd'
+import { Icon, Layout, Tabs, Input } from 'antd'
 import qs from "querystring"
 import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
 import Explorer from "./D3Visualization"
-
-import {
-  StyledForm,
-  StyledInput,
-  AddonContainer,
-  AddonLeft
-} from "./styled"
 
 const { TabPane } = Tabs
 
@@ -161,12 +154,11 @@ export default class ExplorerSection extends React.Component {
       <Card>
         <Tabs animated={false}>
           <TabPane tab="Entity Explorer" key="1">
-            <StyledForm onSubmit={this.handleSearch.bind(this)}>
-              <AddonContainer>
-                <AddonLeft><i className="fas fa-search"></i></AddonLeft>
-                <StyledInput name="searchInput" />
-              </AddonContainer>
-            </StyledForm>
+            <Input
+              prefix={<Icon type="search" />}
+              style={{marginBottom: 8}}
+              onPressEnter={this.handleSearch.bind(this)}
+            />
             <div style={appStore.explorerFullscreen ? fullscreenStyle : { height: "600px" }}>
               { maybeExplorer }
             </div>
