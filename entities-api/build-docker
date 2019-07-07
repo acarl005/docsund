@@ -1,1 +1,1 @@
-docker build -t acarl005/docsund-entities-api:0.1.4 .
+docker build -t acarl005/docsund-entities-api:0.1.5 .

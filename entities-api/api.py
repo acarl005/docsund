@@ -125,17 +125,29 @@ def get_internal_relationships():
 @app.route("/emails", methods=["GET"])
 @cross_origin()
 def get_emails_between():
-    ids = request.args.get("between").split(",")
-    if len(ids) != 2:
-        return json_response({"message": "invalid format for argument `between`. should be a list of 2 ids"})
-    with driver.session() as sesh:
-        query = sesh.run("""
-            MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
-            WHERE (ID(a) = $id_a AND ID(b) = $id_b) OR (ID(b) = $id_a AND ID(a) = $id_b)
-            RETURN DISTINCT e
-            ORDER BY e.date
-        """, id_a=int(ids[0]), id_b=int(ids[1]))
-        results = query.values()
+    if "between" in request.args:
+        person_ids = request.args.get("between").split(",")
+        if len(person_ids) != 2:
+            return json_response({"message": "invalid format for argument `between`. should be a list of 2 ids"})
+        with driver.session() as sesh:
+            query = sesh.run("""
+                MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
+                WHERE (ID(a) = $id_a AND ID(b) = $id_b) OR (ID(b) = $id_a AND ID(a) = $id_b)
+                RETURN DISTINCT e
+                ORDER BY e.date
+            """, id_a=int(person_ids[0]), id_b=int(person_ids[1]))
+            results = query.values()
+    elif "email_ids" in request.args:
+        email_ids = request.args.get("email_ids").split(",")
+        with driver.session() as sesh:
+            query = sesh.run("""
+                MATCH (e:Email)
+                WHERE e.emailId IN $email_ids
+                RETURN DISTINCT e
+            """, email_ids=email_ids)
+            results = query.values()
+    else:
+        return json_response({"message": "one of `between` or `email_ids` is required in the query string"})
     return json_response([neo4j_node_to_dict(record[0]) for record in results])
 
 
@@ -161,7 +173,7 @@ def es_search_emails():
     page_num = request.args.get("page_num", default=1, type=int)
     search_body = {
         "_source": {
-            "includes": ["id", "to", "from", "subject", "body"]
+            "includes": ["id", "to", "from", "subject", "body", "date"]
         },
         "query": {
             "query_string": {
@@ -179,7 +191,8 @@ def es_search_emails():
                 "to": {},
                 "from": {},
                 "subject": {},
-                "body": {}
+                "body": {},
+                "date": {}
             }
         }
     }
