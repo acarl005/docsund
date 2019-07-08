@@ -11,8 +11,6 @@ from enum import IntEnum
 import base64
 import json
 
-from neo4j import GraphDatabase
-
 from EmailHelperFunctions import get_text_from_email, split_email_addresses, clean_email
 from MDS import cmdscale
 
@@ -24,22 +22,12 @@ from wordcloud import WordCloud
 
 logging.basicConfig(format="%(asctime)s - %(levelname)s:%(message)s", level=logging.INFO)
 
-neo4j_host = os.getenv("NEO4J_DATABASE_SERVICE_HOST", "localhost")
-neo4j_port = os.getenv("NEO4J_DATABASE_SERVICE_PORT_MAIN", "7687")
-neo4j_url = "bolt://{}:{}".format(neo4j_host, neo4j_port)
-neo4j_user = os.getenv("NEO4J_DATABASE_USER", "neo4j")
-neo4j_password = os.getenv("NEO4J_DATABASE_PASSWORD", "neo4j").strip()
-
-logging.info("connecting to %s as user %s", neo4j_url, neo4j_user)
-driver = GraphDatabase.driver(neo4j_url, auth=(neo4j_user, neo4j_password))
-logging.info("connected")
-
 # Set the random seed for reproducability
 random.seed(1)
 
-# Set the sample sizes
-optimum_sample_size = 100
-sample_size         = 1000     # TODO: this assumes that there are at least 10000 documents in the corpus
+# TODO: Set the sample sizes
+optimum_sample_size = 1000
+sample_size         = 15000
 
 # Number of words to include in word cloud
 number_of_topic_words = 30
@@ -124,7 +112,8 @@ class createModelThread(threading.Thread):
         topic_token_count = [0 for i in range(0,self.tm.numberOfTopics)]
         topicSeries = []
 
-        for i in range(0,sample_size):
+        # Note: Must use len(text_clean) because len(text_clean) <= sample_size because some documents may have been removed (e.g. were HTML)
+        for i in range(0,len(self.tm.text_clean)):
             assignedTopic = self.assigned_topic(self.get_candidate_topics(i))
             topic_token_count[assignedTopic] += len(self.tm.text_term_matrix[i])
             topicSeries.append(assignedTopic)
@@ -141,30 +130,11 @@ class createModelThread(threading.Thread):
         global sample_size
         global optimum_sample_size
 
-        emails_df = pd.DataFrame(columns=['ID','Date','Message'])
+        # Load the entire email corpus
+        emails_df = pd.read_csv('email_data.csv')
+        emails_df.columns = ['ID', 'To', 'From', 'Subject', 'Body', 'Date']
 
-        # Read emails from the Neo4j database
-        with driver.session() as sesh:
-            query = sesh.run("""
-            MATCH(e:Email) return e.emailId, e.date, e.body
-            """)
-
-            for id_, date, message in query:
-                emails_df = emails_df.append({'ID': int(id_), 'Date': pd.to_datetime(str(date)), 'Message': message}, ignore_index=True)
-
-        # Parse the emails into a list email objects
-        messages = list(map(email.message_from_string, emails_df['Message']))
-
-        # Parse content from emails
-        emails_df['content'] = list(map(get_text_from_email, messages))
-        del messages
-        emails_df = emails_df.drop(['Message'], axis=1)
-
-        # Remove emails that are HTML
-        emails_df = emails_df[(emails_df['content'].str.lower()).str.find("<head>") == -1]
-
-        # Sample emails for topic modeling
-
+        # Adjust the sample size if necessary
         if sample_size > len(emails_df):
 
             # In case the hard coded sample size is greater than the number of
@@ -175,7 +145,25 @@ class createModelThread(threading.Thread):
             # topics
             optimum_sample_size = round(sample_size * 0.1)
 
-        self.tm.sub_df = emails_df.sample(sample_size, random_state=1)
+        # Sample emails from entire csv
+        emails_df = emails_df.sample(n=sample_size)
+
+        # Convert columns to the correct type
+        emails_df['ID'] = pd.to_numeric(emails_df['ID'])
+        emails_df['Date'] = emails_df['Date'].apply(lambda x: pd.to_datetime(str(x)))
+
+        # Parse the emails into a list email objects
+        messages = list(map(email.message_from_string, emails_df['Body']))
+
+        # Parse content from emails
+        emails_df['content'] = list(map(get_text_from_email, messages))
+        del messages
+        emails_df = emails_df.drop(['Body'], axis=1)
+
+        # Remove emails that are HTML
+        emails_df = emails_df[(emails_df['content'].str.lower()).str.find("<head>") == -1]
+
+        self.tm.sub_df = emails_df
 
         # Set the text_clean to be used to create the LDA model
         for text in self.tm.sub_df['content']:
