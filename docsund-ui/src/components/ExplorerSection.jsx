@@ -40,7 +40,7 @@ export default class ExplorerSection extends React.Component {
 
   async handleSearch(e) {
     e.preventDefault()
-    const searchQuery = e.target.elements.searchInput.value.toLowerCase()
+    const searchQuery = e.target.value.toLowerCase()
     const searchResults = await fetch(`${API_URL}/search?` + qs.stringify({
       q: searchQuery
     }))
@@ -52,7 +52,7 @@ export default class ExplorerSection extends React.Component {
   }
 
   async componentDidMount() {
-    const userNode = await this.getUserNode(36290)
+    const userNode = await this.getUserNode(2275)
     this.setState({
       initialNodes: [userNode],
     })
