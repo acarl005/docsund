@@ -103,7 +103,7 @@ class createModelThread(threading.Thread):
         # Buid the Gensim LDA model
         Lda = gensim.models.ldamodel.LdaModel
 
-        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=3)
+        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=30)
 
         #
         # Get token count proportion statistics for the plot.  Also add topic
