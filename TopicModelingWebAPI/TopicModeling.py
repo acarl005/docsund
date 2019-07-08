@@ -166,6 +166,7 @@ class createModelThread(threading.Thread):
         self.tm.sub_df = emails_df
 
         # Set the text_clean to be used to create the LDA model
+        self.tm.text_clean = []
         for text in self.tm.sub_df['content']:
             self.tm.text_clean.append(clean_email(text, self.tm.userStopList).split())
 
