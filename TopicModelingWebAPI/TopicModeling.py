@@ -36,8 +36,8 @@ number_of_topic_words = 30
 # Mallet is Java based, so make sure Java is installed
 
 # Set the paths to Mallet
-mallet_distribution = '/home/matt/W210/mallet-2.0.8'
-mallet_binary = '/home/matt/W210/mallet-2.0.8/bin/mallet'
+mallet_distribution = os.environ["MALLET_HOME"]
+mallet_binary = os.path.join(mallet_distribution, 'bin', 'mallet')
 
 class DocumentTypeEnum(IntEnum):
     unknownType = 0
@@ -103,7 +103,7 @@ class createModelThread(threading.Thread):
         # Buid the Gensim LDA model
         Lda = gensim.models.ldamodel.LdaModel
 
-        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=30)
+        self.tm.ldamodel = Lda(self.tm.text_term_matrix, num_topics=self.tm.numberOfTopics, id2word = self.tm.dictionary, passes=3)
 
         #
         # Get token count proportion statistics for the plot.  Also add topic
