@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table } from 'antd'
-import { formatDate } from '../utils'
+import { formatDate } from '../../utils'
 import EmailContentPreview from './EmailContentPreview'
 
 export default class EmailListView extends React.Component {

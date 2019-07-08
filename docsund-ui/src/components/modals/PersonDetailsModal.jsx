@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { observer } from 'mobx-react'
 import { List, Modal } from 'antd'
-import appStore from '../stores/AppStore'
+import appStore from '../../stores/AppStore'
 
 @observer
 export default class PersonDetailsModal extends Component {

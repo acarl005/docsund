@@ -1,4 +1,5 @@
 import React from "react";
+import appStore from "../stores/AppStore"
 
 
 function createNode(element) {
@@ -214,28 +215,24 @@ class TopicModelingComponent extends React.Component {
     // Returns the document IDs associated with a particular topic, and displays them
     // in a text box control.
     //
-    getDocumentIDsFn () {
-        var topicIDForDocumentsText = document.getElementById('topicIDForDocumentsText');
+    async getDocumentIDsFn () {
+        const topicIDForDocumentsText = document.getElementById('topicIDForDocumentsText');
 
         // From the perspective of the user, topics range from 1 to #topics
-        var chosenTopicNumber = parseInt(topicIDForDocumentsText.value, 10);
-        chosenTopicNumber -= 1;
+        const chosenTopicNumber = parseInt(topicIDForDocumentsText.value, 10) - 1;
 
-        fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
+        const data = await fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
             mode: 'cors',
             method: 'GET'
-        })
-        .then((resp) => resp.json())
-        .then((data) => {
+        }).then((resp) => resp.json())
 
-            var documentIDsText = document.getElementById('documentIDsText');
-            var documentIDArray = data['docIDs'];
+        const documentIDsText = document.getElementById('documentIDsText');
+        const documentIDArray = data.docIDs;
 
-            this.setState({docIDs: documentIDArray});
-        })
-        .catch(function (error) {
-            console.log(JSON.stringify(error));
-        });
+        this.setState({docIDs: documentIDArray});
+        await appStore.fetchEmailsFromIDs(documentIDArray, 100)
+        appStore.toggleModal('topicSample')
+        appStore.setEmailModalView('list')
     }
 
     //
@@ -280,7 +277,7 @@ class TopicModelingComponent extends React.Component {
         <img id="wordCloudImg" src="" width="800" height="500"/>
         <br />
         <p>Enter a topic number (1-#topics) and press 'Get Document IDs' to get a list of document IDs:</p>
-        <button id="getDocumentIDsBtn" disabled={!this.state.modelCreated} onClick={this.getDocumentIDsFn}>Get Document IDs</button>
+        <button id="getDocumentIDsBtn" disabled={!this.state.modelCreated} onClick={this.getDocumentIDsFn}>Get Documents</button>
         <input type="text" id="topicIDForDocumentsText" size="10"/>
         <br />
         <textarea id="documentIDsText" rows="10" cols="50" value={this.state.docIDs} readOnly></textarea>

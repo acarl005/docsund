@@ -3,6 +3,7 @@ import { action, computed, observable } from 'mobx'
 class AppStore {
   @observable modalVisibility = {
     emailsBetween: false,
+    topicSample: false,
     emailSearchResult: false,
     personDetails: false,
   }
@@ -14,11 +15,7 @@ class AppStore {
   @observable explorerFullscreen = false
   @observable emailSearchTerm = ''
   @observable emailSearchResults = []
-
-  @computed
-  get activeEmail() {
-    return this.activeRelationship.emails.find((email) => email.id === this.activeEmailId)
-  }
+  @observable topicEmails = []
 
   @computed
   get activeSearchEmail() {
@@ -63,13 +60,20 @@ class AppStore {
       }
     }))
   }
+  
+  @action
+  async fetchEmailsFromIDs(ids, sample) {
+    const response = await fetch(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
+      .then(res => res.json())
+    this.topicEmails = response
+  }
 
   @action setEmailModalView(view) {
     this.emailModalView = view
   }
 
-  @action setActiveEmail(id) {
-    this.activeEmailId = id
+  @action setActiveEmail(email) {
+    this.activeEmail = email
   }
 
   @action setActiveSearchEmail(id) {

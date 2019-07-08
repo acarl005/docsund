@@ -4,8 +4,9 @@ import qs from "querystring"
 import { observer } from 'mobx-react'
 import { Layout, Tabs, Menu, Icon } from 'antd'
 import appStore from "../stores/AppStore"
-import EmailsBetweenModal from "./EmailsBetweenModal"
-import PersonDetailsModal from "./PersonDetailsModal"
+import EmailsBetweenModal from "./modals/EmailsBetweenModal"
+import PersonDetailsModal from "./modals/PersonDetailsModal"
+import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
 import ExplorerSection from './ExplorerSection'
@@ -26,6 +27,7 @@ export default class Main extends Component {
       <Layout>
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
         {appStore.modalVisibility.emailsBetween && <EmailsBetweenModal />}
+        {appStore.modalVisibility.topicSample && <TopicSampleModal />}
         {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
         <Header className="header">
           <div className="logo" style={{

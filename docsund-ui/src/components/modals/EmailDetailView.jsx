@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from 'antd'
-import Collapse from './Collapse'
+import Collapse from '../Collapse'
 
 const Wrapper = styled.div`
   > *:not(:first-child) {
