@@ -11,7 +11,7 @@ import re
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
                         'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
-NLP = spacy.load('en_core_web_sm')
+NLP = spacy.load('en_core_web_sm', disable=['parser', 'textcat'])
 
 
 def load_data(data="enron.csv", nrows=5000, skiprows=0):
@@ -75,7 +75,6 @@ def clean_enron_list(entity_list):
 
 def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
     new_cols = entity_list.copy()
-    new_cols.append('processed_body')
     for col in new_cols:
         if col not in df:
             # intialize to a column of empty lists
@@ -83,8 +82,6 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
 
     for i, rows in df.iterrows():
         processed_body = nlp(df.at[i, 'body'])
-        df.at[i, 'processed_body'] = processed_body
-
         found_entities = set([ent.label_ for ent in processed_body.ents])
         for entity in entity_list:
             if entity in found_entities:
