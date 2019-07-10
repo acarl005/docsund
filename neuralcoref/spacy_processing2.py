@@ -1,8 +1,8 @@
 from __future__ import print_function, unicode_literals
 
-import sys
+## import sys
 import spacy
-import neuralcoref
+## import neuralcoref
 import pandas as pd
 import numpy as np
 import time
@@ -18,7 +18,7 @@ ENCODING = 'utf-8'
 
 csv.field_size_limit(100000000)
 
-columns = defaultdict(list) # each value in each column is appended to a list
+columns = defaultdict(list) 
 
 def clean_enron_list(entity_list):
     for x in range(len(entity_list)):
