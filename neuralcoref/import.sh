@@ -1,0 +1,27 @@
+neo4j-admin import --database graph.db \
+                   --multiline-fields true \
+                   --nodes neo4j-csv/persons.csv \
+                   --nodes neo4j-csv/emails.csv \
+                   --relationships neo4j-csv/emails_to.csv \
+                   --relationships neo4j-csv/from.csv \
+                   --relationships neo4j-csv/to.csv \
+                   --nodes neo4j-csv/entity_date.csv \
+                   --nodes neo4j-csv/entity_fac.csv \
+                   --nodes neo4j-csv/entity_gpe.csv \
+                   --nodes neo4j-csv/entity_loc.csv \
+                   --nodes neo4j-csv/entity_money.csv \
+                   --nodes neo4j-csv/entity_norp.csv \
+                   --nodes neo4j-csv/entity_org.csv \
+                   --nodes neo4j-csv/entity_person.csv \
+                   --nodes neo4j-csv/entity_quantity.csv \
+                   --nodes neo4j-csv/entity_time.csv \
+                   --relationships neo4j-csv/mentions_date.csv \
+                   --relationships neo4j-csv/mentions_fac.csv \
+                   --relationships neo4j-csv/mentions_gpe.csv \
+                   --relationships neo4j-csv/mentions_loc.csv \
+                   --relationships neo4j-csv/mentions_money.csv \
+                   --relationships neo4j-csv/mentions_norp.csv \
+                   --relationships neo4j-csv/mentions_org.csv \
+                   --relationships neo4j-csv/mentions_person.csv \
+                   --relationships neo4j-csv/mentions_quantity.csv \
+                   --relationships neo4j-csv/mentions_time.csv
