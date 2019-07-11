@@ -4,6 +4,9 @@ import nltk
 from nltk.corpus import stopwords 
 from nltk.stem.wordnet import WordNetLemmatizer
 
+nltk.download('stopwords')
+nltk.download('wordnet')
+
 
 def get_text_from_email(msg):
     '''To get the content from email objects'''

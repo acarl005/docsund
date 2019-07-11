@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Modal } from 'antd'
-import appStore from '../stores/AppStore'
+import appStore from '../../stores/AppStore'
 import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
@@ -39,7 +39,7 @@ export default class EmailsBetweenModal extends React.Component {
   }
 
   onDetailViewClick = (email) => {
-    appStore.setActiveEmail(email.id)
+    appStore.setActiveEmail(email)
     appStore.setEmailModalView('detail')
   }
 

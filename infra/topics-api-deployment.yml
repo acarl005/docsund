@@ -16,14 +16,23 @@ spec:
     spec:
       containers:
         - name: docsund-topics-api
-          image: acarl005/docsund-topics-api:0.1.0
-          imagePullPolicy: Never
+          image: acarl005/docsund-topics-api:0.1.2
           env:
-            - name: NEO4J_DATABASE_PASSWORD
+            - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: neo4j-secrets
-                  key: password
+                  name: aws-secrets
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret_access_key
+            - name: AWS_S3_CSV_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: s3_csv_path
           ports:
             - containerPort: 5000
 

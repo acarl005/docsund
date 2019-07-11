@@ -1,1 +1,1 @@
-docker build -t acarl005/docsund-topics-api:0.1.0 .
+docker build -t acarl005/docsund-topics-api:0.1.2 .

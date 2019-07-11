@@ -36,8 +36,8 @@ number_of_topic_words = 30
 # Mallet is Java based, so make sure Java is installed
 
 # Set the paths to Mallet
-mallet_distribution = '/home/matt/W210/mallet-2.0.8'
-mallet_binary = '/home/matt/W210/mallet-2.0.8/bin/mallet'
+mallet_distribution = os.environ["MALLET_HOME"]
+mallet_binary = os.path.join(mallet_distribution, 'bin', 'mallet')
 
 class DocumentTypeEnum(IntEnum):
     unknownType = 0

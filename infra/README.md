@@ -74,7 +74,8 @@ kubectl apply -f logstash-deployment.yml
 
 **Warning:** On some versions of EKS, an error occurs with `mmapfs`.
 You might need to SSH into the Node and change a setting.
-[See here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html).
+See [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html) or
+[here](https://stackoverflow.com/questions/41192680/update-max-map-count-for-elasticsearch-docker-container-mac-host).
 
 ## 7. Launch the API
 
@@ -96,3 +97,15 @@ kubectl apply -f docsund-ui-service.yml
 
 **Warning:** Make sure TCP traffic on port 80 is permitted in the security group in your node group.
 This may not be enabled by default.
+
+# Appendix
+
+To try locally, you can use [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) instead of EKS.
+
+Here is the recommended command to create a cluster:
+
+```sh
+minikube start --cpus 4 --memory 8192 --disk-size 30g
+minikube dashboard
+```
+
