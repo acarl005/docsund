@@ -341,7 +341,7 @@ class TopicModeling:
 
     def getCachedWordCloud(self, topicNumber):
         # TODO: read from a cached file
-        return str(self.getWordCloudForTopic(topicNumber)[1])
+        return (self.getWordCloudForTopic(topicNumber)[1]).decode("utf-8")
 
     def getWordsForTopic(self, topicNumber):
         print('getWordsForTopic: {}'.format(topicNumber))
