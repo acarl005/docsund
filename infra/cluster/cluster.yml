@@ -1,0 +1,28 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: docsund
+  region: us-east-2
+
+nodeGroups:
+  - name: docsund-workers
+    labels:
+      group: workers
+    instanceType: t3.medium
+    desiredCapacity: 4
+    minSize: 2
+    maxSize: 5
+    ssh:
+      publicKeyPath: ~/.ssh/kube-key.pub
+    ami: auto
+    # these are necessary to make elasticsearch container run
+    preBootstrapCommands:
+      - "echo vm.max_map_count=262144 >> /etc/sysctl.conf"
+      - "sysctl -w vm.max_map_count=262144"
+  - name: docsund-high-power
+    instanceType: c5d.2xlarge
+    desiredCapacity: 1
+    ssh:
+      publicKeyPath: ~/.ssh/kube-key.pub
+    ami: auto

@@ -9,5 +9,6 @@ RUN pip3 install awscli
 COPY . /etl
 WORKDIR /etl
 RUN pip3 install -r requirements.txt
+
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["./etl.sh"]
