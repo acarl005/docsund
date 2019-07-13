@@ -10,6 +10,7 @@ import time
 from enum import IntEnum
 import base64
 import json
+from collections import Counter
 
 from EmailHelperFunctions import get_text_from_email, split_email_addresses, clean_email
 from MDS import cmdscale
@@ -20,6 +21,10 @@ from gensim.models import CoherenceModel
 
 from wordcloud import WordCloud
 
+from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+
 logging.basicConfig(format="%(asctime)s - %(levelname)s:%(message)s", level=logging.INFO)
 
 # Set the random seed for reproducability
@@ -28,6 +33,10 @@ random.seed(1)
 # TODO: Set the sample sizes
 optimum_sample_size = 1000
 sample_size         = 15000
+
+# Min and max number of topics
+min_topic_size = 3
+max_topic_size = 35
 
 # Number of words to include in word cloud
 number_of_topic_words = 30
@@ -77,6 +86,12 @@ class createModelThread(threading.Thread):
         #
         if self.tm.numberOfTopics <= 0:
 
+            # Compute optimial number of topics only
+            optimalTopicsOnly = False
+
+            if self.tm.numberOfTopics == -1:
+                optimalTopicsOnly = True
+
             # Set paths needed by Mallet
             os.environ.update({'MALLET_HOME': mallet_distribution})
             self.mallet_path = mallet_binary
@@ -85,16 +100,19 @@ class createModelThread(threading.Thread):
             model_list, coherence_values = self.compute_coherence_values(dictionary=self.tm.dictionary,\
                                                                          corpus=self.tm.text_term_matrix,\
                                                                          texts=self.tm.optimum_text_clean,\
-                                                                         limit=35,\
+                                                                         limit=max_topic_size,\
                                                                          start=5,step=5)
 
             # Find the optimal number of topics
-            limit = 35
+            limit = max_topic_size
             start = 5
             step = 5
             x = list(range(start, limit, step))
             self.tm.numberOfTopics = x[np.argmax(coherence_values)]
             print('Optimum number of topics is: {}'.format(self.tm.numberOfTopics))
+
+            if optimalTopicsOnly:
+                return True
 
         # Create the dictionary and term matrix used by LDA
         self.tm.dictionary = corpora.Dictionary(self.tm.text_clean)
@@ -121,10 +139,63 @@ class createModelThread(threading.Thread):
         self.tm.token_count_proportions = np.array(topic_token_count) / sum(topic_token_count)
         self.tm.sub_df['topic'] = topicSeries
 
+        # Write the data frame (with topic assignment) to disk so it can be read when the user switches the number of topics
+        self.tm.sub_df.to_csv('./TopicData/topic_{0}.csv'.format(self.tm.numberOfTopics), index=False)
+
         self.tm.modelBuilt = True
 
         print('Finished createModelThread: {}'.format(datetime.datetime.now()))
         return True
+
+    def createStopWordList(self, df):
+
+        stop_words_path = './TopicData/stopwords.json'
+
+        # Read stop words from a file if it already exists
+        if os.path.isfile(stop_words_path):
+            with open(stop_words_path, 'r') as f:
+                return json.load(f)
+
+        # Get word count vector
+        cv = CountVectorizer(min_df = 0.01, max_df = 1.0)
+        word_count_vector = cv.fit_transform(df.content)
+        feature_names = cv.get_feature_names()
+
+        # Calculate TF-IDF weights for words in documents
+        tfidf_transformer = TfidfTransformer(smooth_idf=True, use_idf=True)
+        transformed_weights = tfidf_transformer.fit_transform(word_count_vector)
+
+        # Create a count of least informative words from each document
+        counter = Counter()
+
+        def findLeastInformativeWordAndUpdateCounter(row):
+            cols = row.nonzero()[1]
+            vals = row.toarray().ravel()[cols].tolist()
+            if len(vals) > 0:
+                counter[cols[np.argmin(vals)]] += 1
+
+        # Find least least informative word for each document
+        for row in transformed_weights:
+            findLeastInformativeWordAndUpdateCounter(row)
+
+        # Now find the words (from the indicies)
+        most_common_indicies = [x[0] for x in counter.most_common()]
+        common_words = [feature_names[idx] for idx in most_common_indicies]
+
+        # Remove English stop words
+        final_list = []
+        for word in common_words:
+            if word not in set(stopwords.words('english')):
+                final_list.append(word)
+
+        final_list = final_list[:20]
+        print('The stop words are: ', final_list)
+
+        # Write to a file so it does not need to be computed each time
+        with open(stop_words_path, 'w') as f:
+            json.dump(final_list, f)
+
+        return final_list
 
     def process_emails(self):
         global sample_size
@@ -165,10 +236,13 @@ class createModelThread(threading.Thread):
 
         self.tm.sub_df = emails_df
 
+        # Create stop words
+        stopWords = self.createStopWordList(emails_df)
+
         # Set the text_clean to be used to create the LDA model
         self.tm.text_clean = []
         for text in self.tm.sub_df['content']:
-            self.tm.text_clean.append(clean_email(text, self.tm.userStopList).split())
+            self.tm.text_clean.append(clean_email(text, stopWords).split())
 
         # Use a smaller sample to find the coherence values in
         # compute_coherence_values()
@@ -293,20 +367,6 @@ class TopicModeling:
             self.createModelThread_ = None
 
         return self.modelBuilt
-
-    def getWordsForTopic(self, topicNumber):
-        print('getWordsForTopic: {}'.format(topicNumber))
-
-        if not self.modelBuilt:
-            return False, []
-
-        if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
-            return False, []
-
-        word_frequencies = self.ldamodel.show_topic(topicNumber, number_of_topic_words)
-        words = [word_pair[0] for word_pair in word_frequencies]
-
-        return True, words
 
     def getWordCloudForTopic(self, topicNumber):
         print('getWordCloudForTopic: {}'.format(topicNumber))
@@ -440,6 +500,283 @@ class TopicModeling:
         print('getDocIDsForTopic')
 
         if not self.modelBuilt:
+            return False, []
+
+        # Filter by topic
+        messageIDs = self.sub_df[self.sub_df['topic'] == topicNumber]
+
+        if self.documentType == DocumentTypeEnum.emailType:
+            return True, messageIDs['ID'].tolist()
+        else:
+            # TODO: return some sort of index for regular documents
+            return True, []
+
+class TopicModeling2:
+    def __init__(self):
+        self.documentType = DocumentTypeEnum.emailType		# TODO: Email processing by default
+        self.sub_df = None
+        self.dictionary = None
+        self.text_term_matrix = None
+        self.text_clean = []
+        self.optimum_text_clean = []
+        self.numberOfTopics = 0
+        self.ldamodel = None
+        self.modelBuilt = False
+        self.createModelThread_ = None
+        self.manuallySetNumTopics = False
+        self.userStopList = None
+        self.topic_data = {}
+        self.topicsBuilt = False
+
+        # Determine the number of topics to calculate
+        current_topic_size = 0
+
+        # Load the topic data file if it exists
+        if os.path.isfile('./TopicData/topic_data.json'):
+            with open('./TopicData/topic_data.json', 'r') as f:
+                self.topic_data = json.load(f)
+
+            # Get current model data
+            if 'models' in self.topic_data:
+                model_data = self.topic_data['models']
+            else:
+                model_data = {}
+
+            # Find the model in the topic data file, and add one for the next model to create
+            current_topic_size = np.max(list(map(lambda x: int(x), model_data.keys()))) + 1
+
+        #----------------------------------------
+        #with open('start.txt', 'w') as f:
+        #    f.write(str(datetime.datetime.now()))
+        #----------------------------------------
+
+        # Create topic data
+        if self.createTopics(current_topic_size):
+
+            # Find optimal number of topics to use if the topic size changed
+            self.findOptimalNumberOfTopics()
+        else:
+
+            # Set the number of topics to the optimum number by default
+            self.numberOfTopics = int(self.topic_data['optimalnumber'])
+
+        #----------------------------------------
+        #with open('complete.txt', 'w') as f:
+        #    f.write(str(datetime.datetime.now()))
+        #----------------------------------------
+
+        print('All topics built')
+        self.topicsBuilt = True
+
+    def createTopics(self, current_topic_size):
+        print('createTopics')
+
+        # Get current model data to build upon
+        if 'models' in self.topic_data:
+            model_data = self.topic_data['models']
+        else:
+            model_data = {}
+
+        topics_changed = False
+
+        while current_topic_size <= max_topic_size:
+            if current_topic_size == 0:
+                current_topic_size = min_topic_size
+
+            print('Creating topic: ', current_topic_size)
+
+            self.numberOfTopics = current_topic_size
+            self.createModelThread_ = createModelThread(self)
+            self.createModelThread_.start()
+            self.createModelThread_.join()
+
+            #
+            # Determine scaled Jensen-Shannon distances
+            #
+            x_values, y_values, marker_area = self.getScaledJensenShannonDistance()
+
+            # Fill out the topic distribution information and word clouds
+            data = {}
+            for i in range(len(x_values)):
+                data[str(i)] = {'x': x_values[i], 'y': y_values[i], 'size': marker_area[i], 'wordcloud': self.createWordCloudForTopic(i)[1]}
+
+            model_data[str(current_topic_size)] = data
+            self.topic_data['models'] = model_data
+
+            print('Saving topic_data.json')
+
+            with open('./TopicData/topic_data.json', 'w') as f:
+                json.dump(self.topic_data, f)
+
+            topics_changed = True
+            current_topic_size += 1
+
+        return topics_changed
+
+    def findOptimalNumberOfTopics(self):
+        print('findOptimalNumberOfTopics')
+
+        self.numberOfTopics = -1
+        self.createModelThread_ = createModelThread(self)
+        self.createModelThread_.start()
+        self.createModelThread_.join()
+
+        self.topic_data['optimalnumber'] = self.numberOfTopics
+
+        print('Saving topic_data.json')
+
+        with open('./TopicData/topic_data.json', 'w') as f:
+            json.dump(self.topic_data, f)
+
+    def startBuildingModel(self):
+        print('startBuildingModel')
+
+        if not self.topicsBuilt:
+            return False
+
+        return True
+
+    def getNumberOfTopics(self):
+        print('getNumberOfToipcs')
+
+        if not self.topicsBuilt:
+            return False, 0
+
+        return True, self.numberOfTopics
+
+    def setNumberOfTopics(self, numTopics):
+        print('setNumberOfTopics')
+
+        if not self.topicsBuilt:
+            return False
+
+        self.numberOfTopics = numTopics
+
+        # Switch to the correct data set in order to read document IDs
+        self.sub_df = pd.read_csv('./TopicData/topic_{0}.csv'.format(numTopics))
+
+        return True
+
+    def setUserStopList(self, userStopList):
+        print('setUserStopList')
+        return True
+
+    def modelBuilding(self):
+        print('modelBuilding')
+        return self.topicsBuilt == False
+
+    def getModelBuilt(self):
+        print('getModelBuilt')
+        return self.topicsBuilt
+
+    def createWordCloudForTopic(self, topicNumber):
+        print('createWordCloudForTopic: {}'.format(topicNumber))
+
+        if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
+            return False, ''
+
+        word_frequencies = self.ldamodel.show_topic(topicNumber, number_of_topic_words)
+
+        # Generate a word cloud image
+        wordFreqDict = dict(word_frequencies)
+        wordcloud = WordCloud().fit_words(wordFreqDict)
+        wordcloud.background_color = 'white'
+
+        fig = plt.figure(figsize=(10,8))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis("off")
+
+        # Save the image to a temp folder to be sent by Flask
+        filePath = os.path.join('./Temp', 'wordcloud.png')
+        plt.savefig(filePath)
+        plt.close(fig)
+
+        # Return file as a base64 encoded string
+        with open(filePath, 'rb') as f:
+            image_read = f.read()
+
+        return True, base64.encodestring(image_read).decode("utf-8")
+
+    def getWordCloudForTopic(self, topicNumber):
+        print('getWordCloudForTopic: {}'.format(topicNumber))
+
+        if not self.topicsBuilt:
+            return False, ''
+
+        if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
+            return False, ''
+
+        # Get the models dictionary
+        model_dict = self.topic_data['models']
+
+        # Get the dictionary for topics found for the model built with
+        # 'numberOfTopics'
+        topics_dict = model_dict[str(self.numberOfTopics)]
+
+        # Get the dictionary for the chosen topic in this model
+        chosen_topic_dict = topics_dict[str(topicNumber)]
+
+        return True, chosen_topic_dict['wordcloud']
+
+    def getWordsForTopic(self, topicNumber):
+        print('getWordsForTopic: {}'.format(topicNumber))
+        return False, ''
+
+    def getScaledJensenShannonDistance(self):
+        print('getScaledJensenShannonDistance')
+
+        #
+        # Determine Jensen-Shannon distances
+        #
+
+        # Get the term-topic matrix learned during inference
+        topics = self.ldamodel.get_topics()
+
+        # Fill in the distance matrix with the Jensen-Shannon distances
+        distance_matrix = np.zeros(shape=(len(topics), len(topics)))
+
+        for row in range(1,len(topics)):
+            for col in range(0, row):
+                distance_matrix[row,col] = gensim.matutils.jensen_shannon(topics[row], topics[col])
+
+        # Make the matrix symmetric
+        distance_matrix = np.maximum(distance_matrix, distance_matrix.T)
+
+        #
+        # Get the MDS for the distance matrix
+        #
+        Y,e = cmdscale(distance_matrix)
+
+        return Y[:,0], -Y[:,1], [ proportion for proportion in self.token_count_proportions]
+
+    def getTopicDistribution(self):
+        print('getTopicDistribution')
+        return False, ''
+
+    def getTopicDistributionData(self):
+        print('getTopicDistributionData')
+
+        if not self.topicsBuilt:
+            return False, ''
+
+        # Get the models dictionary
+        model_dict = self.topic_data['models']
+
+        # Get the dictionary for topics found for the model built with
+        # 'numberOfTopics'
+        topics_dict = model_dict[str(self.numberOfTopics)]
+
+        # Output the data
+        data = {}
+        for topic_id in topics_dict.keys():
+            data[topic_id] = {'size': topics_dict[topic_id]['size'], 'topic': topic_id, 'wordcloud': topics_dict[topic_id]['wordcloud'], 'x': topics_dict[topic_id]['x'], 'y': topics_dict[topic_id]['y']}
+
+        return True, json.dumps(data)
+
+    def getDocIDsForTopic(self, topicNumber):
+        print('getDocIDsForTopic')
+
+        if not self.topicsBuilt:
             return False, []
 
         # Filter by topic
