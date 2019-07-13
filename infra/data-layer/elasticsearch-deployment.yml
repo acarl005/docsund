@@ -27,3 +27,5 @@ spec:
               name: main
             - containerPort: 9300
               name: peer
+      nodeSelector:
+        group: workers
