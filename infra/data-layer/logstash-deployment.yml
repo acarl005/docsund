@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docsund-logstash
+  labels:
+    app: docsund-logstash
+spec:
+  selector:
+    matchLabels:
+      app: docsund-logstash
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: docsund-logstash
+    spec:
+      containers:
+        - name: docsund-logstash
+          image: acarl005/docsund-logstash:0.1.0
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret_access_key
+            - name: AWS_S3_CSV_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: s3_csv_path
+          resources:
+            requests:
+              ephemeral-storage: 4Gi
+          ports:
+            - containerPort: 9600
+              name: main
+      initContainers:
+        - name: wait-for-elasticsearch
+          image: darthcabs/tiny-tools:1
+          args:
+            - /bin/bash
+            - -c
+            - >
+              set -x;
+              while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://elasticsearch:9200/_cat/health)" != "200" ]]; do 
+                echo 'waiting for elasticsearch'
+                sleep 10;
+              done

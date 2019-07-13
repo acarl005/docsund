@@ -28,6 +28,10 @@ Upload this to an [AWS S3 bucket](https://aws.amazon.com/s3/).
 
 ## 2. Create a Kubernetes Cluster
 
+```sh
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/kube-key
+```
+
 You can `cd` into `infra/` and run `./create-cluster.sh`. 
 If you want SSH access to the nodes, edit the script to add the `--ssh-access` and `--ssh-public-key` options.
 This assumes you have `eksctl` installed.
@@ -41,7 +45,7 @@ Optionally, you can enable the Kubernetes Dashboard by running `./enable-dashboa
 There are 2 sets of [Kubernetes secrets](https://kubernetes.io/docs/concepts/configuration/secret/):
 
 1. `aws-secrets` with keys `access_key_id`, `s3_csv_path`, and `secret_access_key`. The `s3_csv_path` is an S3 path to your CSV file. The containers will download the data from there. The `access_key_id` and `secret_access_key` are credentials to access the bucket. You can `cd` into `infra/secrets/aws-secrets`, create text files for the secrets, and run `./create.sh`.
-1. `neo4j-secrets` with key `password` for the database password.
+1. `neo4j-secrets` with key `password` for the database password. **Warning: Make sure you don't have an extra newline at the end of your password string. If you create the secret from a file, for example, many editors add this automatically so watch out!**
 
 ## 4. ETL the Entities Data for Neo4j
 
@@ -54,6 +58,11 @@ kubectl apply -f etl-job.yml
 ```
 
 Once this job is done, the volume is ready to be mounted for Neo4j.
+
+```sh
+eksctl drain nodegroup --cluster docsund docsund-high-power
+eksctl delete nodegroup --cluster docsund docsund-high-power
+```
 
 ## 5. Launch Neo4j
 
@@ -74,7 +83,8 @@ kubectl apply -f logstash-deployment.yml
 
 **Warning:** On some versions of EKS, an error occurs with `mmapfs`.
 You might need to SSH into the Node and change a setting.
-See [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html) or
+See [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html),
+[here](https://stackoverflow.com/questions/42300463/elasticsearch-bootstrap-checks-failing/47211716), or
 [here](https://stackoverflow.com/questions/41192680/update-max-map-count-for-elasticsearch-docker-container-mac-host).
 
 ## 7. Launch the API
