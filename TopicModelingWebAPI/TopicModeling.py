@@ -339,6 +339,10 @@ class TopicModeling:
 
         return True, base64.encodestring(image_read)
 
+    def getCachedWordCloud(self, topicNumber):
+        # TODO: read from a cached file
+        return (self.getWordCloudForTopic(topicNumber)[1]).decode("utf-8")
+
     def getWordsForTopic(self, topicNumber):
         print('getWordsForTopic: {}'.format(topicNumber))
 
@@ -426,9 +430,9 @@ class TopicModeling:
         #
         x_values, y_values, marker_area = self.getScaledJensenShannonDistance()
 
-        data = []
+        data = {}
         for i in range(len(x_values)):
-            data.append({'topic': i+1, 'x': x_values[i], 'y': y_values[i], 'size': marker_area[i]})
+            data[i] = {'size': marker_area[i], 'topic': i, 'wordcloud': self.getCachedWordCloud(i), 'x': x_values[i], 'y': y_values[i]}
 
         return True, json.dumps(data)
 

@@ -9,3 +9,12 @@
 4. Run `./import.sh` to ingest those CSVs into Neo4j in a database named "docsund" (or, if you're stuck in Windows hell like me, `neo4j-admin import --f=import.txt`).
 5. Change the active database to "docsund" by editing the [Neo4j config](https://neo4j.com/docs/operations-manual/current/configuration/neo4j-conf/) file. The location of this file depends on your installation. If on MacOS and installed via Homebrew, it would be at something like `/usr/local/Cellar/neo4j/$VERSION/libexec/conf/neo4j.conf`.
 6. Start up Neo4J.
+
+
+# Increasing efficiency
+## SpaCy Processing
+The following were attempted to increase the speed/decrease the memory usage when running `python spacy_processing.py all`:
+- Chunking with `pd.read_csv`'s `chunksize` argument and looping through the script in batches for the entire dataset
+- Streaming the dataset with Python's base csv functionality
+- Removing/altering the multiprocessing functionality
+- Using `nlp.pipe` instead of `nlp` when processing the emails
