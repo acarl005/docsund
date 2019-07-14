@@ -12,7 +12,7 @@ topicExplorer.topicPlot = function () {
         bottom: 50
     };
 
-    var topicPlotSvg = d3.select("body")
+    var topicPlotSvg = d3.select("#topic-explorer")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -29,8 +29,6 @@ topicExplorer.topicPlot = function () {
     };
 
     var plotTopicData_ = function (newTopicData) {
-        var elem = topicPlotSvg.selectAll("g")
-            .data(newTopicData);
 
         // Scaling functions
         var calcRadius = function (area) {
@@ -49,14 +47,21 @@ topicExplorer.topicPlot = function () {
             .domain(d3.extent(newTopicData, d => calcRadius(d.size)))
             .range([10, 40]);
 
-        var elemEnter = elem.enter()
-            .append("g")
-            .attr("class", "topic-group")
-            .merge(elem)
-            .attr("transform", d => "translate(" + xScale(d.x) + "," + yScale(d.y) + ")");
+        // Calculate the radius
+        newTopicData = newTopicData.map(function (d) {
+            return {
+                radius: radScale(calcRadius(d.size)),
+                size: d.size,
+                x: xScale(d.x),
+                y: yScale(d.y),
+                wordcloud: d.wordcloud,
+                topic: d.topic
+            };
+        });
 
-        elem.exit().remove();
+        // Remove pre-existing circles from a potential previous plot
         topicPlotSvg.selectAll("circle").remove();
+        topicPlotSvg.selectAll("text").remove();
 
         // Draw the topic circles
         var standardStrokeColor = "#10885C";
@@ -67,8 +72,14 @@ topicExplorer.topicPlot = function () {
         var hoveredStrokeWidth = 6;
         var expandedRadiusRatio = 1.2;
 
-        var topicCircles = elemEnter.append("circle")
+        // Plot the topic circles
+        var topicCircles = topicPlotSvg.selectAll("circle")
+            .data(newTopicData)
+            .enter()
+            .append("circle")
             .attr("r", d => radScale(calcRadius(d.size)))
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y)
             .style("stroke", standardStrokeColor)
             .style("fill", standardFillColor)
             .style("opacity", 0.8)
@@ -104,14 +115,32 @@ topicExplorer.topicPlot = function () {
             });
 
         // Write in the topic circle labels
-        elemEnter.append("text")
+        var topicLabels = topicPlotSvg.selectAll("text")
+            .data(newTopicData)
+            .enter()
+            .append("text")
+            // Add your code below this line
+            .text(d => d.topic)
             .attr("text-anchor", "middle")
             .attr("font-family", "sans-serif")
             .attr("font-size", "10px")
-            .text(d => d.topic);
+            .attr("x", d => d.x)
+            .attr("y",  d => d.y);
+
+        // Collision force to prevent topic circle overlap
+        var ticked = function () {
+            topicCircles.attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+            topicLabels.attr("x", d => d.x)
+                .attr("y", d => d.y);
+        };
+
+        var simulation = d3.forceSimulation(newTopicData)
+            .force("collide", d3.forceCollide()
+                .strength(0.2)
+                .radius(d => d.radius + 2))
+            .on("tick", ticked);
     };
-
-
 
     var public_ = {
         "wordCloud": wordCloud_,
@@ -133,7 +162,7 @@ topicExplorer.wordCloud = function() {
         bottom: 50
     };
 
-    var wordCloudSvg = d3.select("body")
+    var wordCloudSvg = d3.select("#topic-explorer")
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -237,6 +266,5 @@ topicExplorer.api = function () {
 };
 
 // ToDo: Add force-directed algorithm to circles so that they don't overlap
-// ToDo: Add ids to the svg elements
 // ToDo: Make the visualization dynamic to page size adjustment.
 // ToDo: Figure out how to style and intuitively arrange the SVGs and input & button.

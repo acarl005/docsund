@@ -10,6 +10,11 @@
 
     <script>
 
+        // Create the div to house the topic explorer
+        topicExporerDiv = d3.select("body")
+            .append("div")
+            .attr("id", "topic-explorer");
+
         // Fit initial topic model with 10 topics & 20 top words
         const defaultNumTopics = 16;
 
@@ -36,10 +41,17 @@
             myWordCloud.clearImage();
         };
 
-    </script>
+        var input = topicExporerDiv.append("input")
+            .attr("type", "text")
+            .attr("placeholder", "# Desired topics")
+            .attr("id", "topic-num-input");
 
-    <input type="text" placeholder="# Desired topics" id="topic-num-input">
-    <button type="button" onclick="onButtonClick()">Calculate Topics</button>
+        var topicButton = topicExporerDiv.append("button")
+            .attr("type", "button")
+            .attr("onclick", "onButtonClick()")
+            .text("Calculate Topics")
+
+    </script>
 
 </body>
 </html>
