@@ -192,6 +192,7 @@ export default class Explorer extends Component {
           graphStyle={neoGraphStyle()}
           onSelectedLabel={this.onSelectedLabel.bind(this)}
           onSelectedRelType={this.onSelectedRelType.bind(this)}
+          theme={this.props.theme}
         />
       )
     } else {
@@ -201,6 +202,7 @@ export default class Explorer extends Component {
           graphStyle={this.state.graphStyle}
           onSelectedLabel={this.onSelectedLabel.bind(this)}
           onSelectedRelType={this.onSelectedRelType.bind(this)}
+          theme={this.props.theme}
         />
       )
     }
@@ -244,6 +246,7 @@ export default class Explorer extends Component {
           graphStyle={this.state.graphStyle}
           updateGraphStyle={this.updateGraphStyle.bind(this)}
           onExpandToggled={this.onInspectorExpandToggled.bind(this)}
+          theme={this.props.theme}
         />
       </StyledFullSizeContainer>
     )

@@ -1,2 +1,4 @@
 mallet-2.0.8*
 Temp/*.png
+TopicData/*
+!TopicData/.gitkeep

@@ -2,6 +2,8 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import { Icon, Layout, Tabs, Input } from 'antd'
 import qs from "querystring"
+
+import { fetchJSON } from "../utils"
 import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
@@ -38,36 +40,37 @@ export default class ExplorerSection extends React.Component {
     initialNodes: [],
   }
 
+  async componentDidMount() {
+    const userNode = await this.getUserNode(2275)
+    computeNodeScaleFactor(userNode)
+    this.setState({
+      initialNodes: [userNode],
+    })
+  }
+
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.value.toLowerCase()
-    const searchResults = await fetch(`${API_URL}/search?` + qs.stringify({
+    const searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
       q: searchQuery
     }))
-      .then(res => res.json())
+    for (let node of searchResults) {
+      computeNodeScaleFactor(node)
+    }
     this.setState({
       initialNodes: searchResults,
       searchQuery
     })
   }
 
-  async componentDidMount() {
-    const userNode = await this.getUserNode(2275)
-    this.setState({
-      initialNodes: [userNode],
-    })
-  }
-
   async getUserNode(id) {
-    const response = await fetch(`${API_URL}/person/${id}`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/person/${id}`)
     computeNodeScaleFactor(response)
     return response
   }
 
   async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetch(`${API_URL}/neighbours/${id}?limit=10`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/neighbours/${id}?limit=10`)
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
       computeNodeScaleFactor(neighbour)
@@ -97,9 +100,7 @@ export default class ExplorerSection extends React.Component {
       existing_ids: existingNodeIds.join(","),
       new_ids: newNodeIds.join(",")
     })
-    const response = await fetch(url)
-      .then(res => res.json())
-    return response
+    return fetchJSON(url)
   }
 
   async onRelDblClick(relationship) {
@@ -124,7 +125,7 @@ export default class ExplorerSection extends React.Component {
     appStore.toggleModal('personDetails')
   }
 
-  setGraph (graph) {
+  setGraph(graph) {
     this.graph = graph
     this.autoCompleteRelationships([], this.graph._nodes)
   }
@@ -147,6 +148,7 @@ export default class ExplorerSection extends React.Component {
         setGraph={this.setGraph.bind(this)}
         onRelDblClick={this.onRelDblClick.bind(this)}
         onNodeDblClick={this.onNodeDblClick.bind(this)}
+        theme={{ secondaryBackground: "rgba(255, 255, 255, 0.5)" }}
       />
     ) : <span />
 

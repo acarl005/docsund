@@ -148,25 +148,23 @@ export class GraphComponent extends Component {
   }
 
   zoomButtons () {
-    if (this.props.fullscreen) {
-      const ButtonGroup = Button.Group
-      return (
-        <StyledZoomHolder>
-          <ButtonGroup>
-            <Button
-              icon='zoom-in'
-              disabled={this.state.zoomInLimitReached}
-              onClick={this.zoomInClicked.bind(this)}
-            />
-            <Button
-              icon='zoom-out'
-              disabled={this.state.zoomOutLimitReached}
-            onClick={this.zoomOutClicked.bind(this)}
-            />
-          </ButtonGroup>
-        </StyledZoomHolder>
-      )
-    }
+    const ButtonGroup = Button.Group
+    return (
+      <StyledZoomHolder>
+        <ButtonGroup>
+          <Button
+            icon='zoom-in'
+            disabled={this.state.zoomInLimitReached}
+            onClick={this.zoomInClicked.bind(this)}
+          />
+          <Button
+            icon='zoom-out'
+            disabled={this.state.zoomOutLimitReached}
+          onClick={this.zoomOutClicked.bind(this)}
+          />
+        </ButtonGroup>
+      </StyledZoomHolder>
+    )
     return null
   }
 

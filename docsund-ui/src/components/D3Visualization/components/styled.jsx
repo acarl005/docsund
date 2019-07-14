@@ -349,7 +349,7 @@ export const StyledZoomHolder = styled.div`
   position: absolute;
   bottom: 39px;
   right: 0;
-  padding: 6px 6px 0 6px;
+  padding: 10px;
 `
 
 export const StyledZoomButton = styled.button`

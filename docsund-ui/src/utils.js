@@ -27,3 +27,15 @@ export const formatDate = date => {
   const format = currentYear(date) ? "MM/DD" : "MM/DD/YY"
   return diff <= 24 ? momentDate.fromNow() : momentDate.format(format)
 }
+
+export async function fetchJSON(...args) {
+  const response = await fetch(...args)
+  if (!response.ok) {
+    throw Error(`Status ${response.status}:\n${await response.text()}`)
+  }
+  const contentType = response.headers.get("content-type")
+  if (!contentType || contentType.indexOf("application/json") === -1) {
+    throw Error(`Content type is not "application/json", but "${contentType}"`)
+  }
+  return response.json()
+}
