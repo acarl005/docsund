@@ -15,7 +15,7 @@
 1. Packages: flask, gensim, wordcloud, neo4j, scikit-learn
 2. Download and extract Mallet: http://mallet.cs.umass.edu/dist/mallet-2.0.8.zip.  Note that Mallet requires Java.
 3. Edit TopicModeling.py to set the paths for Mallet
-4. Create the Temp and TopidData folders
+4. Create the Temp and TopicData folders
 5. Download NLTK stopwords and wordnet if necessary:
 
 import nltk<br>
@@ -23,6 +23,9 @@ nltk.download('stopwords')<br>
 nltk.download('wordnet')<br>
 
 ## If using TopicModeling2:
+
+Create the topic data by running:<br>
+python3 CreateTopicData.py<br>
 
 Edit TopicModelingAPI.py and make two changes:
 1. At the top of TopicModelingAPI.py, import TopicModeling2 instead of TopicModeling.
