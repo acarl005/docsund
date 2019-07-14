@@ -63,6 +63,7 @@ def create_entity_node_relationships(df, entity_name, global_id_counter, levensh
         resolved_entity_counts = entity_counts
 
     resolved_entity_count_df = pd.DataFrame({"mentions": resolved_entity_counts})
+    resolved_entity_count_df = resolved_entity_count_df[resolved_entity_count_df.mentions > 1]
     resolved_entity_count_df["id"] = [str(next(global_id_counter)) for _ in range(len(resolved_entity_count_df))]
     resolved_entity_count_df["name"] = resolved_entity_count_df.index
     resolved_entity_count_df = resolved_entity_count_df.set_index("id", drop=False)
@@ -71,7 +72,7 @@ def create_entity_node_relationships(df, entity_name, global_id_counter, levensh
         "entity{entity}Id:ID".format(entity=entity_name.capitalize()): resolved_entity_count_df.id,
         "name": resolved_entity_count_df.name,
         "mentions:int": resolved_entity_count_df.mentions,
-        ":LABEL": "Entity_{entity}".format(entity=entity_name.capitalize())
+        ":LABEL": "Entity;Entity_{entity}".format(entity=entity_name.capitalize())
     })
 
     save_node = "neo4j-csv/entity_{entity}.csv".format(entity=entity_name)

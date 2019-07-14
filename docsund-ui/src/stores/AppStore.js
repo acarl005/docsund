@@ -1,4 +1,5 @@
 import { action, computed, observable } from 'mobx'
+import { fetchJSON } from '../utils'
 
 class AppStore {
   @observable modalVisibility = {
@@ -24,8 +25,7 @@ class AppStore {
 
   @action
   async getEmailsBetween(toUser, fromUser) {
-    const response = await fetch(`${API_URL}/emails?between=${toUser.id},${fromUser.id}`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/emails?between=${toUser.id},${fromUser.id}`)
     this.activeRelationship = {
       toUser,
       fromUser,
@@ -35,8 +35,7 @@ class AppStore {
 
   @action
   async getPersonDetails(person) {
-    const response = await fetch(`${API_URL}/neighbours/${person.id}`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/neighbours/${person.id}`)
     this.activePerson = {
       ...person,
       details: response
@@ -45,8 +44,7 @@ class AppStore {
 
   @action
   async submitEmailSearch(searchTerm) {
-    const response = await fetch(`${API_URL}/elasticsearch?q=${searchTerm}`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/elasticsearch?q=${searchTerm}`)
     this.emailSearchTerm = searchTerm
     this.emailSearchResults = response.hits.map(hit => ({
       id: hit._source.id,
@@ -63,8 +61,7 @@ class AppStore {
   
   @action
   async fetchEmailsFromIDs(ids, sample) {
-    const response = await fetch(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
-      .then(res => res.json())
+    const response = await fetchJSON(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
     this.topicEmails = response
   }
 
