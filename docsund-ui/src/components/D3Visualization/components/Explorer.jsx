@@ -100,7 +100,7 @@ export default class Explorer extends Component {
     if (currentNeighbours.length > this.props.maxNeighbours) {
       callback(null, { nodes: [], relationships: [] })
     }
-    this.props.getNeighbours(node.id, currentNeighbours).then(
+    this.props.getNeighbours(node, currentNeighbours).then(
       result => {
         let nodes = result.nodes
         if (

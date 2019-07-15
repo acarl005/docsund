@@ -1,12 +1,12 @@
 import { action, computed, observable } from 'mobx'
-import { fetchJSON } from '../utils'
+import { fetchJSON, deepEquals } from '../utils'
 
 class AppStore {
   @observable modalVisibility = {
     emailsBetween: false,
     topicSample: false,
     emailSearchResult: false,
-    personDetails: false,
+    nodeDetails: false,
   }
   @observable emailModalView = 'list'
   @observable activeEmailId = ''
@@ -34,10 +34,11 @@ class AppStore {
   }
 
   @action
-  async getPersonDetails(person) {
-    const response = await fetchJSON(`${API_URL}/neighbours/${person.id}`)
-    this.activePerson = {
-      ...person,
+  async getNodeDetails(node) {
+    const type = deepEquals(node.labels, ["Person"]) ? "Person" : "Entity"
+    const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
+    this.activeNode = {
+      node,
       details: response
     }
   }

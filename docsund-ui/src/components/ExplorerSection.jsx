@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import { Icon, Layout, Tabs, Input } from 'antd'
 import qs from "querystring"
 
-import { fetchJSON } from "../utils"
+import { fetchJSON, deepEquals } from "../utils"
 import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
@@ -12,16 +12,20 @@ import Explorer from "./D3Visualization"
 const { TabPane } = Tabs
 
 function computeNodeScaleFactor(node) {
-  const messages = node.properties.incoming + node.properties.outgoing
-  if (messages <= 1000) {
-    node.scaleFactor = 1
-  } else {
-    node.scaleFactor = 1 + ((messages - 1000) / 1000) ** 0.3
+  if (deepEquals(node.labels, ["Person"])) {
+    const messages = node.properties.incoming + node.properties.outgoing
+    if (messages <= 500) {
+      node.scaleFactor = 1
+    } else {
+      node.scaleFactor = Math.min(1 + Math.log(messages / 500) / Math.log(7), 2.5)
+    }
   }
 }
 
 function computeRelationshipScaleFactor(relationship) {
-  relationship.scaleFactor = relationship.properties.count ** 0.4
+  if (relationship.type == "EMAILS_TO") {
+    relationship.scaleFactor = relationship.properties.count ** 0.4
+  }
 }
 
 const fullscreenStyle = {
@@ -69,8 +73,9 @@ export default class ExplorerSection extends React.Component {
     return response
   }
 
-  async getNeighbours(id, currentNeighbourIds = []) {
-    const response = await fetchJSON(`${API_URL}/neighbours/${id}?limit=10`)
+  async getNeighbours(node, currentNeighbourIds = []) {
+    const type = deepEquals(node.labels, ["Person"]) ? "Person" : "Entity"
+    const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
       computeNodeScaleFactor(neighbour)
@@ -117,12 +122,8 @@ export default class ExplorerSection extends React.Component {
   }
 
   async onNodeDblClick(node) {
-    const person = {
-      id: node.id,
-      email: node.propertyMap.email,
-    }
-    await appStore.getPersonDetails(person)
-    appStore.toggleModal('personDetails')
+    await appStore.getNodeDetails(node)
+    appStore.toggleModal('nodeDetails')
   }
 
   setGraph(graph) {

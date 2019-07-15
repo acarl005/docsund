@@ -5,7 +5,7 @@ import { observer } from 'mobx-react'
 import { Layout, Tabs, Menu, Icon } from 'antd'
 import appStore from "../stores/AppStore"
 import EmailsBetweenModal from "./modals/EmailsBetweenModal"
-import PersonDetailsModal from "./modals/PersonDetailsModal"
+import NodeDetailsModal from "./modals/NodeDetailsModal"
 import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
@@ -28,7 +28,7 @@ export default class Main extends Component {
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
         {appStore.modalVisibility.emailsBetween && <EmailsBetweenModal />}
         {appStore.modalVisibility.topicSample && <TopicSampleModal />}
-        {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
+        {appStore.modalVisibility.nodeDetails && <NodeDetailsModal />}
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
