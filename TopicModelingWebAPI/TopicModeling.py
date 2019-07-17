@@ -237,7 +237,7 @@ class TopicModeling:
         messageIDs = self.sub_df[self.sub_df['topic'] == topicNumber]
 
         if self.documentType == DocumentTypeEnum.emailType:
-            return True, messageIDs['ID'].tolist()
+            return True, messageIDs['id'].tolist()
         else:
             # TODO: return some sort of index for regular documents
             return True, []
@@ -365,7 +365,7 @@ class TopicModeling2:
         messageIDs = self.sub_df[self.sub_df['topic'] == topicNumber]
 
         if self.documentType == DocumentTypeEnum.emailType:
-            return True, messageIDs['ID'].tolist()
+            return True, messageIDs['id'].tolist()
         else:
             # TODO: return some sort of index for regular documents
             return True, []
