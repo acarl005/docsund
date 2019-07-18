@@ -8,20 +8,21 @@ import { deepEquals } from "../../utils"
 import { StyledListItem } from "./styled"
 
 @observer
-export default class PersonDetailsModal extends Component {
+export default class EntityDetailsModal extends Component {
   onOk() {
-    appStore.toggleModal('personDetails')
+    appStore.toggleModal('entityDetails')
   }
 
-  async onPersonClick(neighbour) {
-    await appStore.getEmailsBetween(neighbour, appStore.activeNode.node)
-    appStore.toggleModal("emailsBetween")
+  async onPersonClick(person) {
+    await appStore.getEmailsAbout(person, appStore.activeNode.node)
+    appStore.toggleModal('emailsAbout')
   }
 
   async onEntityClick(entity) {
-    await appStore.getEmailsAbout(appStore.activeNode.node, entity)
-    appStore.toggleModal("emailsAbout")
+    await appStore.getEmailsMentioning(entity, appStore.activeNode.node)
+    appStore.toggleModal('emailsMentioning')
   }
+
 
   formattedPersonDetails() {
     const { activeNode } = appStore
@@ -67,12 +68,12 @@ export default class PersonDetailsModal extends Component {
         onOk={this.onOk}
         visible
         width="75%"
-        title={appStore.activeNode.node.propertyMap.email}
+        title={appStore.activeNode.node.propertyMap.name}
       >
         <Row>
           <Col span={12} style={{ paddingRight: "10px" }}>
             <List
-              header={<Title level={4}>Emails with</Title>}
+              header={<Title level={4}>Mentioned by</Title>}
               pagination={{ pageSize: 10 }}
               dataSource={this.formattedPersonDetails()}
               renderItem={item => (
@@ -80,14 +81,14 @@ export default class PersonDetailsModal extends Component {
                   onClick={() => this.onPersonClick(item)}
                 >
                   <List.Item.Meta title={item.propertyMap.email} />
-                  <div>{item.count} emails</div>
+                  <div>{item.count} mentions</div>
                 </StyledListItem>
               )}
             />
           </Col>
           <Col span={12} style={{ paddingLeft: "10px" }}>
             <List
-              header={<Title level={4}>Entities discussed</Title>}
+              header={<Title level={4}>Mentioned with</Title>}
               pagination={{ pageSize: 10 }}
               dataSource={this.formattedEntityDetails()}
               renderItem={item => (
@@ -95,7 +96,7 @@ export default class PersonDetailsModal extends Component {
                   onClick={() => this.onEntityClick(item)}
                 >
                   <List.Item.Meta title={item.propertyMap.name} />
-                  <div>{item.count} mentions</div>
+                  <div>{item.count} cooccurences</div>
                 </StyledListItem>
               )}
             />

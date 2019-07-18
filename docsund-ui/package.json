@@ -2,18 +2,19 @@
   "name": "docsund-ui",
   "version": "0.0.0",
   "description": "The Interactice Web UI for Docsund",
+  "author": "Andrew Carlson <acarl005@g.ucla.edu>",
+  "license": "GPL-3.0",
   "main": "index.js",
   "scripts": {
     "start": "node --experimental-modules server.mjs",
     "dev": "parcel src/index.html",
     "build": "rm -rf dist && API_URL=/api TOPIC_API_URL=/topic-api parcel build src/index.html",
+    "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
     "node": ">=12.x"
   },
-  "author": "Andrew Carlson <acarl005@g.ucla.edu>",
-  "license": "GPL-3.0",
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
@@ -25,6 +26,11 @@
     "babel-preset-env": "^1.7.0",
     "d3": "^3.5.17",
     "deepmerge": "^3.2.0",
+    "eslint": "^6.0.1",
+    "eslint-config-airbnb": "^17.1.1",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.14.2",
     "mobx": "^5.10.1",
     "mobx-react": "^6.1.1",
     "moment": "^2.24.0",

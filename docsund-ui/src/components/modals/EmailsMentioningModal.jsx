@@ -1,15 +1,14 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Modal } from 'antd'
-
 import appStore from '../../stores/AppStore'
 import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
 @observer
-export default class EmailsBetweenModal extends React.Component {
+export default class EmailsMentioningModal extends React.Component {
   onOk() {
-    appStore.toggleModal('emailsBetween')
+    appStore.toggleModal('emailsMentioning')
     appStore.setEmailModalView('list')
   }
 
@@ -56,7 +55,7 @@ export default class EmailsBetweenModal extends React.Component {
         onCancel={this.onOk}
         onOk={this.onOk}
         width="75%"
-        title={`Emails between ${fromNode.propertyMap.email} and ${toNode.propertyMap.email}`}
+        title={`Emails mentioning ${fromNode.propertyMap.name} and ${toNode.propertyMap.name}`}
       >
         {
           appStore.emailModalView === 'list' ?

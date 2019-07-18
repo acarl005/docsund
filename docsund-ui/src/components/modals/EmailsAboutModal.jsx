@@ -1,15 +1,14 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Modal } from 'antd'
-
 import appStore from '../../stores/AppStore'
 import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
 @observer
-export default class EmailsBetweenModal extends React.Component {
+export default class EmailsAboutModal extends React.Component {
   onOk() {
-    appStore.toggleModal('emailsBetween')
+    appStore.toggleModal('emailsAbout')
     appStore.setEmailModalView('list')
   }
 
@@ -48,7 +47,6 @@ export default class EmailsBetweenModal extends React.Component {
     if (appStore.activeRelationship === undefined) {
       return null;
     }
-
     const { fromNode, toNode } = appStore.activeRelationship
     return (
       <Modal
@@ -56,7 +54,7 @@ export default class EmailsBetweenModal extends React.Component {
         onCancel={this.onOk}
         onOk={this.onOk}
         width="75%"
-        title={`Emails between ${fromNode.propertyMap.email} and ${toNode.propertyMap.email}`}
+        title={`Emails to/from ${fromNode.propertyMap.email} mentioning ${toNode.propertyMap.name}`}
       >
         {
           appStore.emailModalView === 'list' ?
