@@ -156,7 +156,7 @@ export class LegendComponent extends Component {
     }
     let relTypes = mapRelTypes(this.props.stats.relTypes)
     return (
-      <StyledLegend className={relTypes ? '' : 'one-row'}>
+      <StyledLegend className={relTypes ? '' : 'one-row'} theme={this.props.theme}>
         {mapLabels(this.props.stats.labels)}
         {relTypes}
       </StyledLegend>

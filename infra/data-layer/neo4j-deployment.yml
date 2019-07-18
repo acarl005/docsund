@@ -17,6 +17,14 @@ spec:
       containers:
         - name: neo4j-database
           image: neo4j
+          env:
+            - name: NEO4J_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-secrets
+                  key: password
+            - name: NEO4J_AUTH
+              value: neo4j/$(NEO4J_DATABASE_PASSWORD)
           resources:
             requests:
               cpu: 1
@@ -32,4 +40,4 @@ spec:
       volumes:
         - name: neo4j-volume
           persistentVolumeClaim:
-            claimName: neo4j-volume
+            claimName: neo4j-volume-claim

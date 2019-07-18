@@ -88,15 +88,24 @@ def get_neighbours(id):
     limit = request.args.get("limit", type=int)
     with driver.session() as sesh:
         query = sesh.run("""
-            MATCH (center:Person)-[e:EMAILS_TO]-(neighbours:Person)
+            MATCH (center:Person)-[emails_to:EMAILS_TO]-(neighbours:Person)
             WHERE ID(center) = $id
-            RETURN neighbours, e
-            ORDER BY e.count DESC
+            RETURN DISTINCT neighbours, reduce(sum = 0, em IN collect(emails_to) | sum + em.count) AS tot_msgs
+            ORDER BY tot_msgs DESC
             {}
         """.format("LIMIT $limit" if limit is not None else ""), id=id, limit=int(limit or 0))
         results = query.values()
         neighbours = [neo4j_node_to_dict(record[0]) for record in results]
-        relationships = [neo4j_edge_to_dict(record[1]) for record in results]
+
+        neighbour_ids = [neighbour["id"] for neighbour in neighbours]
+        query = sesh.run("""
+            MATCH (center:Person)-[emails_to:EMAILS_TO]-(neighbours:Person)
+            WHERE ID(center) = $id AND ID(neighbours) IN $neighbour_ids
+            RETURN emails_to
+        """, id=id, neighbour_ids=neighbour_ids)
+        results = query.value()
+        relationships = [neo4j_edge_to_dict(record) for record in results]
+
     return json_response({
         "neighbours": neighbours,
         "relationships": relationships,

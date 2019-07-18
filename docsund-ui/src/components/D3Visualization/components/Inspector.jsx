@@ -205,6 +205,7 @@ export class InspectorComponent extends Component {
 
     return (
       <StyledStatusBar
+        theme={this.props.theme}
         fullscreen={this.props.fullscreen}
         className='status-bar'
       >
