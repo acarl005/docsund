@@ -74,7 +74,7 @@ export default class ExplorerSection extends React.Component {
   }
 
   async getNeighbours(node, currentNeighbourIds = []) {
-    const type = deepEquals(node.labels, ["Person"]) ? "Person" : "Entity"
+    const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
     const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
@@ -109,21 +109,28 @@ export default class ExplorerSection extends React.Component {
   }
 
   async onRelDblClick(relationship) {
-    const source = {
-      id: relationship.source.id,
-      email: relationship.source.propertyMap.email,
+    const { source, target } = relationship
+    if (relationship.type === "EMAILS_TO") {
+      await appStore.getEmailsBetween(source, target)
+      appStore.toggleModal("emailsBetween")
+    } else if (relationship.type === "DISCUSSED") {
+      await appStore.getEmailsAbout(source, target)
+      appStore.toggleModal("emailsAbout")
+    } else if (relationship.type === "APPEAR_WITH") {
+      await appStore.getEmailsMentioning(source, target)
+      appStore.toggleModal("emailsMentioning")
+    } else {
+      throw Error("Cannot handle relationship type ${relationship.type}")
     }
-    const target = {
-      id: relationship.target.id,
-      email: relationship.target.propertyMap.email,
-    }
-    await appStore.getEmailsBetween(source, target)
-    appStore.toggleModal('emailsBetween')
   }
 
   async onNodeDblClick(node) {
     await appStore.getNodeDetails(node)
-    appStore.toggleModal('nodeDetails')
+    if (deepEquals(node.labels, ["Person"])) {
+      appStore.toggleModal('personDetails')
+    } else {
+      appStore.toggleModal('entityDetails')
+    }
   }
 
   setGraph(graph) {

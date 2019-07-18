@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Button } from 'antd'
+
 import Collapse from '../Collapse'
+import appStore from '../../stores/AppStore'
 
 const Wrapper = styled.div`
   > *:not(:first-child) {
@@ -28,11 +30,16 @@ const Body = styled.div`
 `
 
 export default class EmailDetailView extends React.Component {
+  backButton() {
+    appStore.setEmailModalView('list')
+  }
+
   render() {
     const { date, from, to, body, subject, onListViewClick } = this.props;
     const toAsString = typeof to === 'object' ? to.join(', ') : to
     return (
       <Wrapper>
+        <Button icon="arrow-left" onClick={() => this.backButton()}>Back</Button>
         {this.onListViewClick && <Button onClick={onListViewClick} icon='arrow-left'>Back to List</Button>}
         <div style={{textAlign: 'right'}}>{date}</div>
         <Subject>{subject}</Subject>

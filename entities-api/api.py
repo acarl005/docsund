@@ -88,7 +88,7 @@ def find_person(id):
     return jsonify(node)
 
 
-@app.route("/Person/<int:id>/graph-neighbours", methods=["GET"])
+@app.route("/person/<int:id>/graph-neighbours", methods=["GET"])
 @cross_origin()
 def get_person_neighbours(id):
     limit = request.args.get("limit", type=int)
@@ -128,7 +128,11 @@ def get_person_neighbours(id):
             {}
         """.format("LIMIT $limit" if limit is not None else "")
         results = sesh.run(entity_neighbours_query, id=id, limit=limit)
-        entity_neighbours = [neo4j_node_to_dict(record[0]) for record in results]
+        entity_neighbours = []
+        entity_neighbour_counts = []
+        for record in results:
+            entity_neighbours.append(neo4j_node_to_dict(record[0]))
+            entity_neighbour_counts.append(record[1])
 
         if limit is not None:
             desired_num_entities = floor(limit / 2)
@@ -151,9 +155,11 @@ def get_person_neighbours(id):
                 "type": "DISCUSSED",
                 "startNodeId": id,
                 "endNodeId": entity_neighbour["id"],
-                "properties": {},
+                "properties": {
+                    "count": entity_neighbour_counts[i]
+                },
             }
-            for entity_neighbour in entity_neighbours
+            for i, entity_neighbour in enumerate(entity_neighbours)
         ]
     neighbours = person_neighbours + entity_neighbours
     relationships = person_relationships + entity_relationships
@@ -164,7 +170,7 @@ def get_person_neighbours(id):
     })
 
 
-@app.route("/Entity/<int:id>/graph-neighbours", methods=["GET"])
+@app.route("/entities/<int:id>/graph-neighbours", methods=["GET"])
 @cross_origin()
 def get_entity_neighbours(id):
     limit = request.args.get("limit", type=int, default=1000)
@@ -186,7 +192,11 @@ def get_entity_neighbours(id):
             {}
         """.format("LIMIT $limit" if limit is not None else "")
         results = sesh.run(person_neighbours_query, id=id, limit=limit).values()
-        person_neighbours = [neo4j_node_to_dict(record[0]) for record in results]
+        person_neighbours = []
+        person_neighbour_counts = []
+        for record in results:
+            person_neighbours.append(neo4j_node_to_dict(record[0]))
+            person_neighbour_counts.append(record[1])
 
         entity_neighbours_query = """
             PROFILE MATCH (center:Entity)<-[:MENTION]-(emails:Email)-[:MENTION]->(en:Entity)
@@ -204,7 +214,11 @@ def get_entity_neighbours(id):
             {}
         """.format("LIMIT $limit" if limit is not None else "")
         results = sesh.run(entity_neighbours_query, id=id, limit=limit)
-        entity_neighbours = [neo4j_node_to_dict(record[0]) for record in results]
+        entity_neighbours = []
+        entity_neighbour_counts = []
+        for record in results:
+            entity_neighbours.append(neo4j_node_to_dict(record[0]))
+            entity_neighbour_counts.append(record[1])
 
         if limit is not None:
             desired_num_entities = floor(limit / 2)
@@ -218,9 +232,11 @@ def get_entity_neighbours(id):
                 "type": "DISCUSSED",
                 "startNodeId": person_neighbour["id"],
                 "endNodeId": id,
-                "properties": {},
+                "properties": {
+                    "count": person_neighbour_counts[i]
+                },
             }
-            for person_neighbour in person_neighbours
+            for i, person_neighbour in enumerate(person_neighbours)
         ]
 
         entity_relationships = [
@@ -229,9 +245,11 @@ def get_entity_neighbours(id):
                 "type": "APPEAR_WITH",
                 "startNodeId": id,
                 "endNodeId": entity_neighbour["id"],
-                "properties": {},
+                "properties": {
+                    "count": entity_neighbour_counts[i]
+                },
             }
-            for entity_neighbour in entity_neighbours
+            for i, entity_neighbour in enumerate(entity_neighbours)
         ]
     neighbours = person_neighbours + entity_neighbours
     relationships = person_relationships + entity_relationships
@@ -273,7 +291,7 @@ def get_emails_between():
                 MATCH (a:Person)<-[:TO]-(e:Email)-[:FROM]->(b:Person)
                 WHERE (ID(a) = $id_a AND ID(b) = $id_b) OR (ID(b) = $id_a AND ID(a) = $id_b)
                 RETURN DISTINCT e
-                ORDER BY e.date
+                ORDER BY e.date DESC
             """, id_a=int(person_ids[0]), id_b=int(person_ids[1]))
             results = query.values()
     elif "email_ids" in request.args:
@@ -287,6 +305,32 @@ def get_emails_between():
             results = query.values()
     else:
         return jsonify(error=400, text="one of `between` or `email_ids` is required in the query string"), 400
+    return jsonify([neo4j_node_to_dict(record[0]) for record in results])
+
+
+@app.route("/entities/<int:id>/emails", methods=["GET"])
+@cross_origin()
+def get_emails_about_entity(id):
+    person_id = request.args.get("person_id", type=int)
+    entity_id = request.args.get("entity_id", type=int)
+    with driver.session() as sesh:
+        if person_id is not None:
+            query = sesh.run("""
+                MATCH (person:Person)<-[]-(em:Email)-[:MENTION]->(entity:Entity)
+                WHERE ID(person) = $person_id AND ID(entity) = $entity_id
+                RETURN DISTINCT em
+                ORDER BY em.date DESC
+            """, person_id=person_id, entity_id=id)
+        elif entity_id is not None:
+            query = sesh.run("""
+                MATCH (ent1:Entity)<-[:MENTION]-(em:Email)-[:MENTION]->(ent2:Entity)
+                WHERE ID(ent1) = $entity1_id AND ID(ent2) = $entity2_id
+                RETURN DISTINCT em
+                ORDER BY em.date DESC
+            """, entity1_id=id, entity2_id=entity_id)
+        else:
+            return jsonify(error=400, text="one of `person_id` or `entity_id` is required in the query string"), 400
+        results = query.values()
     return jsonify([neo4j_node_to_dict(record[0]) for record in results])
 
 
@@ -342,6 +386,7 @@ def es_search_emails():
 @app.errorhandler(404)
 def page_not_found(e):
     return jsonify(error=404, text=str(e)), 404
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

@@ -4,6 +4,7 @@ import { fetchJSON, deepEquals } from '../utils'
 class AppStore {
   @observable modalVisibility = {
     emailsBetween: false,
+    emailsAbout: false,
     topicSample: false,
     emailSearchResult: false,
     nodeDetails: false,
@@ -11,7 +12,7 @@ class AppStore {
   @observable emailModalView = 'list'
   @observable activeEmailId = ''
   @observable activeRelationship
-  @observable activePerson
+  @observable activeNode
   @observable activeSearchEmailId = ''
   @observable explorerFullscreen = false
   @observable emailSearchTerm = ''
@@ -24,18 +25,38 @@ class AppStore {
   }
 
   @action
-  async getEmailsBetween(toUser, fromUser) {
-    const response = await fetchJSON(`${API_URL}/emails?between=${toUser.id},${fromUser.id}`)
+  async getEmailsBetween(fromNode, toNode) {
+    const response = await fetchJSON(`${API_URL}/emails?between=${toNode.id},${fromNode.id}`)
     this.activeRelationship = {
-      toUser,
-      fromUser,
-      emails: response,
+      toNode,
+      fromNode,
+      emails: response
+    }
+  }
+
+  @action
+  async getEmailsAbout(person, entity) {
+    const response = await fetchJSON(`${API_URL}/entities/${entity.id}/emails?person_id=${person.id}`)
+    this.activeRelationship = {
+      toNode: entity,
+      fromNode: person,
+      emails: response
+    }
+  }
+
+  @action
+  async getEmailsMentioning(fromNode, toNode) {
+    const response = await fetchJSON(`${API_URL}/entities/${toNode.id}/emails?entity_id=${fromNode.id}`)
+    this.activeRelationship = {
+      toNode,
+      fromNode,
+      emails: response
     }
   }
 
   @action
   async getNodeDetails(node) {
-    const type = deepEquals(node.labels, ["Person"]) ? "Person" : "Entity"
+    const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
     const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
     this.activeNode = {
       node,
@@ -89,4 +110,5 @@ class AppStore {
 
 const APP_STORE = new AppStore()
 window.appStore = APP_STORE
+window.proxyDebug = obj => JSON.parse(JSON.stringify(obj))
 export default APP_STORE

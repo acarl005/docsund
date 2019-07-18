@@ -1,20 +1,28 @@
 import React, { Component } from "react"
 import { observer } from "mobx-react"
-import { Row, Col, List, Modal } from "antd"
+import { Row, Col, List, Modal, Typography } from "antd"
+const { Title } = Typography
 
 import appStore from "../../stores/AppStore"
 import { deepEquals } from "../../utils"
+import { StyledListItem } from "./styled"
 
 @observer
-export default class NodeDetailsModal extends Component {
+export default class EntityDetailsModal extends Component {
   onOk() {
-    appStore.toggleModal('nodeDetails')
+    appStore.toggleModal('entityDetails')
   }
 
-  async onRowClick(neighbour) {
-    await appStore.getEmailsBetween(neighbour, appStore.activeNode)
-    appStore.toggleModal('emailsBetween')
+  async onPersonClick(person) {
+    await appStore.getEmailsAbout(person, appStore.activeNode.node)
+    appStore.toggleModal('emailsAbout')
   }
+
+  async onEntityClick(entity) {
+    await appStore.getEmailsMentioning(entity, appStore.activeNode.node)
+    appStore.toggleModal('emailsMentioning')
+  }
+
 
   formattedPersonDetails() {
     const { activeNode } = appStore
@@ -28,7 +36,7 @@ export default class NodeDetailsModal extends Component {
         return {
           id: neighbour.id,
           count: rel.properties.count,
-          email: neighbour.properties.email
+          propertyMap: neighbour.properties
         }
       })
   }
@@ -44,8 +52,8 @@ export default class NodeDetailsModal extends Component {
         )
         return {
           id: neighbour.id,
-          count: neighbour.properties.mentions,
-          name: neighbour.properties.name
+          count: rel.properties.count,
+          propertyMap: neighbour.properties
         }
       })
   }
@@ -60,34 +68,36 @@ export default class NodeDetailsModal extends Component {
         onOk={this.onOk}
         visible
         width="75%"
-        title={appStore.activeNode.node.propertyMap.email}
+        title={appStore.activeNode.node.propertyMap.name}
       >
         <Row>
-          <Col span={12}>
+          <Col span={12} style={{ paddingRight: "10px" }}>
             <List
-              header="Emails with"
-              pagination={{ pageSize: 12 }}
+              header={<Title level={4}>Mentioned by</Title>}
+              pagination={{ pageSize: 10 }}
               dataSource={this.formattedPersonDetails()}
               renderItem={item => (
-                <List.Item
-                  onClick={() => this.onRowClick({ id: item.id, email: item.email })}
+                <StyledListItem
+                  onClick={() => this.onPersonClick(item)}
                 >
-                  <List.Item.Meta title={item.email} />
-                  <div>{item.count} emails</div>
-                </List.Item>
+                  <List.Item.Meta title={item.propertyMap.email} />
+                  <div>{item.count} mentions</div>
+                </StyledListItem>
               )}
             />
           </Col>
-          <Col span={12}>
+          <Col span={12} style={{ paddingLeft: "10px" }}>
             <List
-              header="Entities discussed"
-              pagination={{ pageSize: 12 }}
+              header={<Title level={4}>Mentioned with</Title>}
+              pagination={{ pageSize: 10 }}
               dataSource={this.formattedEntityDetails()}
               renderItem={item => (
-                <List.Item>
-                  <List.Item.Meta title={item.name} />
-                  <div>{item.count} mentions</div>
-                </List.Item>
+                <StyledListItem
+                  onClick={() => this.onEntityClick(item)}
+                >
+                  <List.Item.Meta title={item.propertyMap.name} />
+                  <div>{item.count} cooccurences</div>
+                </StyledListItem>
               )}
             />
           </Col>

@@ -5,7 +5,10 @@ import { observer } from 'mobx-react'
 import { Layout, Tabs, Menu, Icon } from 'antd'
 import appStore from "../stores/AppStore"
 import EmailsBetweenModal from "./modals/EmailsBetweenModal"
-import NodeDetailsModal from "./modals/NodeDetailsModal"
+import EmailsAboutModal from "./modals/EmailsAboutModal"
+import EmailsMentioningModal from "./modals/EmailsMentioningModal"
+import PersonDetailsModal from "./modals/PersonDetailsModal"
+import EntityDetailsModal from "./modals/EntityDetailsModal"
 import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
@@ -27,8 +30,11 @@ export default class Main extends Component {
       <Layout>
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
         {appStore.modalVisibility.emailsBetween && <EmailsBetweenModal />}
+        {appStore.modalVisibility.emailsAbout && <EmailsAboutModal />}
+        {appStore.modalVisibility.emailsMentioning && <EmailsMentioningModal />}
         {appStore.modalVisibility.topicSample && <TopicSampleModal />}
-        {appStore.modalVisibility.nodeDetails && <NodeDetailsModal />}
+        {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
+        {appStore.modalVisibility.entityDetails && <EntityDetailsModal />}
         <Header className="header">
           <div className="logo" style={{
               marginRight: "30px",
