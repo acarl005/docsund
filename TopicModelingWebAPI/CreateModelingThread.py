@@ -193,7 +193,7 @@ class createModelThread(threading.Thread):
 
         # Load the entire email corpus
         emails_df = pd.read_csv('email_data.csv')
-        emails_df.columns = ['ID', 'To', 'From', 'Subject', 'Body', 'Date']
+        emails_df.columns = emails_df.columns.str.lower()
 
         # Adjust the sample size if necessary
         if sample_size > len(emails_df):
@@ -210,16 +210,16 @@ class createModelThread(threading.Thread):
         emails_df = emails_df.sample(n=sample_size)
 
         # Convert columns to the correct type
-        emails_df['ID'] = pd.to_numeric(emails_df['ID'])
-        emails_df['Date'] = emails_df['Date'].apply(lambda x: pd.to_datetime(str(x)))
+        emails_df['id'] = pd.to_numeric(emails_df['id'])
+        emails_df['date'] = emails_df['date'].apply(lambda x: pd.to_datetime(str(x)))
 
         # Parse the emails into a list email objects
-        messages = list(map(email.message_from_string, emails_df['Body']))
+        messages = list(map(email.message_from_string, emails_df['body']))
 
         # Parse content from emails
         emails_df['content'] = list(map(get_text_from_email, messages))
         del messages
-        emails_df = emails_df.drop(['Body'], axis=1)
+        emails_df = emails_df.drop(['body'], axis=1)
 
         # Remove emails that are HTML
         emails_df = emails_df[(emails_df['content'].str.lower()).str.find("<head>") == -1]
