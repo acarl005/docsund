@@ -7,32 +7,14 @@ import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
 @observer
-export default class EmailsBetweenModal extends React.Component {
-  onOk() {
-    appStore.toggleModal('emailsBetween')
+export default class RelationshipEmails extends React.Component {
+  onClose() {
+    appStore.toggleModal('relationshipEmails')
     appStore.setEmailModalView('list')
   }
 
-  getColumnConfig() {
-    return [
-      {
-        key: 'from',
-        render: (text, record) => record.properties.from
-      },
-      {
-        key: 'content',
-        render: (text, record) => (
-          <EmailContentPreview
-            subject={record.properties.subject}
-            body={record.properties.body}
-          />
-        )
-      },
-      {
-        key: 'date',
-        render: (text, record) => formatDate(record.properties.date)
-      },
-    ]
+  clickBack() {
+    appStore.setEmailModalView('list')
   }
 
   onListViewClick = () => {
@@ -48,15 +30,25 @@ export default class EmailsBetweenModal extends React.Component {
     if (appStore.activeRelationship === undefined) {
       return null;
     }
-
     const { fromNode, toNode } = appStore.activeRelationship
+    let title
+    if (fromNode.labels[0] === "Person") {
+      if (toNode.labels[0] === "Person") {
+        title = `Emails between ${fromNode.propertyMap.email} and ${toNode.propertyMap.email}`
+      } else {
+        title = `Emails to/from ${fromNode.propertyMap.email} mentioning ${toNode.propertyMap.name}`
+      }
+    } else {
+      title = `Emails mentioning ${fromNode.propertyMap.name} and ${toNode.propertyMap.name}`
+    }
+
     return (
       <Modal
         visible
-        onCancel={this.onOk}
-        onOk={this.onOk}
+        onCancel={this.onClose}
         width="75%"
-        title={`Emails between ${fromNode.propertyMap.email} and ${toNode.propertyMap.email}`}
+        title={title}
+        footer={null}
       >
         {
           appStore.emailModalView === 'list' ?
@@ -65,6 +57,7 @@ export default class EmailsBetweenModal extends React.Component {
               onDetailViewClick={this.onDetailViewClick}
             /> :
             <EmailDetailView
+              clickBack={this.clickBack}
               date={appStore.activeEmail.properties.date}
               from={appStore.activeEmail.properties.from}
               to={appStore.activeEmail.properties.to}

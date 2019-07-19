@@ -9,18 +9,18 @@ import { StyledListItem } from "./styled"
 
 @observer
 export default class PersonDetailsModal extends Component {
-  onOk() {
-    appStore.toggleModal('personDetails')
+  onClose() {
+    appStore.toggleModal("personDetails")
   }
 
   async onPersonClick(neighbour) {
     await appStore.getEmailsBetween(neighbour, appStore.activeNode.node)
-    appStore.toggleModal("emailsBetween")
+    appStore.toggleModal("relationshipEmails")
   }
 
   async onEntityClick(entity) {
     await appStore.getEmailsAbout(appStore.activeNode.node, entity)
-    appStore.toggleModal("emailsAbout")
+    appStore.toggleModal("relationshipEmails")
   }
 
   formattedPersonDetails() {
@@ -33,7 +33,7 @@ export default class PersonDetailsModal extends Component {
           neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
         )
         return {
-          id: neighbour.id,
+          ...neighbour,
           count: rel.properties.count,
           propertyMap: neighbour.properties
         }
@@ -50,7 +50,7 @@ export default class PersonDetailsModal extends Component {
           neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
         )
         return {
-          id: neighbour.id,
+          ...neighbour,
           count: rel.properties.count,
           propertyMap: neighbour.properties
         }
@@ -63,11 +63,11 @@ export default class PersonDetailsModal extends Component {
     }
     return (
       <Modal
-        onCancel={this.onOk}
-        onOk={this.onOk}
+        onCancel={this.onClose}
         visible
         width="75%"
         title={appStore.activeNode.node.propertyMap.email}
+        footer={null}
       >
         <Row>
           <Col span={12} style={{ paddingRight: "10px" }}>

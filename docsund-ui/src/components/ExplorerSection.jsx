@@ -8,6 +8,7 @@ import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
 import Explorer from "./D3Visualization"
+import { ExplorerContainer } from "./styled"
 
 const { TabPane } = Tabs
 
@@ -112,16 +113,14 @@ export default class ExplorerSection extends React.Component {
     const { source, target } = relationship
     if (relationship.type === "EMAILS_TO") {
       await appStore.getEmailsBetween(source, target)
-      appStore.toggleModal("emailsBetween")
     } else if (relationship.type === "DISCUSSED") {
       await appStore.getEmailsAbout(source, target)
-      appStore.toggleModal("emailsAbout")
     } else if (relationship.type === "APPEAR_WITH") {
       await appStore.getEmailsMentioning(source, target)
-      appStore.toggleModal("emailsMentioning")
     } else {
       throw Error("Cannot handle relationship type ${relationship.type}")
     }
+    appStore.toggleModal("relationshipEmails")
   }
 
   async onNodeDblClick(node) {
@@ -169,9 +168,9 @@ export default class ExplorerSection extends React.Component {
               style={{marginBottom: 8}}
               onPressEnter={this.handleSearch.bind(this)}
             />
-            <div style={appStore.explorerFullscreen ? fullscreenStyle : { height: "600px" }}>
+            <ExplorerContainer fullscreen={appStore.explorerFullscreen}>
               { maybeExplorer }
-            </div>
+            </ExplorerContainer>
           </TabPane>
           <TabPane tab="Topic Explorer" key="2">
             <TopicModelingComponent/>

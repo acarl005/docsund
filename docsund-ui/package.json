@@ -41,6 +41,7 @@
     "styled-components": "^4.2.0"
   },
   "dependencies": {
+    "bluebird": "^3.5.5",
     "express": "^4.17.1",
     "http-proxy-middleware": "^0.19.1"
   }

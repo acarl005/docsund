@@ -1,14 +1,8 @@
 import React from 'react'
-import styled from 'styled-components'
+import { StyledItem } from "./styled"
+import { LeftRightContainer } from "../styled"
+import { formatDate } from "../../utils"
 
-const Wrapper = styled.div`
-  width: 100%;
-  cursor: pointer;
-
-  > *:not(:first-child) {
-    margin-top: 8px;
-  }
-`
 
 const highlightedText = (key, val) => (
   <div
@@ -31,7 +25,7 @@ const originalText = (key, val) => (
 )
 
 export default class EmailSearchResultItem extends React.Component {
-  renderByKey = (key) => {
+  renderByKey(key) {
     const { highlight, properties } = this.props;
     return key in highlight
       ? highlightedText(key, highlight[key])
@@ -40,15 +34,15 @@ export default class EmailSearchResultItem extends React.Component {
 
   render() {
     return (
-      <Wrapper
+      <StyledItem
         onClick={() => this.props.onItemClick(this.props.id)}
       >
-        <div style={{ textAlign: 'right' }}>{this.props.properties.date}</div>
-        {this.renderByKey('from')}
+        <LeftRightContainer left={this.renderByKey('from')}
+                            right={formatDate(this.props.properties.date)} />
         {this.renderByKey('to')}
         {this.renderByKey('subject')}
         {this.renderByKey('body')}
-      </Wrapper>
+      </StyledItem>
     )
   }
 }

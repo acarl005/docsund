@@ -28,7 +28,7 @@ export default class Collapse extends React.Component {
 
   render() {
     return (
-      <div>
+      <div style={this.props.style}>
         <div
           style={this.state.collapsed ? collapsedStyle : {}}
           ref={ref => (this.span = ref)}

@@ -5,7 +5,7 @@ import EmailDetailView from '../modals/EmailDetailView'
 
 @observer
 export default class EmailSearchResultModal extends React.Component {
-  onOk = () => {
+  onClose() {
     appStore.toggleModal('emailSearchResult')
   }
 
@@ -13,10 +13,10 @@ export default class EmailSearchResultModal extends React.Component {
     return (
       <Modal
         visible
-        onCancel={this.onOk}
-        onOk={this.onOk}
+        onCancel={this.onClose}
         width="75%"
-        title={'Email Detail Viewer'}
+        title={"Email Viewer"}
+        footer={null}
       >
         <EmailDetailView
           date={appStore.activeSearchEmail.properties.date}

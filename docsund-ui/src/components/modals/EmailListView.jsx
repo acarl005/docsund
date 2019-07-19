@@ -7,18 +7,21 @@ export default class EmailListView extends React.Component {
   getColumnConfig() {
     return [
       {
-        key: 'from',
+        key: "from",
+        title: "From",
         render: (text, record) => record.properties.from
       },
       {
-        key: 'content',
+        key: "content",
+        title: "Content",
         render: (text, record) => <EmailContentPreview
           subject={record.properties.subject}
           body={record.properties.body}
         />
       },
       {
-        key: 'date',
+        key: "Date",
+        title: "Date",
         render: (text, record) => formatDate(record.properties.date)
       },
     ]
@@ -32,7 +35,7 @@ export default class EmailListView extends React.Component {
         onRow={record => ({
           onClick: () => onDetailViewClick(record)
         })}
-        showHeader={false}
+        showHeader={true}
         columns={this.getColumnConfig()}
         dataSource={emails}
       />

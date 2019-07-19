@@ -1,11 +1,11 @@
 import styled from "styled-components"
-import { List } from "antd"
+import { StyledListItem as BaseStyledListItem } from "../styled"
 
-export const StyledListItem = styled(List.Item)`
+export const StyledListItem = styled(BaseStyledListItem)`
   padding-left: 5px;
   padding-right: 5px;
-  transition: all 0.3s;
   background: white;
+  transition: all 0.3s;
 
   :hover {
     cursor: pointer;

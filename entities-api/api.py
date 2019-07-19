@@ -347,13 +347,13 @@ def neo4j_search_emails():
         results = db_query.values()
     return jsonify([neo4j_node_to_dict(record[0]) for record in results])
 
-PAGE_SIZE = 25
 
 @app.route("/elasticsearch", methods=["GET"])
 @cross_origin()
 def es_search_emails():
     search_query = request.args.get("q").strip()
     page_num = request.args.get("page_num", default=1, type=int)
+    page_size = request.args.get("page_size", default=50, type=int)
     search_body = {
         "_source": {
             "includes": ["id", "to", "from", "subject", "body", "date"]
@@ -363,8 +363,8 @@ def es_search_emails():
                 "query": search_query
             }
         },
-        "from": (page_num - 1) * PAGE_SIZE,
-        "size": PAGE_SIZE,
+        "from": (page_num - 1) * page_size,
+        "size": page_size,
         "highlight": {
             "type": "unified",
             "pre_tags": "<mark>",

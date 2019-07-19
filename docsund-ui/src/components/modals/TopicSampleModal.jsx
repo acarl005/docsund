@@ -6,32 +6,14 @@ import EmailListView from './EmailListView'
 import EmailDetailView from './EmailDetailView'
 
 @observer
-export default class EmailsBetweenModal extends React.Component {
-  onOk = () => {
+export default class TopicSampleModal extends React.Component {
+  onClose() {
     appStore.toggleModal('topicSample')
     appStore.setEmailModalView('list')
   }
 
-  getColumnConfig() {
-    return [
-      {
-        key: 'from',
-        render: (text, record) => record.properties.from
-      },
-      {
-        key: 'content',
-        render: (text, record) => (
-          <EmailContentPreview
-            subject={record.properties.subject}
-            body={record.properties.body}
-          />
-        )
-      },
-      {
-        key: 'date',
-        render: (text, record) => formatDate(record.properties.date)
-      },
-    ]
+  clickBack() {
+    appStore.setEmailModalView('list')
   }
 
   onListViewClick = () => {
@@ -47,10 +29,10 @@ export default class EmailsBetweenModal extends React.Component {
     return (
       <Modal
         visible
-        onCancel={this.onOk}
-        onOk={this.onOk}
+        onCancel={this.onClose}
         width="75%"
         title="Sample Emails for Topic"
+        footer={null}
       >
         {
           appStore.emailModalView === 'list' ?
@@ -59,6 +41,7 @@ export default class EmailsBetweenModal extends React.Component {
               onDetailViewClick={this.onDetailViewClick}
             /> :
             <EmailDetailView
+              clickBack={this.clickBack}
               date={appStore.activeEmail.properties.date}
               from={appStore.activeEmail.properties.from}
               to={appStore.activeEmail.properties.to}

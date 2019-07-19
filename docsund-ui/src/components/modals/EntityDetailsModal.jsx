@@ -9,18 +9,18 @@ import { StyledListItem } from "./styled"
 
 @observer
 export default class EntityDetailsModal extends Component {
-  onOk() {
-    appStore.toggleModal('entityDetails')
+  onClose() {
+    appStore.toggleModal("entityDetails")
   }
 
   async onPersonClick(person) {
     await appStore.getEmailsAbout(person, appStore.activeNode.node)
-    appStore.toggleModal('emailsAbout')
+    appStore.toggleModal("relationshipEmails")
   }
 
   async onEntityClick(entity) {
     await appStore.getEmailsMentioning(entity, appStore.activeNode.node)
-    appStore.toggleModal('emailsMentioning')
+    appStore.toggleModal("relationshipEmails")
   }
 
 
@@ -34,7 +34,7 @@ export default class EntityDetailsModal extends Component {
           neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
         )
         return {
-          id: neighbour.id,
+          ...neighbour,
           count: rel.properties.count,
           propertyMap: neighbour.properties
         }
@@ -51,7 +51,7 @@ export default class EntityDetailsModal extends Component {
           neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
         )
         return {
-          id: neighbour.id,
+          ...neighbour,
           count: rel.properties.count,
           propertyMap: neighbour.properties
         }
@@ -64,11 +64,11 @@ export default class EntityDetailsModal extends Component {
     }
     return (
       <Modal
-        onCancel={this.onOk}
-        onOk={this.onOk}
+        onCancel={this.onClose}
         visible
         width="75%"
         title={appStore.activeNode.node.propertyMap.name}
+        footer={null}
       >
         <Row>
           <Col span={12} style={{ paddingRight: "10px" }}>

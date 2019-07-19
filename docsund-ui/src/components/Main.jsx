@@ -4,22 +4,19 @@ import qs from "querystring"
 import { observer } from 'mobx-react'
 import { Layout, Tabs, Menu, Icon } from 'antd'
 import appStore from "../stores/AppStore"
-import EmailsBetweenModal from "./modals/EmailsBetweenModal"
-import EmailsAboutModal from "./modals/EmailsAboutModal"
-import EmailsMentioningModal from "./modals/EmailsMentioningModal"
+import RelationshipEmailsModal from "./modals/RelationshipEmailsModal"
 import PersonDetailsModal from "./modals/PersonDetailsModal"
 import EntityDetailsModal from "./modals/EntityDetailsModal"
 import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
 import ExplorerSection from './ExplorerSection'
-const { Header } = Layout
+let { Header, Content } = Layout
 
-const Content = styled.div`
-  padding: 0 180px;
-
+Content = styled(Content)`
+  padding: 0 12%;
   > * {
-    margin-top: 24px;
+    margin: 24px;
   }
 `
 
@@ -29,9 +26,7 @@ export default class Main extends Component {
     return (
       <Layout>
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
-        {appStore.modalVisibility.emailsBetween && <EmailsBetweenModal />}
-        {appStore.modalVisibility.emailsAbout && <EmailsAboutModal />}
-        {appStore.modalVisibility.emailsMentioning && <EmailsMentioningModal />}
+        {appStore.modalVisibility.relationshipEmails && <RelationshipEmailsModal />}
         {appStore.modalVisibility.topicSample && <TopicSampleModal />}
         {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
         {appStore.modalVisibility.entityDetails && <EntityDetailsModal />}

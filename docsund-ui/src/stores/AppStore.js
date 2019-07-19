@@ -1,21 +1,21 @@
-import { action, computed, observable } from 'mobx'
-import { fetchJSON, deepEquals } from '../utils'
+import { action, computed, observable } from "mobx"
+import qs from "querystring"
+import { fetchJSON, deepEquals } from "../utils"
 
 class AppStore {
   @observable modalVisibility = {
-    emailsBetween: false,
-    emailsAbout: false,
+    relationshipEmails: false,
     topicSample: false,
     emailSearchResult: false,
     nodeDetails: false,
   }
   @observable emailModalView = 'list'
-  @observable activeEmailId = ''
+  @observable activeEmailId = null
   @observable activeRelationship
   @observable activeNode
-  @observable activeSearchEmailId = ''
+  @observable activeSearchEmailId = null
   @observable explorerFullscreen = false
-  @observable emailSearchTerm = ''
+  @observable searchQuery
   @observable emailSearchResults = []
   @observable topicEmails = []
 
@@ -65,20 +65,27 @@ class AppStore {
   }
 
   @action
-  async submitEmailSearch(searchTerm) {
-    const response = await fetchJSON(`${API_URL}/elasticsearch?q=${searchTerm}`)
-    this.emailSearchTerm = searchTerm
-    this.emailSearchResults = response.hits.map(hit => ({
-      id: hit._source.id,
-      highlight: hit.highlight,
-      properties: {
-        date: hit._source.date,
-        subject: hit._source.subject,
-        body: hit._source.body,
-        to: hit._source.to,
-        from: hit._source.from,
-      }
+  async submitEmailSearch(searchTerm, pageSize, pageNum = 1) {
+    const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
+      q: searchTerm,
+      page_num: pageNum,
+      page_size: pageSize
     }))
+    this.emailSearchResults = {
+      ...response,
+      hits: response.hits.map(hit => ({
+        id: hit._source.id,
+        highlight: hit.highlight,
+        properties: {
+          to: hit._source.to,
+          from: hit._source.from,
+          subject: hit._source.subject,
+          body: hit._source.body,
+          date: hit._source.date
+        }
+      }))
+    }
+    this.searchQuery = searchTerm
   }
   
   @action
