@@ -1,7 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { Icon, Input, List, Row, Col, Pagination } from 'antd'
-import Promise from "bluebird"
 
 import appStore from '../../stores/AppStore'
 import Card from '../Card'
@@ -19,7 +18,6 @@ export default class EmailSearch extends React.Component {
   onSearch = async e => {
     const { value } = e.target
     this.setState({ pageNum: 1 })
-    await Promise.delay(1000)
     await appStore.submitEmailSearch(value, PAGE_SIZE)
   }
 
