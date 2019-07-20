@@ -21,7 +21,7 @@ class AppStore {
 
   @computed
   get activeSearchEmail() {
-    return this.emailSearchResults.find((email) => email.id === this.activeSearchEmailId)
+    return this.emailSearchResults.hits.find((email) => email.id === this.activeSearchEmailId)
   }
 
   @action

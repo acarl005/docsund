@@ -18,6 +18,15 @@ def unnest(df, col):
     return unnested.join(df.drop(col, 1), how="left")
 
 
+def free_gen(global_id_counter, taken):
+    """generator function to wrap the counter that avoids duplicate IDs"""
+    while True:
+        id = next(global_id_counter)
+        if str(id) in taken or id in taken:
+            continue
+        yield id
+
+
 def get_entity_df(df, entity_col):
     melted = pd.melt(df, id_vars=['id'], value_vars=[entity_col])
     melted = melted.loc[melted['value'] != '']
@@ -100,7 +109,7 @@ def create_entity_node_relationships(df, entity_name, global_id_counter, levensh
 
 def spacy_to_neo4j_etl(email_df, progress_bar=False):
     # generator for globally unique IDs in neo4j
-    global_id_counter = count()
+    global_id_counter = free_gen(count(), email_df.index)
 
     email_df["to"] = email_df.to.apply(lambda s: re.split(r"\s*,\s*", s.strip()))
     email_df["subject"] = email_df.subject.fillna("").apply(lambda s: escape_backslashes(s.strip()))

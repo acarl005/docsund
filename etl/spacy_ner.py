@@ -12,6 +12,7 @@ from to_neo4j import spacy_to_neo4j_etl
 
 csv.field_size_limit(sys.maxsize)
 ENTITIES_OF_INTEREST = ["PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", "DATE", "TIME", "MONEY", "QUANTITY"]
+DESIRED_COLUMNS = ["body", "date", "from", "id", "subject", "to"]
 spacy_nlp = spacy.load("en_core_web_sm", disable=["parser", "textcat"])
 
 
@@ -65,6 +66,8 @@ def main(csv_path, nrows, progress):
     with open(csv_path) as f:
         csv_reader = csv.reader(f)
         csv_columns = next(csv_reader)
+        assert sorted(csv_columns) == DESIRED_COLUMNS, ("csv columns must be {}. instead got {}"
+                                                        .format(DESIRED_COLUMNS, sorted(csv_columns)))
         email_body_index = csv_columns.index("body")
         for i in range(num_child_processes):
             q_send = mp.Queue()
@@ -92,7 +95,7 @@ def main(csv_path, nrows, progress):
 
     for entity in ["PERSON", "ORG", "FAC"]:
         processed_df[entity] = processed_df[entity].apply(lambda s: clean_enron_list(s))
-    spacy_to_neo4j_etl(processed_df.sort_values(by=["id"]), progress is not None)
+    spacy_to_neo4j_etl(processed_df.sort_values(by=["id"]).set_index("id", drop=False), progress is not None)
 
 
 if __name__ == "__main__":
