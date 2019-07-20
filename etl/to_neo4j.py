@@ -102,7 +102,7 @@ def spacy_to_neo4j_etl(email_df, progress_bar=False):
     # generator for globally unique IDs in neo4j
     global_id_counter = count()
 
-    email_df["to"] = email_df.to.apply(lambda s: s.strip().split(","))
+    email_df["to"] = email_df.to.apply(lambda s: re.split(r"\s*,\s*", s.strip()))
     email_df["subject"] = email_df.subject.fillna("").apply(lambda s: escape_backslashes(s.strip()))
     email_df["body"] = email_df.body.fillna("").apply(lambda s: escape_backslashes(s.strip()))
 
