@@ -161,12 +161,13 @@ export default class ExplorerSection extends React.Component {
 
     return (
       <Card>
-        <Tabs animated={false}>
+        <Tabs animated={false} className="explorer-information">
           <TabPane tab="Entity Explorer" key="1">
             <Input
               prefix={<Icon type="search" />}
               style={{marginBottom: 8}}
               onPressEnter={this.handleSearch.bind(this)}
+              className="entity-explorer-search"
             />
             <ExplorerContainer fullscreen={appStore.explorerFullscreen}>
               { maybeExplorer }
