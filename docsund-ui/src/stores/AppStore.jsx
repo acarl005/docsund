@@ -1,5 +1,7 @@
+import React from "react"
 import { action, computed, observable } from "mobx"
 import qs from "querystring"
+import { notification } from "antd"
 import { fetchJSON, deepEquals } from "../utils"
 
 class AppStore {
@@ -77,27 +79,35 @@ class AppStore {
   async submitEmailSearch(searchTerm, pageSize, pageNum = 1) {
     this.loadingEmailSearch = true
     this.searchQuery = null
-    const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
-      q: searchTerm,
-      page_num: pageNum,
-      page_size: pageSize
-    }))
-    this.emailSearchResults = {
-      ...response,
-      hits: response.hits.map(hit => ({
-        id: hit._source.id,
-        highlight: hit.highlight,
-        properties: {
-          to: hit._source.to,
-          from: hit._source.from,
-          subject: hit._source.subject,
-          body: hit._source.body,
-          date: hit._source.date
-        }
+    try {
+      const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
+        q: searchTerm,
+        page_num: pageNum,
+        page_size: pageSize
       }))
+      this.emailSearchResults = {
+        ...response,
+        hits: response.hits.map(hit => ({
+          id: hit._source.id,
+          highlight: hit.highlight,
+          properties: {
+            to: hit._source.to,
+            from: hit._source.from,
+            subject: hit._source.subject,
+            body: hit._source.body,
+            date: hit._source.date
+          }
+        }))
+      }
+      this.searchQuery = searchTerm
+    } catch (err) {
+      notification.error({
+        message: "Error",
+        description: <pre>{err.stack}</pre>
+      })
+    } finally {
+      this.loadingEmailSearch = false
     }
-    this.searchQuery = searchTerm
-    this.loadingEmailSearch = false
   }
 
   @action

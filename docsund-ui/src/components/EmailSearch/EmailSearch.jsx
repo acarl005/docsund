@@ -78,7 +78,7 @@ export default class EmailSearch extends React.Component {
 function SkeletonList() {
   return (
     <List
-      dataSource={new Array(PAGE_SIZE).fill({})}
+      dataSource={new Array(4).fill({})}
       renderItem={item => (
         <List.Item>
           <Skeleton active loading />

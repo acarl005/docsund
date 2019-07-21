@@ -48,9 +48,15 @@ export default class ExplorerSection extends React.Component {
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.value.toLowerCase()
-    const searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
-      q: searchQuery
-    }))
+    this.setState({ loading: true })
+    let searchResults
+    try {
+      searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
+        q: searchQuery
+      }))
+    } finally {
+      this.setState({ loading: false })
+    }
     for (let node of searchResults) {
       computeNodeScaleFactor(node)
     }
@@ -69,8 +75,12 @@ export default class ExplorerSection extends React.Component {
   async getNeighbours(node, currentNeighbourIds = []) {
     const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
     this.setState({ loading: true })
-    const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
-    this.setState({ loading: false })
+    let response
+    try {
+      response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
+    } finally {
+      this.setState({ loading: false })
+    }
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
       computeNodeScaleFactor(neighbour)
