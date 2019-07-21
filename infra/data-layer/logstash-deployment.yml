@@ -51,3 +51,5 @@ spec:
                 echo 'waiting for elasticsearch'
                 sleep 10;
               done
+      nodeSelector:
+        group: workers

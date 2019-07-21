@@ -110,6 +110,8 @@ This may not be enabled by default.
 
 # Appendix
 
+## Deploy Locally
+
 To try locally, you can use [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) instead of EKS.
 
 Here is the recommended command to create a cluster:
@@ -117,5 +119,14 @@ Here is the recommended command to create a cluster:
 ```sh
 minikube start --cpus 4 --memory 8192 --disk-size 30g
 minikube dashboard
+```
+
+## Multiple Datasets
+
+```sh
+kubectl config set-context --current --namespace enron
+kub create namespace enron
+
+eksctl scale nodegroup --cluster docsund --nodes 7 docsund-workers
 ```
 

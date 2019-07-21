@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: docsund-etl
-          image: acarl005/docsund-etl:0.1.3
+          image: acarl005/docsund-etl:0.1.4
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
