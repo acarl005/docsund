@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { observer } from "mobx-react"
-import { Row, Col, List, Modal, Typography } from "antd"
+import { Skeleton, Row, Col, List, Modal, Typography } from "antd"
 const { Title } = Typography
 
 import appStore from "../../stores/AppStore"
@@ -14,13 +14,13 @@ export default class EntityDetailsModal extends Component {
   }
 
   async onPersonClick(person) {
-    await appStore.getEmailsAbout(person, appStore.activeNode.node)
     appStore.toggleModal("relationshipEmails")
+    await appStore.getEmailsAbout(person, appStore.activeNode.node)
   }
 
   async onEntityClick(entity) {
-    await appStore.getEmailsMentioning(entity, appStore.activeNode.node)
     appStore.toggleModal("relationshipEmails")
+    await appStore.getEmailsMentioning(entity, appStore.activeNode.node)
   }
 
 
@@ -72,37 +72,52 @@ export default class EntityDetailsModal extends Component {
       >
         <Row>
           <Col span={12} style={{ paddingRight: "10px" }}>
-            <List
-              header={<Title level={4}>Mentioned by</Title>}
-              pagination={{ pageSize: 10 }}
-              dataSource={this.formattedPersonDetails()}
-              renderItem={item => (
-                <StyledListItem
-                  onClick={() => this.onPersonClick(item)}
-                >
-                  <List.Item.Meta title={item.propertyMap.email} />
-                  <div>{item.count} mentions</div>
-                </StyledListItem>
-              )}
-            />
+            {appStore.loadingNodeDetails
+              ? <Skeleton
+                  paragraph={{ rows: 20 }}
+                  loading
+                  active
+                />
+              : <List
+                  header={<Title level={4}>Mentioned by</Title>}
+                  pagination={{ pageSize: 10 }}
+                  dataSource={this.formattedPersonDetails()}
+                  renderItem={item => (
+                    <StyledListItem
+                      onClick={() => this.onPersonClick(item)}
+                    >
+                      <List.Item.Meta title={item.propertyMap.email} />
+                      <div>{item.count} mentions</div>
+                    </StyledListItem>
+                  )}
+                />
+            }
           </Col>
           <Col span={12} style={{ paddingLeft: "10px" }}>
-            <List
-              header={<Title level={4}>Mentioned with</Title>}
-              pagination={{ pageSize: 10 }}
-              dataSource={this.formattedEntityDetails()}
-              renderItem={item => (
-                <StyledListItem
-                  onClick={() => this.onEntityClick(item)}
-                >
-                  <List.Item.Meta title={item.propertyMap.name} />
-                  <div>{item.count} cooccurences</div>
-                </StyledListItem>
-              )}
-            />
+            {appStore.loadingNodeDetails
+              ? <Skeleton
+                  paragraph={{ rows: 20 }}
+                  loading
+                  active
+                />
+              : <List
+                  header={<Title level={4}>Mentioned with</Title>}
+                  pagination={{ pageSize: 10 }}
+                  dataSource={this.formattedEntityDetails()}
+                  renderItem={item => (
+                    <StyledListItem
+                      onClick={() => this.onEntityClick(item)}
+                    >
+                      <List.Item.Meta title={item.propertyMap.name} />
+                      <div>{item.count} cooccurences</div>
+                    </StyledListItem>
+                  )}
+                />
+            }
           </Col>
         </Row>
       </Modal>
     )
   }
 }
+

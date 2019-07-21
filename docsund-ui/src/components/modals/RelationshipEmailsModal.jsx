@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Modal } from 'antd'
+import { Skeleton, Modal } from 'antd'
 
 import appStore from '../../stores/AppStore'
 import EmailListView from './EmailListView'
@@ -42,6 +42,21 @@ export default class RelationshipEmails extends React.Component {
       title = `Emails mentioning ${fromNode.propertyMap.name} and ${toNode.propertyMap.name}`
     }
 
+    const EmailView = appStore.emailModalView === 'list'
+      ? <EmailListView
+          emails={appStore.activeRelationship.emails}
+          onDetailViewClick={this.onDetailViewClick}
+        />
+      : <EmailDetailView
+          clickBack={this.clickBack}
+          date={appStore.activeEmail.properties.date}
+          from={appStore.activeEmail.properties.from}
+          to={appStore.activeEmail.properties.to}
+          body={appStore.activeEmail.properties.body}
+          subject={appStore.activeEmail.properties.subject}
+          onListViewClick={this.onListViewClick}
+        />
+
     return (
       <Modal
         visible
@@ -50,23 +65,15 @@ export default class RelationshipEmails extends React.Component {
         title={title}
         footer={null}
       >
-        {
-          appStore.emailModalView === 'list' ?
-            <EmailListView
-              emails={appStore.activeRelationship.emails}
-              onDetailViewClick={this.onDetailViewClick}
-            /> :
-            <EmailDetailView
-              clickBack={this.clickBack}
-              date={appStore.activeEmail.properties.date}
-              from={appStore.activeEmail.properties.from}
-              to={appStore.activeEmail.properties.to}
-              body={appStore.activeEmail.properties.body}
-              subject={appStore.activeEmail.properties.subject}
-              onListViewClick={this.onListViewClick}
+        {appStore.loadingRelationshipEmails
+          ? <Skeleton
+              paragraph={{ rows: 20 }}
+              loading
+              active
             />
-        }
+          : EmailView}
       </Modal>
+
     )
   }
 }

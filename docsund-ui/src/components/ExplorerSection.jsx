@@ -110,6 +110,7 @@ export default class ExplorerSection extends React.Component {
   }
 
   async onRelDblClick(relationship) {
+    appStore.toggleModal("relationshipEmails")
     const { source, target } = relationship
     if (relationship.type === "EMAILS_TO") {
       await appStore.getEmailsBetween(source, target)
@@ -120,16 +121,15 @@ export default class ExplorerSection extends React.Component {
     } else {
       throw Error("Cannot handle relationship type ${relationship.type}")
     }
-    appStore.toggleModal("relationshipEmails")
   }
 
   async onNodeDblClick(node) {
-    await appStore.getNodeDetails(node)
     if (deepEquals(node.labels, ["Person"])) {
       appStore.toggleModal('personDetails')
     } else {
       appStore.toggleModal('entityDetails')
     }
+    await appStore.getNodeDetails(node)
   }
 
   setGraph(graph) {
