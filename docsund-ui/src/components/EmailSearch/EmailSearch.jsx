@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Icon, Input, List, Row, Col, Pagination } from 'antd'
+import { Skeleton, Icon, Input, List, Row, Col, Pagination } from 'antd'
 
 import appStore from '../../stores/AppStore'
 import Card from '../Card'
@@ -58,6 +58,8 @@ export default class EmailSearch extends React.Component {
           onChange={this.onPageChange}
         /> : null}
       </>
+    } else if (appStore.loadingEmailSearch) {
+      maybeContent = <SkeletonList />
     }
 
     return (
@@ -71,4 +73,17 @@ export default class EmailSearch extends React.Component {
       </Card>
     )
   }
+}
+
+function SkeletonList() {
+  return (
+    <List
+      dataSource={new Array(PAGE_SIZE).fill({})}
+      renderItem={item => (
+        <List.Item>
+          <Skeleton active loading />
+        </List.Item>
+      )}
+    />
+  )
 }

@@ -20,6 +20,7 @@ class AppStore {
   @observable topicEmails = []
   @observable loadingNodeDetails = false
   @observable loadingRelationshipEmails = false
+  @observable loadingEmailSearch = false
 
   @computed
   get activeSearchEmail() {
@@ -74,6 +75,8 @@ class AppStore {
 
   @action
   async submitEmailSearch(searchTerm, pageSize, pageNum = 1) {
+    this.loadingEmailSearch = true
+    this.searchQuery = null
     const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
       q: searchTerm,
       page_num: pageNum,
@@ -94,6 +97,7 @@ class AppStore {
       }))
     }
     this.searchQuery = searchTerm
+    this.loadingEmailSearch = false
   }
 
   @action
