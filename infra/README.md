@@ -22,8 +22,8 @@ You'll need a CSV file in an S3 bucket. The CSV file should have the following c
 1. **date** - The datetime that it was sent, formated as an [ISO 8601](https://www.google.com/search?q=iso+date+string&oq=iso+date+string&aqs=chrome..69i57j0l5.2758j1j4&sourceid=chrome&ie=UTF-8) string, e.g. `2019-07-06T02:01:12Z`.
 
 As an example, you can download the [Enron Email Dataset](https://www.kaggle.com/wcukierski/enron-email-dataset/version/2) from Kaggle and unzip it.
-`cd` into `etl/` of this repo and move the CSV file here.
-Run `python preprocess.py` to get it in the correct format.
+`cd` into `preprocess/` of this repo, move the CSV file here, and rename it `enron_raw.csv`.
+Run `python enron_pre.py` to get it in the correct format.
 Upload this to an [AWS S3 bucket](https://aws.amazon.com/s3/).
 
 ## 2. Create a Kubernetes Cluster
