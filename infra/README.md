@@ -8,7 +8,7 @@ This guide will walk you through deploying it on [Amazon EKS](https://aws.amazon
 1. An email dataset
 1. `kubectl`
 1. Python 3
-1. Optional: `eksctl`
+1. `eksctl`
 
 ## 1. Formatting your Data
 
@@ -34,12 +34,15 @@ Create an keypair for SSH access. Note: If you don't want to enable SSH access, 
 
 ```sh
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/kube-key
+eksctl create cluster -f cluster.yml
 ```
 
-Run `eksctl create cluster -f cluster.yml`. 
-This assumes you have `eksctl` installed.
-
 Optionally, you can enable the Kubernetes Dashboard by running `./enable-dashboard.sh`, which is just a script for [this tutorial](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
+
+```sh
+./enable-dashboard.sh
+# outputs the auth token and link you need to get into the dashboard
+```
 
 
 ## 3. Create Secrets
