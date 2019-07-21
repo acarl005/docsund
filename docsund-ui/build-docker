@@ -1,1 +1,1 @@
-docker build -t acarl005/docsund-ui:0.1.7 .
+docker build -t acarl005/docsund-ui:0.1.8 .

@@ -33,6 +33,18 @@ export const StyledListItem = styled(List.Item)`
   }
 `
 
+export const LoadingWidgetContainer = styled.div`
+  text-align: center;
+  padding-top: 30%;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+`
+
 export const ExplorerContainer = styled.div`
   ${props => props.fullscreen ? `
     top: 0;
@@ -41,7 +53,9 @@ export const ExplorerContainer = styled.div`
     right: 0;
     z-index: 100;
     position: fixed;
-  ` :
-    "height: 600px"
+  ` : `
+    height: 600px;
+    position: relative;
+  `
   }
 `

@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Icon, Layout, Tabs, Input } from 'antd'
+import { Icon, Layout, Tabs, Input, Spin } from 'antd'
 import qs from "querystring"
 
 import { fetchJSON, deepEquals } from "../utils"
@@ -8,7 +8,7 @@ import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
 import Explorer from "./D3Visualization"
-import { ExplorerContainer } from "./styled"
+import { ExplorerContainer, LoadingWidgetContainer } from "./styled"
 
 const { TabPane } = Tabs
 
@@ -29,20 +29,12 @@ function computeRelationshipScaleFactor(relationship) {
   }
 }
 
-const fullscreenStyle = {
-  top: 0,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  zIndex: 100,
-  position: 'fixed',
-}
-
 @observer
 export default class ExplorerSection extends React.Component {
   state = {
     searchQuery: "",
     initialNodes: [],
+    loading: false
   }
 
   async componentDidMount() {
@@ -76,7 +68,9 @@ export default class ExplorerSection extends React.Component {
 
   async getNeighbours(node, currentNeighbourIds = []) {
     const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
+    this.setState({ loading: true })
     const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
+    this.setState({ loading: false })
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
       computeNodeScaleFactor(neighbour)
@@ -138,8 +132,9 @@ export default class ExplorerSection extends React.Component {
   }
 
   render() {
-    const maybeExplorer = this.state.initialNodes.length > 0 ? (
-      <Explorer
+    let maybeExplorer = null
+    if (this.state.initialNodes.length > 0) {
+      maybeExplorer = <Explorer
         key={this.state.searchQuery}
         maxNeighbours={100}
         initialNodeDisplay={300}
@@ -157,7 +152,7 @@ export default class ExplorerSection extends React.Component {
         onNodeDblClick={this.onNodeDblClick.bind(this)}
         theme={{ secondaryBackground: "rgba(255, 255, 255, 0.5)" }}
       />
-    ) : <span />
+    }
 
     return (
       <Card>
@@ -169,6 +164,11 @@ export default class ExplorerSection extends React.Component {
               onPressEnter={this.handleSearch.bind(this)}
             />
             <ExplorerContainer fullscreen={appStore.explorerFullscreen}>
+              { this.state.loading ? 
+                <LoadingWidgetContainer>
+                  <Spin tip="loading..." size="large" />
+                </LoadingWidgetContainer>
+                : ""}
               { maybeExplorer }
             </ExplorerContainer>
           </TabPane>
