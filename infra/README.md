@@ -28,14 +28,16 @@ Upload this to an [AWS S3 bucket](https://aws.amazon.com/s3/).
 
 ## 2. Create a Kubernetes Cluster
 
+First, `cd` into `infra/cluster/`.
+
+Create an keypair for SSH access. Note: If you don't want to enable SSH access, you'll need to remove that setting in `cluster.yml`.
+
 ```sh
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/kube-key
 ```
 
-You can `cd` into `infra/` and run `./create-cluster.sh`. 
-If you want SSH access to the nodes, edit the script to add the `--ssh-access` and `--ssh-public-key` options.
+Run `eksctl create cluster -f cluster.yml`. 
 This assumes you have `eksctl` installed.
-You can create the cluster with whichever method you like.
 
 Optionally, you can enable the Kubernetes Dashboard by running `./enable-dashboard.sh`, which is just a script for [this tutorial](https://docs.aws.amazon.com/eks/latest/userguide/dashboard-tutorial.html).
 
@@ -51,58 +53,41 @@ There are 2 sets of [Kubernetes secrets](https://kubernetes.io/docs/concepts/con
 
 Create a persistent volume, and ETL the data into it.
 It will format the data to be consumed by Neo4j.
+`cd` into `ingest/`.
 
 ```sh
-kubectl apply -f neo4j-volume.yml
-kubectl apply -f etl-job.yml
+cd ingest/
+./create
 ```
 
 Once this job is done, the volume is ready to be mounted for Neo4j.
+
+In the cluster created step, we created a high-powered node (which is expensive) for running this specific job.
+We can delete it now that it's done.
 
 ```sh
 eksctl drain nodegroup --cluster docsund docsund-high-power
 eksctl delete nodegroup --cluster docsund docsund-high-power
 ```
 
-## 5. Launch Neo4j
-
-```sh
-kubectl apply -f neo4j-deployment.yml
-kubectl apply -f neo4j-service.yml
-```
-
-## 6. Launch Elasticsearch and Logstash
+## 5. Launch Neo4j, Elasticsearch, and Logstash
 
 [Elasticsearch](https://www.elastic.co/products/elasticsearch) powers the search feature, and [Logstash](https://www.elastic.co/products/logstash) ETLs the data into it.
 
+[Neo4j](https://neo4j.com/) powers the entity explorer visualization.
+
+`cd ..` back up to the `infra/` directory.
+
 ```sh
-kubectl apply -f elasticsearch-deployment.yml
-kubectl apply -f elasticsearch-service.yml
-kubectl apply -f logstash-deployment.yml
+kubectl apply -f data-layer
 ```
 
-**Warning:** On some versions of EKS, an error occurs with `mmapfs`.
-You might need to SSH into the Node and change a setting.
-See [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html),
-[here](https://stackoverflow.com/questions/42300463/elasticsearch-bootstrap-checks-failing/47211716), or
-[here](https://stackoverflow.com/questions/41192680/update-max-map-count-for-elasticsearch-docker-container-mac-host).
-
-## 7. Launch the API
+## 6. Launch the API and UI
 
 This is the intermediary between the databases and web UI.
 
 ```sh
-kubectl apply -f entities-api-deployment.yml
-kubectl apply -f entities-api-service.yml
-```
-
-## 8. Launch the UI
-
-Finally, launch the Web interface.
-
-```sh
-kubectl apply -f docsund-ui-deployment.yml
-kubectl apply -f docsund-ui-service.yml
+kubectl apply -f app-layer
 ```
 
 **Warning:** Make sure TCP traffic on port 80 is permitted in the security group in your node group.
