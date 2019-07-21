@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: docsund-entities-api
-          image: acarl005/docsund-entities-api:0.1.5
+          image: acarl005/docsund-entities-api:0.1.8
           env:
             - name: NEO4J_DATABASE_PASSWORD
               valueFrom:
@@ -25,4 +25,5 @@ spec:
                   key: password
           ports:
             - containerPort: 5000
-
+      nodeSelector:
+        group: workers

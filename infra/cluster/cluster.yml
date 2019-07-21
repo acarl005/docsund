@@ -11,8 +11,6 @@ nodeGroups:
       group: workers
     instanceType: t3.medium
     desiredCapacity: 4
-    minSize: 2
-    maxSize: 5
     ssh:
       publicKeyPath: ~/.ssh/kube-key.pub
     ami: auto

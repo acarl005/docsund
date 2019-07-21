@@ -60,7 +60,7 @@ export default class Main extends Component {
     const {run, steps} = this.state;
 
     return (
-      <Layout>
+      <Layout style={{ minHeight: "100vh" }}>
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
         {appStore.modalVisibility.relationshipEmails && <RelationshipEmailsModal />}
         {appStore.modalVisibility.topicSample && <TopicSampleModal />}

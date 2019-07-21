@@ -51,8 +51,8 @@ def kaggle_preprocess(csv_path='emails.csv'):
 
     email_df["date"] = email_df.date.dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    email_df.drop(["md5", "date_rank"], axis=1).to_csv("enron.csv", index=False, quoting=csv.QUOTE_ALL)
+    email_df.drop(["md5", "date_rank"], axis=1).to_csv("enron_emails.csv", index=False, quoting=csv.QUOTE_ALL)
 
 
 if __name__ == "__main__":
-    kaggle_preprocess()
+    kaggle_preprocess("enron_raw.csv")
