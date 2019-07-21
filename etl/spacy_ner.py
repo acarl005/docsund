@@ -14,6 +14,7 @@ csv.field_size_limit(sys.maxsize)
 ENTITIES_OF_INTEREST = ["PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", "DATE", "TIME", "MONEY", "QUANTITY"]
 DESIRED_COLUMNS = ["body", "date", "from", "id", "subject", "to"]
 spacy_nlp = spacy.load("en_core_web_sm", disable=["parser", "textcat"])
+error = None
 
 
 def clean_enron_list(entity_list):
@@ -63,33 +64,42 @@ def main(csv_path, nrows, progress):
     children = []
     combined_results = []
 
-    with open(csv_path) as f:
-        csv_reader = csv.reader(f)
-        csv_columns = next(csv_reader)
-        assert sorted(csv_columns) == DESIRED_COLUMNS, ("csv columns must be {}. instead got {}"
-                                                        .format(DESIRED_COLUMNS, sorted(csv_columns)))
-        email_body_index = csv_columns.index("body")
-        for i in range(num_child_processes):
-            q_send = mp.Queue()
-            proc = mp.Process(target=extract_entities, args=(email_body_index, q_recv, q_send, progress))
-            children.append({"queue": q_send, "process": proc})
-            proc.start()
+    try:
+        with open(csv_path) as f:
+            csv_reader = csv.reader(f)
+            csv_columns = next(csv_reader)
+            assert sorted(csv_columns) == DESIRED_COLUMNS, ("csv columns must be {}. instead got {}"
+                                                            .format(DESIRED_COLUMNS, sorted(csv_columns)))
+            email_body_index = csv_columns.index("body")
+            for i in range(num_child_processes):
+                q_send = mp.Queue()
+                proc = mp.Process(target=extract_entities, args=(email_body_index, q_recv, q_send, progress))
+                children.append({"queue": q_send, "process": proc})
+                proc.start()
 
-        for i, row in enumerate(csv_reader):
-            if i == nrows:
-                break
-            children[i % len(children)]["queue"].put(row)
+            for i, row in enumerate(csv_reader):
+                if i == nrows:
+                    break
+                children[i % len(children)]["queue"].put(row)
 
-    for child in children:
-        child["queue"].put("END")
+        for child in children:
+            child["queue"].put("END")
 
-    for i in range(len(children)):
-        data_list = q_recv.get()
-        combined_results += data_list
+        for i in range(len(children)):
+            data_list = q_recv.get()
+            combined_results += data_list
 
-    for child in children:
-        child["process"].join()
+    except Exception as err:
+        global error
+        error = err
+        for child in children:
+            child["process"].kill()
+    finally:
+        for child in children:
+            child["process"].join()
 
+    if error:
+        raise error
     processed_df = pd.DataFrame(combined_results, columns=csv_columns + ENTITIES_OF_INTEREST)
     del combined_results
 
