@@ -107,3 +107,9 @@ minikube start --cpus 4 --memory 8192 --disk-size 30g
 minikube dashboard
 ```
 
+Note: If you do it this way, you *may* need to change a setting in your Minikube VM to get Elasticsearch to run.
+See [this issue](https://github.com/kubernetes/minikube/issues/2367).
+Get more info about this See [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html),
+[here](https://stackoverflow.com/questions/42300463/elasticsearch-bootstrap-checks-failing/47211716), or
+[here](https://stackoverflow.com/questions/41192680/update-max-map-count-for-elasticsearch-docker-container-mac-host).
+
