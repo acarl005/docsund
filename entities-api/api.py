@@ -338,13 +338,25 @@ def get_emails_about_entity(id):
 @cross_origin()
 def neo4j_search_emails():
     search_terms = request.args.get("q").strip().split()
+    limit = request.args.get("limit", type=int, default=25)
     with driver.session() as sesh:
-        db_query = sesh.run("""
+        db_query_persons = sesh.run("""
             MATCH (result:Person)
-            WHERE reduce(acc = FALSE, x IN $search_terms | acc OR (result.email CONTAINS x))
-            RETURN DISTINCT result
-        """, search_terms=search_terms)
-        results = db_query.values()
+            WITH result, reduce(acc = 0, x IN $search_terms | acc + CASE WHEN (result.email CONTAINS x) THEN 1 ELSE 0 END) AS hits
+            WHERE hits > 0
+            RETURN DISTINCT result, hits
+            ORDER BY hits DESC
+            LIMIT $limit
+        """, search_terms=search_terms, limit=ceil(limit / 2))
+        db_query_entities = sesh.run("""
+            MATCH (result:Entity)
+            WITH result, reduce(acc = 0, x IN $search_terms | acc + CASE WHEN (result.name CONTAINS x) THEN 1 ELSE 0 END) AS hits
+            WHERE hits > 0
+            RETURN DISTINCT result, hits
+            ORDER BY hits DESC
+            LIMIT $limit
+        """, search_terms=search_terms, limit=floor(limit / 2))
+        results = db_query_persons.values() + db_query_entities.values()
     return jsonify([neo4j_node_to_dict(record[0]) for record in results])
 
 
