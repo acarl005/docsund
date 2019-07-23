@@ -128,3 +128,9 @@ kub create namespace enron
 eksctl scale nodegroup --cluster docsund --nodes 7 docsund-workers
 ```
 
+
+```sh
+curl -L 'https://github.com/neo4j-contrib/neo4j-graph-algorithms/releases/download/3.5.4.0/graph-algorithms-algo-3.5.4.0.jar' \
+  -o ~/neo4j/plugins/graph-algorithms-algo-3.5.4.0.jar
+docker run --rm -p 7474:7474 -p 7687:7687 --env NEO4J_AUTH=neo4j/corncorn --env 'NEO4J_dbms_security_procedures_unrestricted=algo.*' -v ~/neo4j/plugins/:/plugins -v ~/neo4j/data:/data neo4j:3.5.6
+```
