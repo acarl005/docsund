@@ -35,6 +35,7 @@ export default class EmailListView extends React.Component {
         onRow={record => ({
           onClick: () => onDetailViewClick(record)
         })}
+        rowKey={record => record.id}
         showHeader={true}
         columns={this.getColumnConfig()}
         dataSource={emails}

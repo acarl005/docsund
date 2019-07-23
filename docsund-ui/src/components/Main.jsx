@@ -11,7 +11,7 @@ import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
 import ExplorerSection from './ExplorerSection'
-import Joyride from 'react-joyride'
+import Joyride, { ACTIONS, STATUS } from 'react-joyride'
 
 let { Header, Content } = Layout
 
@@ -22,43 +22,75 @@ Content = styled(Content)`
   }
 `
 
+const joyrideSteps = [
+  {
+    content: <p align="left">
+      You can enter a search query here (and press enter) to search for that word or phrase in all the emails.
+    </p>,
+    placement: "bottom-start",
+    target: "#search-information",
+    disableBeacon: true
+  },
+  {
+    content: <p align="left">
+      Click on one of these tabs to choose a tool to use.
+    </p>,
+    placement: "top",
+    target: ".ant-tabs-nav"
+  },
+  {
+    content: <p align="left">
+      Enter a search term here (and press enter) to find a particular entity to show in the window below. For example to find the email address for John Doe, try searching for john.doe or johndoe.
+    </p>,
+    placement: "bottom-start",
+    target: "#entity-explorer-search"
+  },
+  {
+    content: <p align="left">
+      <strong>Single-click</strong> or <strong>double-click</strong> a node to see some cool stuff.
+    </p>,
+    placement: "bottom-start",
+    target: ".node",
+    //disableOverlayClose: true,
+    //hideCloseButton: true,
+    //hideFooter: true,
+    //spotlightClicks: true,
+  },
+  {
+    content: <p align="left">
+      <strong>Double-click</strong> an arrow to see emails between entities.
+    </p>,
+    placement: "bottom-start",
+    target: ".relationship"
+  },
+  //{
+  //  content: <p align="left">
+  //    Close the list.
+  //  </p>,
+  //  placement: "bottom-start",
+  //  target: ".ant-modal-close"
+  //}
+]
+
 @observer
 export default class Main extends Component {
 
   constructor(props) {
-      super(props);
+    super(props)
 
-      this.state = {
-          run: false,
-          steps: [
-              {
-                  content: <p align="left">First choose an email dump to use.</p>,
-                  placement: 'bottom-start',
-                  target: '.main-menu',
-                  disableBeacon: true
-              },
-              {
-                  content: <p align="left">You can enter a search query here (and press enter) to search for that word or phrase in all the emails. Note that you can use Boolean operators such as AND and OR in the search expression.</p>,
-                  placement: 'bottom-start',
-                  target: '.search-information',
-              },
-              {
-                  content: <p align="left">Click on one of these tabs to choose a tool to use.</p>,
-                  placement: 'top',
-                  target: '.explorer-information'
-              },
-              {
-                  content: <p align="left">Enter a search term here (and press enter) to find a particular entity to show in the window below. For example to find the email address for John Doe, try searching for john.doe or johndoe.</p>,
-                  placement: 'bottom-start',
-                  target: '.entity-explorer-search'
-              }
-          ]
-      };
+    this.state = {
+      joyride: false
+    }
+  }
+
+  joyrideEvent(e) {
+    const { action, status } = e
+    if (action === ACTIONS.RESET && status == STATUS.READY) {
+      this.setState({ joyride: false })
+    }
   }
 
   render() {
-    const {run, steps} = this.state;
-
     return (
       <Layout style={{ minHeight: "100vh" }}>
         {appStore.modalVisibility.emailSearchResult && <EmailSearchResultModal />}
@@ -67,11 +99,12 @@ export default class Main extends Component {
         {appStore.modalVisibility.personDetails && <PersonDetailsModal />}
         {appStore.modalVisibility.entityDetails && <EntityDetailsModal />}
         <Joyride
+          callback={this.joyrideEvent.bind(this)}
           continuous={true}
-          run={run}
+          run={this.state.joyride}
           scrollToFirstStep={true}
           showProgress={true}
-          steps={steps}
+          steps={joyrideSteps}
         />
         <Header className="header">
           <div className="logo" style={{
@@ -86,13 +119,13 @@ export default class Main extends Component {
             mode="horizontal"
             defaultSelectedKeys={['3']}
             style={{ lineHeight: '64px', marginBottom: '64px' }}
-            className="main-menu"
+            id="main-menu"
           >
             <Menu.Item key="1">Home</Menu.Item>
             <Menu.Item key="2">About</Menu.Item>
             <Menu.Item key="3">Enron Emails</Menu.Item>
             <Menu.Item key="4">Sony Emails</Menu.Item>
-            <Menu.Item key="5" onClick={() => this.setState({run: true})}>Walk-through</Menu.Item>
+            <Menu.Item key="5" onClick={() => this.setState({ joyride: true })}>Walk-through</Menu.Item>
           </Menu>
         </Header>
         <Content>

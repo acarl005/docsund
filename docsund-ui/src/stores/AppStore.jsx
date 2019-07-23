@@ -4,6 +4,14 @@ import qs from "querystring"
 import { notification } from "antd"
 import { fetchJSON, deepEquals } from "../utils"
 
+
+function notifyError(err) {
+  notification.error({
+    message: "Error",
+    description: <pre>{err.stack}</pre>
+  })
+}
+
 class AppStore {
   @observable modalVisibility = {
     relationshipEmails: false,
@@ -32,47 +40,69 @@ class AppStore {
   @action
   async getEmailsBetween(fromNode, toNode) {
     this.loadingRelationshipEmails = true
-    this.activeRelationship = {
-      toNode,
-      fromNode,
+    try {
+      const response = await fetchJSON(`${API_URL}/emails?between=${toNode.id},${fromNode.id}`)
+      this.activeRelationship = {
+        toNode,
+        fromNode,
+        emails: response
+      }
+    } catch (err) {
+      notifyError(err)
+    } finally {
+      this.loadingRelationshipEmails = false
     }
-    const response = await fetchJSON(`${API_URL}/emails?between=${toNode.id},${fromNode.id}`)
-    this.activeRelationship.emails = response
-    this.loadingRelationshipEmails = false
   }
 
   @action
   async getEmailsAbout(person, entity) {
     this.loadingRelationshipEmails = true
-    this.activeRelationship = {
-      toNode: entity,
-      fromNode: person,
+    try {
+      const response = await fetchJSON(`${API_URL}/entities/${entity.id}/emails?person_id=${person.id}`)
+      this.activeRelationship = {
+        toNode: entity,
+        fromNode: person,
+        emails: response
+      }
+    } catch (err) {
+      notifyError(err)
+    } finally {
+      this.loadingRelationshipEmails = false
     }
-    const response = await fetchJSON(`${API_URL}/entities/${entity.id}/emails?person_id=${person.id}`)
-    this.activeRelationship.emails = response
-    this.loadingRelationshipEmails = false
   }
 
   @action
   async getEmailsMentioning(fromNode, toNode) {
     this.loadingRelationshipEmails = true
-    this.activeRelationship = {
-      toNode,
-      fromNode,
+    try {
+      const response = await fetchJSON(`${API_URL}/entities/${toNode.id}/emails?entity_id=${fromNode.id}`)
+      this.activeRelationship = {
+        toNode,
+        fromNode,
+        emails: response
+      }
+    } catch (err) {
+      notifyError(err)
+    } finally {
+      this.loadingRelationshipEmails = false
     }
-    const response = await fetchJSON(`${API_URL}/entities/${toNode.id}/emails?entity_id=${fromNode.id}`)
-    this.activeRelationship.emails = response
-    this.loadingRelationshipEmails = false
   }
 
   @action
   async getNodeDetails(node) {
     this.loadingNodeDetails = true
-    this.activeNode = { node }
     const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
-    const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
-    this.activeNode.details = response
-    this.loadingNodeDetails = false
+    try {
+      const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
+      this.activeNode = {
+        node,
+        details: response
+      }
+    } catch (err) {
+      notifyError(err)
+    } finally {
+      this.loadingNodeDetails = false
+    }
   }
 
   @action
@@ -101,15 +131,13 @@ class AppStore {
       }
       this.searchQuery = searchTerm
     } catch (err) {
-      notification.error({
-        message: "Error",
-        description: <pre>{err.stack}</pre>
-      })
+      notifyError(err)
     } finally {
       this.loadingEmailSearch = false
     }
   }
 
+  // TODO hook this up!
   @action
   async fetchEmailsFromIDs(ids, sample) {
     const response = await fetchJSON(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
