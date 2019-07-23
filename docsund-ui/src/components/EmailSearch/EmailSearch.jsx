@@ -68,6 +68,7 @@ export default class EmailSearch extends React.Component {
           prefix={<Icon type="search" />}
           placeholder="Type a search query against the emails..."
           onPressEnter={this.onSearch}
+          id="search-information"
         />
         {maybeContent}
       </Card>
