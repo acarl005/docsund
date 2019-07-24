@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: docsund-etl
-          image: acarl005/docsund-etl:0.1.4
+          image: acarl005/docsund-etl:0.1.5
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
@@ -26,15 +26,20 @@ spec:
                   key: s3_csv_path
           resources:
             requests:
-              cpu: 6
-              memory: 8Gi
+              cpu: 3
+              memory: 4Gi
             limits:
-              cpu: 8
+              cpu: 4
           volumeMounts:
-            - name: neo4j-volume
+            - name: neo4j-data-volume
               mountPath: /data
+            - name: neo4j-plugin-volume
+              mountPath: /plugins
       volumes:
-        - name: neo4j-volume
+        - name: neo4j-data-volume
           persistentVolumeClaim:
-            claimName: neo4j-volume-claim
+            claimName: neo4j-data-volume-claim
+        - name: neo4j-plugin-volume
+          persistentVolumeClaim:
+            claimName: neo4j-plugin-volume-claim
       restartPolicy: OnFailure

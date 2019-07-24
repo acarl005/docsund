@@ -18,6 +18,9 @@ spec:
         - name: neo4j-database
           image: neo4j
           env:
+            # this config is necessary for the PageRank plugin to work
+            - name: NEO4J_dbms_security_procedures_unrestricted
+              value: algo.*
             - name: NEO4J_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -35,11 +38,16 @@ spec:
             - containerPort: 7687
               name: main
           volumeMounts:
-            - name: neo4j-volume
+            - name: neo4j-data-volume
               mountPath: /data
+            - name: neo4j-plugin-volume
+              mountPath: /plugins
       nodeSelector:
         group: workers
       volumes:
-        - name: neo4j-volume
+        - name: neo4j-data-volume
           persistentVolumeClaim:
-            claimName: neo4j-volume-claim
+            claimName: neo4j-data-volume-claim
+        - name: neo4j-plugin-volume
+          persistentVolumeClaim:
+            claimName: neo4j-plugin-volume-claim
