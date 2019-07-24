@@ -1,0 +1,6 @@
+#!/bin/bash -xe
+
+minikube start --cpus 4 --memory 8192 --disk-size 30g
+minikube ssh 'echo "sysctl -w vm.max_map_count=262144" | sudo tee -a /var/lib/boot2docker/bootlocal.sh'
+minikube stop && minikube start
+kubectl label node minikube group=workers
