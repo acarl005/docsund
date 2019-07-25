@@ -18,7 +18,6 @@ def preprocess_emails(email_df=EMAILS, person_df=PERSONS):
     emails_subset = emails_subset.loc[emails_subset.email.apply(lambda x: x.split('@')[1] == target_domain)]
     emails_subset['email'] = emails_subset['email'].apply(lambda x: re.sub(r'^[^a-zA-Z0-9]', '', x).lower())
     emails_subset = emails_subset[['personId:ID', 'email']]
-    #emails_subset['email'] = person_df.name.apply(lambda x: x.lower())
 
     person_df['name'] = person_df.name.astype(str)
     person_df['name'] = person_df.name.apply(lambda x: x.lower())
@@ -36,7 +35,7 @@ def match_initials(name):
             if name[1] in email:
                 if name[0][0] in email:
                     return email, email_id
-            if fuzz.ratio(name[1], email.split('@')[0]) > 80:
+            if fuzz.ratio(name[1], email.split('@')[0]) > 85:
                 if name[0][0] in email:
                     return email, email_id
         if name[0][0]+name[1] in email:
@@ -51,9 +50,10 @@ def match_full(name):
         if (name[0] + '_' + name[1]) == email.split('@')[0]:
             return email, email_id
         if len(re.split("\W+", email.split('@')[0])) >= 2:
-            if fuzz.ratio(name[1], re.split("\W+", email.split('@')[0])[-1]) > 80:
-                if fuzz.ratio(name[0], re.split("\W+", email.split('@')[0])[0]) > 80:
-                    return email, email_id
+            if fuzz.ratio(name[1], re.split("\W+", email.split('@')[0])[-1]) > 85:
+                if len(name[0]) >= 2:
+                    if fuzz.ratio(name[0], re.split("\W+", email.split('@')[0])[0]) > 85:
+                        return email, email_id
 
 if __name__ == '__main__':
     start_time = time.time()
