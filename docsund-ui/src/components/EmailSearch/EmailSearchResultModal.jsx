@@ -1,12 +1,16 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Modal } from 'antd'
+import { Modal, Button } from 'antd'
 import EmailDetailView from '../modals/EmailDetailView'
 
 @observer
 export default class EmailSearchResultModal extends React.Component {
   onClose() {
     appStore.toggleModal('emailSearchResult')
+  }
+
+  handleExploreButton() {
+
   }
 
   render() {
@@ -16,7 +20,11 @@ export default class EmailSearchResultModal extends React.Component {
         onCancel={this.onClose}
         width="75%"
         title={"Email Viewer"}
-        footer={null}
+        footer={
+          <Button type="primary" onClick={this.handleExploreButton}>
+            Explore
+          </Button>
+        }
       >
         <EmailDetailView
           date={appStore.activeSearchEmail.properties.date}
