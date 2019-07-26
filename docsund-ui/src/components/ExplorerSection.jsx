@@ -65,6 +65,7 @@ export default class ExplorerSection extends React.Component {
       }
       this.setState({
         initialNodes: searchResults,
+        initialRelationships: [],
         searchQuery
       })
     } finally {
