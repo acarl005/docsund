@@ -10,6 +10,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;MDS.py<br>
 &nbsp;&nbsp;&nbsp;&nbsp;TopicModeling.py<br>
 &nbsp;&nbsp;&nbsp;&nbsp;TopicModelingAPI.py<br>
+&nbsp;&nbsp;&nbsp;&nbsp;CreateTopicModelingThread.py<br>
+&nbsp;&nbsp;&nbsp;&nbsp;CreateTopicData.py<br>
 
 ## Prerequisite:
 1. Packages: flask, gensim, wordcloud, neo4j, scikit-learn
@@ -85,7 +87,7 @@ The API should be callable using REST calls from the website.
 **Set the number of topics manually**<br>
 POST	/TM/topics/\<num topics\>
 
-**Determine the number of topics.**<br>
+**Determine the number of topics. By default, the number of topics is the optimal number of topics for that model.**<br>
 GET	/TM/topics<br>
 
 **Get a word cloud for a topic**<br>
@@ -97,7 +99,7 @@ GET	/TM/topics/\<id\>/words
 **Get a visualization of the topic distribution data. Returns a JSON array of data points representing the topic distribution.**<br>
 GET	/TM/topicdistributiondata<br>
 
-**Get the documents Ids for a topic**<br>
+**Get the documents Ids for a topic. These IDs can be passed to the email viewer to display emails for a topic.**<br>
 GET	/TM/topics/\<id\>/documents
 
 Example:<br>
