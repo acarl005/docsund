@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2002-2019 "Neo4j,"
+ * Modified work Copyright (c) 2019 Andrew Carlson
+ * Original work Copyright (c) 2002-2019 "Neo4j,"
  * Neo4j Sweden AB [http://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -73,17 +74,18 @@ export default class NeoD3Geometry {
 
 let square = distance => distance * distance
 let addShortenedNextWord = (line, word, measure) => {
-  const result = []
-  while (!(word.length <= 2)) {
-    word = word.substr(0, word.length - 2) + '\u2026'
-    if (measure(word) < line.remainingWidth) {
-      line.text += ` ${word}`
-      break
-    } else {
-      result.push(undefined)
-    }
-  }
-  return result
+  line.text += word
+  //const result = []
+  //while (!(word.length <= 2)) {
+  //  word = word.substr(0, word.length - 2) + '\u2026'
+  //  if (measure(word) < line.remainingWidth) {
+  //    line.text += ` ${word}`
+  //    break
+  //  } else {
+  //    result.push(undefined)
+  //  }
+  //}
+  //return result
 }
 let noEmptyLines = function (lines) {
   for (let line of Array.from(lines)) {

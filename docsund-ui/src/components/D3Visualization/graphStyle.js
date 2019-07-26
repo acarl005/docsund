@@ -56,7 +56,7 @@ export default function neoGraphStyle () {
       color: '#A5ABB6',
       'border-color': '#9AA1AC',
       'border-width': '2px',
-      'text-color-internal': '#FFFFFF',
+      'text-color-internal': '#000000',
       'font-size': '10px'
     },
     relationship: {
@@ -139,27 +139,27 @@ export default function neoGraphStyle () {
     {
       color: '#FFE081',
       'border-color': '#9AA1AC',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#C990C0',
       'border-color': '#b261a5',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#F79767',
       'border-color': '#f36924',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#57C7E3',
       'border-color': '#23b3d7',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#F16667',
       'border-color': '#eb2728',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#D9C8AE',
@@ -179,7 +179,7 @@ export default function neoGraphStyle () {
     {
       color: '#4C8EDA',
       'border-color': '#2870c2',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#FFC454',
@@ -189,12 +189,12 @@ export default function neoGraphStyle () {
     {
       color: '#DA7194',
       'border-color': '#cc3c6c',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     },
     {
       color: '#569480',
       'border-color': '#447666',
-      'text-color-internal': '#FFFFFF'
+      'text-color-internal': '#000000'
     }
   ]
   const Selector = (function () {
