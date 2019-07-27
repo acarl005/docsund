@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { List } from "antd"
+import { List, Button } from "antd"
 
 const Left = styled.div`
   float: left;
@@ -58,4 +58,9 @@ export const ExplorerContainer = styled.div`
     position: relative;
   `
   }
+`
+export const TransparentButton = styled(Button)`
+  background: transparent;
+  box-shadow: none;
+  border: none;
 `
