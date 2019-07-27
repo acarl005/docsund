@@ -1,8 +1,8 @@
 import React, { Component } from "react"
-import styled from 'styled-components'
+import styled from "styled-components"
 import qs from "querystring"
-import { observer } from 'mobx-react'
-import { Layout, Tabs, Menu, Icon } from 'antd'
+import { observer } from "mobx-react"
+import { Layout, Tabs, Menu, Icon, Button } from "antd"
 import appStore from "../stores/AppStore"
 import RelationshipEmailsModal from "./modals/RelationshipEmailsModal"
 import PersonDetailsModal from "./modals/PersonDetailsModal"
@@ -10,8 +10,9 @@ import EntityDetailsModal from "./modals/EntityDetailsModal"
 import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
-import ExplorerSection from './ExplorerSection'
-import Joyride, { ACTIONS, STATUS } from 'react-joyride'
+import ExplorerSection from "./ExplorerSection"
+import Joyride, { ACTIONS, STATUS } from "react-joyride"
+import { TransparentButton } from "./styled"
 
 let { Header, Content } = Layout
 
@@ -40,16 +41,15 @@ const joyrideSteps = [
   },
   {
     content: <p align="left">
-      Enter a search term here (and press enter) to find a particular entity to show in the window below. For example to find the email address for John Doe, try searching for john.doe or johndoe.
+      Enter a search term here (and press enter) to find a particular entity to show in the window below.
+      For example to find the email address for John Doe, try searching for john.doe or johndoe.
     </p>,
-    placement: "bottom-start",
     target: "#entity-explorer-search"
   },
   {
     content: <p align="left">
       <strong>Single-click</strong> or <strong>double-click</strong> a node to see some cool stuff.
     </p>,
-    placement: "bottom-start",
     target: ".node",
     //disableOverlayClose: true,
     //hideCloseButton: true,
@@ -60,7 +60,6 @@ const joyrideSteps = [
     content: <p align="left">
       <strong>Double-click</strong> an arrow to see emails between entities.
     </p>,
-    placement: "bottom-start",
     target: ".relationship"
   },
   //{
@@ -74,13 +73,8 @@ const joyrideSteps = [
 
 @observer
 export default class Main extends Component {
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      joyride: false
-    }
+  state = {
+    joyride: false
   }
 
   joyrideEvent(e) {
@@ -103,15 +97,16 @@ export default class Main extends Component {
           continuous={true}
           run={this.state.joyride}
           scrollToFirstStep={true}
+          disableScrolling={true}
           showProgress={true}
           steps={joyrideSteps}
         />
         <Header className="header">
           <div className="logo" style={{
-              marginRight: "30px",
-              float: "left",
-              width: "40px"
-            }}>
+            marginRight: "30px",
+            float: "left",
+            width: "40px"
+          }}>
             <img src={ require("../../assets/logo.png") } style={{ width: "100%" }} />
           </div>
           <Menu
@@ -129,6 +124,9 @@ export default class Main extends Component {
           </Menu>
         </Header>
         <Content>
+          <div style={{ marginBottom: "-20px", textAlign: "right" }}>
+            <TransparentButton icon="question-circle" onClick={() => this.setState({ joyride: true })}>Help</TransparentButton>
+          </div>
           <EmailSearch />
           <ExplorerSection />
         </Content>
