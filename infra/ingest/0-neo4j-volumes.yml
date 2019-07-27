@@ -10,7 +10,7 @@ parameters:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: neo4j-volume-claim
+  name: neo4j-data-volume-claim
   labels:
     app: neo4j-volume
 spec:
@@ -19,4 +19,18 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: topology-aware-standard
+  #storageClassName: topology-aware-standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: neo4j-plugin-volume-claim
+  labels:
+    app: neo4j-volume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  #storageClassName: topology-aware-standard

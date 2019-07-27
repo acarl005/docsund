@@ -68,6 +68,7 @@ export default class EmailSearch extends React.Component {
           prefix={<Icon type="search" />}
           placeholder="Type a search query against the emails..."
           onPressEnter={this.onSearch}
+          id="search-information"
         />
         {maybeContent}
       </Card>
@@ -78,7 +79,7 @@ export default class EmailSearch extends React.Component {
 function SkeletonList() {
   return (
     <List
-      dataSource={new Array(PAGE_SIZE).fill({})}
+      dataSource={new Array(4).fill({})}
       renderItem={item => (
         <List.Item>
           <Skeleton active loading />

@@ -317,14 +317,16 @@ def get_emails_about_entity(id):
         if person_id is not None:
             query = sesh.run("""
                 MATCH (person:Person)<-[]-(em:Email)-[:MENTION]->(entity:Entity)
-                WHERE ID(person) = $person_id AND ID(entity) = $entity_id
+                WHERE ID(person) = $person_id
+                  AND ID(entity) = $entity_id
                 RETURN DISTINCT em
                 ORDER BY em.date DESC
             """, person_id=person_id, entity_id=id)
         elif entity_id is not None:
             query = sesh.run("""
                 MATCH (ent1:Entity)<-[:MENTION]-(em:Email)-[:MENTION]->(ent2:Entity)
-                WHERE ID(ent1) = $entity1_id AND ID(ent2) = $entity2_id
+                WHERE ID(ent1) = $entity1_id
+                  AND ID(ent2) = $entity2_id
                 RETURN DISTINCT em
                 ORDER BY em.date DESC
             """, entity1_id=id, entity2_id=entity_id)
@@ -338,14 +340,65 @@ def get_emails_about_entity(id):
 @cross_origin()
 def neo4j_search_emails():
     search_terms = request.args.get("q").strip().split()
+    limit = request.args.get("limit", type=int, default=25)
     with driver.session() as sesh:
-        db_query = sesh.run("""
+        db_query_persons = sesh.run("""
             MATCH (result:Person)
-            WHERE reduce(acc = FALSE, x IN $search_terms | acc OR (result.email CONTAINS x))
-            RETURN DISTINCT result
-        """, search_terms=search_terms)
-        results = db_query.values()
+            WITH result, reduce(acc = 0, x IN $search_terms | acc + CASE WHEN (result.email CONTAINS x) THEN 1 ELSE 0 END) AS hits
+            WHERE hits > 0
+            RETURN DISTINCT result, hits
+            ORDER BY hits DESC
+            LIMIT $limit
+        """, search_terms=search_terms, limit=ceil(limit / 2))
+        db_query_entities = sesh.run("""
+            MATCH (result:Entity)
+            WITH result, reduce(acc = 0, x IN $search_terms | acc + CASE WHEN (result.name CONTAINS x) THEN 1 ELSE 0 END) AS hits
+            WHERE hits > 0
+              AND (
+                result:Entity_Fac OR
+                result:Entity_Gpe OR
+                result:Entity_Org OR
+                result:Entity_Norp OR
+                result:Entity_Person OR
+                result:Entity_Money
+              )
+            RETURN DISTINCT result, hits
+            ORDER BY hits DESC
+            LIMIT $limit
+        """, search_terms=search_terms, limit=floor(limit / 2))
+        results = db_query_persons.values() + db_query_entities.values()
     return jsonify([neo4j_node_to_dict(record[0]) for record in results])
+
+
+@app.route("/nodes/central", methods=["GET"])
+@cross_origin()
+def central_nodes():
+    limit = request.args.get("limit", type=int, default=3)
+    with driver.session() as sesh:
+        centrality_query = """
+        CALL algo.pageRank.stream('Person', 'EMAILS_TO', {iterations:20, dampingFactor:0.85})
+        YIELD nodeId, score
+
+        RETURN algo.asNode(nodeId) AS person, score
+        ORDER BY score DESC
+        LIMIT 1
+        """
+        result = sesh.run(centrality_query, limit=limit).single()[0]
+        center = neo4j_node_to_dict(result)
+        neighbours_query = """
+        MATCH (center:Person)-[e:EMAILS_TO]-(neighbour:Person)
+        WHERE ID(center) = $center_id
+        RETURN neighbour, e
+        ORDER BY e.count DESC
+        LIMIT $limit
+        """
+        results = sesh.run(neighbours_query, center_id=center["id"], limit=limit).values()
+    nodes = [center]
+    relationships = []
+    for record in results:
+        nodes.append(neo4j_node_to_dict(record[0]))
+        relationships.append(neo4j_edge_to_dict(record[1]))
+    return jsonify(nodes=nodes, relationships=relationships)
 
 
 @app.route("/elasticsearch", methods=["GET"])

@@ -1,0 +1,8 @@
+#!/bin/bash -xe
+
+kubectl apply -f 0-neo4j-volumes.yml
+# sometimes the job just errors and never succeeds if the volume isn't ready, so just wait a bit
+sleep 10
+kubectl apply -f 1-etl-job.yml
+# wait for the job to complete. not actually necessary to keep this running. it can take a couple hours
+kubectl wait --for=condition=complete job/etl --timeout 10h

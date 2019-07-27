@@ -35,4 +35,5 @@ spec:
                   key: s3_csv_path
           ports:
             - containerPort: 5000
-
+      nodeSelector:
+        group: workers

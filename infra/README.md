@@ -98,6 +98,8 @@ This may not be enabled by default.
 
 # Appendix
 
+## Deploy Locally
+
 To try locally, you can use [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) instead of EKS.
 
 Here is the recommended command to create a cluster:
@@ -113,3 +115,22 @@ Get more info about this See [here](https://www.elastic.co/guide/en/elasticsearc
 [here](https://stackoverflow.com/questions/42300463/elasticsearch-bootstrap-checks-failing/47211716), or
 [here](https://stackoverflow.com/questions/41192680/update-max-map-count-for-elasticsearch-docker-container-mac-host).
 
+## Multiple Datasets
+
+You can deploy multiple datasets in their own cluster at once.
+We recommend using different namespaces in Kubernetes.
+You will also need to scale up the nodes in the node group.
+
+```sh
+kubectl config set-context --current --namespace enron
+kub create namespace enron
+
+eksctl scale nodegroup --cluster docsund --nodes 7 docsund-workers
+```
+
+
+```sh
+curl -L 'https://github.com/neo4j-contrib/neo4j-graph-algorithms/releases/download/3.5.4.0/graph-algorithms-algo-3.5.4.0.jar' \
+  -o ~/neo4j/plugins/graph-algorithms-algo-3.5.4.0.jar
+docker run --rm -p 7474:7474 -p 7687:7687 --env NEO4J_AUTH=neo4j/corncorn --env 'NEO4J_dbms_security_procedures_unrestricted=algo.*' -v ~/neo4j/plugins/:/plugins -v ~/neo4j/data:/data neo4j:3.5.6
+```

@@ -1,1 +1,1 @@
-docker build -t acarl005/docsund-etl:0.1.3 .
+docker build -t acarl005/docsund-etl:0.1.5 .

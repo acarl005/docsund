@@ -35,30 +35,43 @@ export default class ExplorerSection extends React.Component {
   state = {
     searchQuery: "",
     initialNodes: [],
+    initialRelationships: [],
     loading: false
   }
 
   async componentDidMount() {
-    const userNode = await this.getUserNode(2275)
-    computeNodeScaleFactor(userNode)
+    const { nodes, relationships } = await fetchJSON(`${API_URL}/nodes/central`)
+    for (let node of nodes) {
+      computeNodeScaleFactor(node)
+    }
+    for (let relationship of relationships) {
+      computeRelationshipScaleFactor(relationship)
+    }
     this.setState({
-      initialNodes: [userNode],
+      initialNodes: nodes,
+      initialRelationships: relationships
     })
   }
 
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.value.toLowerCase()
-    const searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
-      q: searchQuery
-    }))
-    for (let node of searchResults) {
-      computeNodeScaleFactor(node)
+    this.setState({ loading: true })
+    try {
+      let searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
+        q: searchQuery
+      }))
+      for (let node of searchResults) {
+        computeNodeScaleFactor(node)
+      }
+      this.setState({
+        initialNodes: searchResults,
+        initialRelationships: [],
+        searchQuery
+      })
+    } finally {
+      this.setState({ loading: false })
     }
-    this.setState({
-      initialNodes: searchResults,
-      searchQuery
-    })
   }
 
   async getUserNode(id) {
@@ -70,8 +83,12 @@ export default class ExplorerSection extends React.Component {
   async getNeighbours(node, currentNeighbourIds = []) {
     const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
     this.setState({ loading: true })
-    const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
-    this.setState({ loading: false })
+    let response
+    try {
+      response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
+    } finally {
+      this.setState({ loading: false })
+    }
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
       computeNodeScaleFactor(neighbour)
@@ -141,7 +158,7 @@ export default class ExplorerSection extends React.Component {
         initialNodeDisplay={300}
         getNeighbours={this.getNeighbours.bind(this)}
         nodes={this.state.initialNodes}
-        relationships={[]}
+        relationships={this.state.initialRelationships}
         fullscreen={appStore.explorerFullscreen}
         frameHeight={this.props.frameHeight}
         assignVisElement={this.props.assignVisElement}
@@ -163,6 +180,7 @@ export default class ExplorerSection extends React.Component {
               prefix={<Icon type="search" />}
               style={{marginBottom: 8}}
               onPressEnter={this.handleSearch.bind(this)}
+              id="entity-explorer-search"
             />
             <ExplorerContainer fullscreen={appStore.explorerFullscreen}>
               { this.state.loading ? 
@@ -175,12 +193,6 @@ export default class ExplorerSection extends React.Component {
           </TabPane>
           <TabPane tab="Topic Explorer" key="2">
             <TopicExplorer />
-          </TabPane>
-          <TabPane tab="Money Explorer" key="3">
-            <img src={ require("../../assets/dollarsign.jpg") } alt=""/>
-          </TabPane>
-          <TabPane disabled tab="Communication Explorer" key="4">
-            Hey.
           </TabPane>
         </Tabs>
       </Card>
