@@ -9,6 +9,7 @@ import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
 import Explorer from "./D3Visualization"
 import { ExplorerContainer, LoadingWidgetContainer } from "./styled"
+import TopicExplorer from "./TopicExplorer"
 
 const { TabPane } = Tabs
 
@@ -173,7 +174,7 @@ export default class ExplorerSection extends React.Component {
             </ExplorerContainer>
           </TabPane>
           <TabPane tab="Topic Explorer" key="2">
-            <TopicModelingComponent/>
+            <TopicExplorer />
           </TabPane>
           <TabPane tab="Money Explorer" key="3">
             <img src={ require("../../assets/dollarsign.jpg") } alt=""/>
