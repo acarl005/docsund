@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { observer } from "mobx-react"
-import { Skeleton, Row, Col, List, Modal, Typography } from "antd"
+import { Skeleton, Row, Col, List, Modal, Typography, Tag } from "antd"
 const { Title } = Typography
 
 import appStore from "../../stores/AppStore"
@@ -26,12 +26,14 @@ export default class PersonDetailsModal extends Component {
   formattedPersonDetails() {
     const { activeNode } = appStore
     const { neighbours, relationships } = activeNode.details
+    const relationshipMap = {}
+    for (let rel of relationships) {
+      relationshipMap[rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId] = rel
+    }
     return neighbours
       .filter(node => deepEquals(node.labels, ["Person"]))
       .map(neighbour => {
-        const rel = relationships.find(rel =>
-          neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
-        )
+        const rel = relationshipMap[neighbour.id]
         return {
           ...neighbour,
           count: rel.properties.count,
@@ -43,12 +45,14 @@ export default class PersonDetailsModal extends Component {
   formattedEntityDetails() {
     const { activeNode } = appStore
     const { neighbours, relationships } = activeNode.details
+    const relationshipMap = {}
+    for (let rel of relationships) {
+      relationshipMap[rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId] = rel
+    }
     return neighbours
       .filter(node => node.labels.includes("Entity"))
       .map(neighbour => {
-        const rel = relationships.find(rel =>
-          neighbour.id === (rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId)
-        )
+        const rel = relationshipMap[neighbour.id]
         return {
           ...neighbour,
           count: rel.properties.count,
@@ -66,7 +70,11 @@ export default class PersonDetailsModal extends Component {
         onCancel={this.onClose}
         visible
         width="75%"
-        title={appStore.activeNode.node.propertyMap.email}
+        title={
+          appStore.activeNode ?
+            <Tag color="purple">{appStore.activeNode.node.propertyMap.email}</Tag> :
+            "..."
+        }
         footer={null}
       >
         <Row>

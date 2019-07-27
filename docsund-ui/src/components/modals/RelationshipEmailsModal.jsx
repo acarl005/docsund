@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Skeleton, Modal } from 'antd'
+import { Skeleton, Modal, Typography, Tag } from 'antd'
 
 import appStore from '../../stores/AppStore'
 import EmailListView from './EmailListView'
@@ -32,17 +32,30 @@ export default class RelationshipEmails extends React.Component {
     }
     const { fromNode, toNode } = appStore.activeRelationship
     let title
-    if (fromNode.labels[0] === "Person") {
-      if (toNode.labels[0] === "Person") {
-        title = `Emails between ${fromNode.propertyMap.email} and ${toNode.propertyMap.email}`
-      } else {
-        title = `Emails to/from ${fromNode.propertyMap.email} mentioning ${toNode.propertyMap.name}`
-      }
+    if (appStore.loadingRelationshipEmails) {
+      title = "..."
     } else {
-      title = `Emails mentioning ${fromNode.propertyMap.name} and ${toNode.propertyMap.name}`
+      if (fromNode.labels[0] === "Person") {
+        if (toNode.labels[0] === "Person") {
+          title = <span>
+            Emails between <Tag color="purple">{fromNode.propertyMap.email}</Tag>
+            and <Tag color="purple">{toNode.propertyMap.email}</Tag>
+          </span>
+        } else {
+          title = <span>
+            Emails to/from <Tag color="purple">{fromNode.propertyMap.email}</Tag>
+            mentioning <Tag color="blue">{toNode.propertyMap.name}</Tag>
+          </span>
+        }
+      } else {
+        title = <span>
+          Emails mentioning <Tag color="blue">{fromNode.propertyMap.name}</Tag>
+          and <Tag color="blue">{toNode.propertyMap.name}</Tag>
+        </span>
+      }
     }
 
-    const EmailView = appStore.emailModalView === 'list'
+    const emailView = appStore.emailModalView === 'list'
       ? <EmailListView
           emails={appStore.activeRelationship.emails}
           onDetailViewClick={this.onDetailViewClick}
@@ -71,7 +84,7 @@ export default class RelationshipEmails extends React.Component {
               loading
               active
             />
-          : EmailView}
+          : emailView}
       </Modal>
 
     )

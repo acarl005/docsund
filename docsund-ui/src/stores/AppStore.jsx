@@ -2,7 +2,7 @@ import React from "react"
 import { action, computed, observable } from "mobx"
 import qs from "querystring"
 import { notification } from "antd"
-import { fetchJSON, deepEquals } from "../utils"
+import { fetchJSON, deepEquals, computeNodeScaleFactor, computeRelationshipScaleFactor } from "../utils"
 
 
 function notifyError(err) {
@@ -20,96 +20,145 @@ class AppStore {
     nodeDetails: false,
   }
   @observable emailModalView = 'list'
-  @observable activeEmailId = null
+  @observable activeEmailId
   @observable activeRelationship
   @observable activeNode
-  @observable activeSearchEmailId = null
+  @observable activeSearchEmailId
   @observable explorerFullscreen = false
-  @observable searchQuery
+  @observable emailSearchQuery
   @observable emailSearchResults = []
   @observable topicEmails = []
   @observable loadingNodeDetails = false
   @observable loadingRelationshipEmails = false
   @observable loadingEmailSearch = false
+  @observable entitySearchQuery
+  @observable entitiesLoading = false
+  @observable initialNodes = []
+  @observable initialRelationships = []
 
   @computed
   get activeSearchEmail() {
     return this.emailSearchResults.hits.find((email) => email.id === this.activeSearchEmailId)
   }
 
+  async tryLoading(failureProneThing, loadingKey) {
+    if (loadingKey) {
+      this[loadingKey] = true
+    }
+    try {
+      await failureProneThing()
+    } catch (err) {
+      console.error(err)
+      notifyError(err)
+    } finally {
+      if (loadingKey) {
+        this[loadingKey] = false
+      }
+    }
+  }
+
+  resetExplorer() {
+    const entitySearchQuery = this.entitySearchQuery
+    this.entitySearchQuery = ""
+    setTimeout(() => {
+      this.entitySearchQuery = entitySearchQuery
+    }, 0)
+  }
+
+  @action
+  async getCentralNodes() {
+    this.tryLoading(async () => {
+      const { nodes, relationships } = await fetchJSON(`${API_URL}/nodes/central`)
+      for (let node of nodes) {
+        computeNodeScaleFactor(node)
+      }
+      for (let relationship of relationships) {
+        computeRelationshipScaleFactor(relationship)
+      }
+      this.initialRelationships = relationships
+      this.initialNodes = nodes
+    })
+  }
+
+  @action
+  async entitySearch(searchQuery) {
+    this.tryLoading(async () => {
+      let searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
+        q: searchQuery
+      }))
+      for (let node of searchResults) {
+        computeNodeScaleFactor(node)
+      }
+      this.initialRelationships = []
+      this.initialNodes = searchResults
+      this.entitySearchQuery = searchQuery
+    }, "loadingEntitySearch")
+  }
+
   @action
   async getEmailsBetween(fromNode, toNode) {
-    this.loadingRelationshipEmails = true
-    try {
+    this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails?between=${toNode.id},${fromNode.id}`)
       this.activeRelationship = {
         toNode,
         fromNode,
         emails: response
       }
-    } catch (err) {
-      notifyError(err)
-    } finally {
-      this.loadingRelationshipEmails = false
-    }
+    }, "loadingRelationshipEmails")
   }
 
   @action
   async getEmailsAbout(person, entity) {
-    this.loadingRelationshipEmails = true
-    try {
+    this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/entities/${entity.id}/emails?person_id=${person.id}`)
       this.activeRelationship = {
         toNode: entity,
         fromNode: person,
         emails: response
       }
-    } catch (err) {
-      notifyError(err)
-    } finally {
-      this.loadingRelationshipEmails = false
-    }
+    }, "loadingRelationshipEmails")
   }
 
   @action
   async getEmailsMentioning(fromNode, toNode) {
-    this.loadingRelationshipEmails = true
-    try {
+    this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/entities/${toNode.id}/emails?entity_id=${fromNode.id}`)
       this.activeRelationship = {
         toNode,
         fromNode,
         emails: response
       }
-    } catch (err) {
-      notifyError(err)
-    } finally {
-      this.loadingRelationshipEmails = false
-    }
+    }, "loadingRelationshipEmails")
   }
 
   @action
   async getNodeDetails(node) {
-    this.loadingNodeDetails = true
-    const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
-    try {
+    const type = node.labels[0] == "Person" ? "person" : "entities"
+    this.activeNode = null
+    this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
       this.activeNode = {
         node,
         details: response
       }
-    } catch (err) {
-      notifyError(err)
-    } finally {
-      this.loadingNodeDetails = false
-    }
+    }, "loadingNodeDetails")
+  }
+
+  @action exploreEmail(email) {
+    // scroll to the bottom of the page (to put the explorer into view)
+    window.scrollTo(0, document.body.scrollHeight)
+    return this.tryLoading(async () => {
+      const response = await fetchJSON(`${API_URL}/emails/${email.id}/entities`)
+      this.initialRelationships = []
+      this.initialNodes = response
+      this.entitySearchQuery = `explore-${email.id}`
+    }, "entitiesLoading")
   }
 
   @action
   async submitEmailSearch(searchTerm, pageSize, pageNum = 1) {
-    this.loadingEmailSearch = true
-    this.searchQuery = null
-    try {
+    this.emailSearchQuery = null
+    this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
         q: searchTerm,
         page_num: pageNum,
@@ -129,12 +178,8 @@ class AppStore {
           }
         }))
       }
-      this.searchQuery = searchTerm
-    } catch (err) {
-      notifyError(err)
-    } finally {
-      this.loadingEmailSearch = false
-    }
+      this.emailSearchQuery = searchTerm
+    }, "loadingEmailSearch")
   }
 
   // TODO hook this up!

@@ -281,6 +281,7 @@ export const StyledLegend = styled.div`
 `
 export const StyledLegendInlineList = styled(StyledInlineList)`
   padding: 7px 9px 0px 10px;
+  margin-bottom: 0;
 `
 export const StyledLegendInlineListItem = styled(StyledInlineListItem)`
   display: inline-block;

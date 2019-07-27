@@ -91,7 +91,7 @@ def find_person(id):
 @app.route("/person/<int:id>/graph-neighbours", methods=["GET"])
 @cross_origin()
 def get_person_neighbours(id):
-    limit = request.args.get("limit", type=int)
+    limit = request.args.get("limit", type=int, default=5000)
     with driver.session() as sesh:
         center_query = """
             MATCH (center)
@@ -107,8 +107,8 @@ def get_person_neighbours(id):
             WHERE ID(center) = $id
             RETURN DISTINCT neighbours, reduce(sum = 0, em IN collect(emails_to) | sum + em.count) AS tot_msgs
             ORDER BY tot_msgs DESC
-            {}
-        """.format("LIMIT $limit" if limit is not None else "")
+            LIMIT $limit
+        """
         results = sesh.run(person_neighbours_query, id=id, limit=limit).values()
         person_neighbours = [neo4j_node_to_dict(record[0]) for record in results]
 
@@ -125,8 +125,8 @@ def get_person_neighbours(id):
               )
             RETURN DISTINCT en, count(emails) AS tot_emails
             ORDER BY tot_emails DESC
-            {}
-        """.format("LIMIT $limit" if limit is not None else "")
+            LIMIT $limit
+        """
         results = sesh.run(entity_neighbours_query, id=id, limit=limit)
         entity_neighbours = []
         entity_neighbour_counts = []
@@ -189,8 +189,8 @@ def get_entity_neighbours(id):
             WHERE ID(center) = $id
             RETURN DISTINCT neighbours, count(emails) AS tot_emails
             ORDER BY tot_emails DESC
-            {}
-        """.format("LIMIT $limit" if limit is not None else "")
+            LIMIT $limit
+        """
         results = sesh.run(person_neighbours_query, id=id, limit=limit).values()
         person_neighbours = []
         person_neighbour_counts = []
@@ -211,8 +211,8 @@ def get_entity_neighbours(id):
               )
             RETURN DISTINCT en, count(emails) AS tot_emails
             ORDER BY tot_emails DESC
-            {}
-        """.format("LIMIT $limit" if limit is not None else "")
+            LIMIT $limit
+        """
         results = sesh.run(entity_neighbours_query, id=id, limit=limit)
         entity_neighbours = []
         entity_neighbour_counts = []
@@ -399,6 +399,28 @@ def central_nodes():
         nodes.append(neo4j_node_to_dict(record[0]))
         relationships.append(neo4j_edge_to_dict(record[1]))
     return jsonify(nodes=nodes, relationships=relationships)
+
+
+@app.route("/emails/<email_id>/entities", methods=["GET"])
+@cross_origin()
+def get_entities_in_email(email_id):
+    with driver.session() as sesh:
+        entities_query = """
+            MATCH (ent)-[]-(email:Email)
+            WHERE email.emailId = $email_id
+              AND (
+                ent:Person OR
+                ent:Entity_Fac OR
+                ent:Entity_Gpe OR
+                ent:Entity_Org OR
+                ent:Entity_Norp OR
+                ent:Entity_Person OR
+                ent:Entity_Money
+              )
+            RETURN DISTINCT ent
+        """
+        results = sesh.run(entities_query, email_id=email_id).values()
+    return jsonify([neo4j_node_to_dict(record[0]) for record in results])
 
 
 @app.route("/elasticsearch", methods=["GET"])
