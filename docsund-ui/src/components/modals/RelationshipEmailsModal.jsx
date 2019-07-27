@@ -32,26 +32,30 @@ export default class RelationshipEmails extends React.Component {
     }
     const { fromNode, toNode } = appStore.activeRelationship
     let title
-    if (fromNode.labels[0] === "Person") {
-      if (toNode.labels[0] === "Person") {
-        title = <span>
-          Emails between <Tag color="purple">{fromNode.propertyMap.email}</Tag>
-          and <Tag color="purple">{toNode.propertyMap.email}</Tag>
-        </span>
+    if (appStore.loadingRelationshipEmails) {
+      title = "..."
+    } else {
+      if (fromNode.labels[0] === "Person") {
+        if (toNode.labels[0] === "Person") {
+          title = <span>
+            Emails between <Tag color="purple">{fromNode.propertyMap.email}</Tag>
+            and <Tag color="purple">{toNode.propertyMap.email}</Tag>
+          </span>
+        } else {
+          title = <span>
+            Emails to/from <Tag color="purple">{fromNode.propertyMap.email}</Tag>
+            mentioning <Tag color="blue">{toNode.propertyMap.name}</Tag>
+          </span>
+        }
       } else {
         title = <span>
-          Emails to/from <Tag color="purple">{fromNode.propertyMap.email}</Tag>
-          mentioning <Tag color="blue">{toNode.propertyMap.name}</Tag>
+          Emails mentioning <Tag color="blue">{fromNode.propertyMap.name}</Tag>
+          and <Tag color="blue">{toNode.propertyMap.name}</Tag>
         </span>
       }
-    } else {
-      title = <span>
-        Emails mentioning <Tag color="blue">{fromNode.propertyMap.name}</Tag>
-        and <Tag color="blue">{toNode.propertyMap.name}</Tag>
-      </span>
     }
 
-    const EmailView = appStore.emailModalView === 'list'
+    const emailView = appStore.emailModalView === 'list'
       ? <EmailListView
           emails={appStore.activeRelationship.emails}
           onDetailViewClick={this.onDetailViewClick}
@@ -80,7 +84,7 @@ export default class RelationshipEmails extends React.Component {
               loading
               active
             />
-          : EmailView}
+          : emailView}
       </Modal>
 
     )

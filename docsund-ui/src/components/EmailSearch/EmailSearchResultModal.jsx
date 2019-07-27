@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Modal, Button } from 'antd'
+import { Modal, Button, Icon } from 'antd'
 import EmailDetailView from '../modals/EmailDetailView'
 
 @observer
@@ -9,8 +9,9 @@ export default class EmailSearchResultModal extends React.Component {
     appStore.toggleModal('emailSearchResult')
   }
 
-  handleExploreButton() {
-
+  async handleExploreButton() {
+    appStore.toggleModal('emailSearchResult')
+    await appStore.exploreEmail(appStore.activeSearchEmail)
   }
 
   render() {
@@ -21,7 +22,7 @@ export default class EmailSearchResultModal extends React.Component {
         width="75%"
         title={"Email Viewer"}
         footer={
-          <Button type="primary" onClick={this.handleExploreButton}>
+          <Button icon="deployment-unit" type="primary" onClick={this.handleExploreButton}>
             Explore
           </Button>
         }

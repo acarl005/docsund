@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import { Icon, Layout, Tabs, Input, Spin } from 'antd'
 import qs from "querystring"
 
-import { fetchJSON, deepEquals } from "../utils"
+import { fetchJSON, deepEquals, computeNodeScaleFactor, computeRelationshipScaleFactor } from "../utils"
 import Card from './Card'
 import appStore from "../stores/AppStore"
 import TopicModelingComponent from "./TopicModelingComponent"
@@ -12,65 +12,16 @@ import { ExplorerContainer, LoadingWidgetContainer } from "./styled"
 
 const { TabPane } = Tabs
 
-function computeNodeScaleFactor(node) {
-  if (deepEquals(node.labels, ["Person"])) {
-    const messages = node.properties.incoming + node.properties.outgoing
-    if (messages <= 500) {
-      node.scaleFactor = 1
-    } else {
-      node.scaleFactor = Math.min(1 + Math.log(messages / 500) / Math.log(7), 2.5)
-    }
-  }
-}
-
-function computeRelationshipScaleFactor(relationship) {
-  if (relationship.type == "EMAILS_TO") {
-    relationship.scaleFactor = relationship.properties.count ** 0.4
-  }
-}
-
 @observer
 export default class ExplorerSection extends React.Component {
-  state = {
-    searchQuery: "",
-    initialNodes: [],
-    initialRelationships: [],
-    loading: false
-  }
-
   async componentDidMount() {
-    const { nodes, relationships } = await fetchJSON(`${API_URL}/nodes/central`)
-    for (let node of nodes) {
-      computeNodeScaleFactor(node)
-    }
-    for (let relationship of relationships) {
-      computeRelationshipScaleFactor(relationship)
-    }
-    this.setState({
-      initialNodes: nodes,
-      initialRelationships: relationships
-    })
+    return appStore.getCentralNodes()
   }
 
   async handleSearch(e) {
     e.preventDefault()
     const searchQuery = e.target.value.toLowerCase()
-    this.setState({ loading: true })
-    try {
-      let searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
-        q: searchQuery
-      }))
-      for (let node of searchResults) {
-        computeNodeScaleFactor(node)
-      }
-      this.setState({
-        initialNodes: searchResults,
-        initialRelationships: [],
-        searchQuery
-      })
-    } finally {
-      this.setState({ loading: false })
-    }
+    await appStore.entitySearch(searchQuery)
   }
 
   async getUserNode(id) {
@@ -81,12 +32,12 @@ export default class ExplorerSection extends React.Component {
 
   async getNeighbours(node, currentNeighbourIds = []) {
     const type = deepEquals(node.labels, ["Person"]) ? "person" : "entities"
-    this.setState({ loading: true })
+    appStore.entitiesLoading = true
     let response
     try {
       response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours?limit=10`)
     } finally {
-      this.setState({ loading: false })
+      appStore.entitiesLoading = false
     }
     const { neighbours, relationships } = response
     for (let neighbour of neighbours) {
@@ -150,14 +101,14 @@ export default class ExplorerSection extends React.Component {
 
   render() {
     let maybeExplorer = null
-    if (this.state.initialNodes.length > 0) {
+    if (appStore.initialNodes.length > 0) {
       maybeExplorer = <Explorer
-        key={this.state.searchQuery}
+        key={appStore.entitySearchQuery}
         maxNeighbours={100}
         initialNodeDisplay={300}
         getNeighbours={this.getNeighbours.bind(this)}
-        nodes={this.state.initialNodes}
-        relationships={this.state.initialRelationships}
+        nodes={appStore.initialNodes}
+        relationships={appStore.initialRelationships}
         fullscreen={appStore.explorerFullscreen}
         frameHeight={this.props.frameHeight}
         assignVisElement={this.props.assignVisElement}
@@ -180,9 +131,10 @@ export default class ExplorerSection extends React.Component {
               style={{marginBottom: 8}}
               onPressEnter={this.handleSearch.bind(this)}
               id="entity-explorer-search"
+              placeholder="search entity names"
             />
             <ExplorerContainer fullscreen={appStore.explorerFullscreen}>
-              { this.state.loading ? 
+              { appStore.entitiesLoading ? 
                 <LoadingWidgetContainer>
                   <Spin tip="loading..." size="large" />
                 </LoadingWidgetContainer>

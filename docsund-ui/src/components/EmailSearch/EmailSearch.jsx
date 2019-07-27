@@ -28,12 +28,12 @@ export default class EmailSearch extends React.Component {
 
   onPageChange = async (pageNum, pageSize) => {
     this.setState({ pageNum })
-    await appStore.submitEmailSearch(appStore.searchQuery, PAGE_SIZE, pageNum)
+    await appStore.submitEmailSearch(appStore.emailSearchQuery, PAGE_SIZE, pageNum)
   }
 
   render() {
     let maybeContent = null
-    if (appStore.searchQuery) {
+    if (appStore.emailSearchQuery) {
       maybeContent = <>
         <div style={{ margin: '16px 0' }}>
           <List
@@ -51,10 +51,11 @@ export default class EmailSearch extends React.Component {
             )}
           />
         </div>
+        {/* the page window has a hard maximum at 10,000 set by elasticsearch */}
         {appStore.emailSearchResults.hits.length > 0 ? <Pagination
           pageSize={PAGE_SIZE}
           current={this.state.pageNum}
-          total={appStore.emailSearchResults.total}
+          total={Math.min(appStore.emailSearchResults.total, 10000)}
           onChange={this.onPageChange}
         /> : null}
       </>
@@ -66,7 +67,7 @@ export default class EmailSearch extends React.Component {
       <Card>
         <Input
           prefix={<Icon type="search" />}
-          placeholder="Type a search query against the emails..."
+          placeholder="search email contents"
           onPressEnter={this.onSearch}
           id="search-information"
         />

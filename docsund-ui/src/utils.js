@@ -40,3 +40,21 @@ export async function fetchJSON(...args) {
   }
   return response.json()
 }
+
+export function computeNodeScaleFactor(node) {
+  if (deepEquals(node.labels, ["Person"])) {
+    const messages = node.properties.incoming + node.properties.outgoing
+    if (messages <= 500) {
+      node.scaleFactor = 1
+    } else {
+      node.scaleFactor = Math.min(1 + Math.log(messages / 500) / Math.log(7), 2.5)
+    }
+  }
+}
+
+export function computeRelationshipScaleFactor(relationship) {
+  if (relationship.type == "EMAILS_TO") {
+    relationship.scaleFactor = relationship.properties.count ** 0.4
+  }
+}
+

@@ -21,7 +21,7 @@
 
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
-import { Icon } from 'antd'
+import { Icon, Tooltip } from 'antd'
 import appStore from "../../../stores/AppStore"
 import {
   legendRowHeight,
@@ -41,7 +41,7 @@ export class LegendComponent extends Component {
     super(props)
     this.state = {}
     this.state.typeRowContracted = true
-    this.state.labelRowContracted = true
+    this.state.labelRowContracted = false
   }
 
   setTypeRowELem (elem) {
@@ -91,18 +91,30 @@ export class LegendComponent extends Component {
       return (
         <StyledLegendRow
           className={this.state.labelRowContracted ? 'contracted' : ''}
+          style={{ display: 'flex', justifyContent: 'space-between' }}
         >
           <StyledLegendInlineList
             className='list-inline'
             ref={this.setLabelRowELem.bind(this)}
           >
             {labelList}
-            <Icon
-              type={appStore.explorerFullscreen ? 'fullscreen-exit' : 'fullscreen'}
-              style={{ float: 'right', cursor: 'pointer' }}
-              onClick={() => {appStore.toggleExplorerFullscreen()}}
-            />
           </StyledLegendInlineList>
+          <div style={{ flexShrink: 0 }}>
+            <Tooltip title="fullscreen">
+              <Icon
+                type={appStore.explorerFullscreen ? 'fullscreen-exit' : 'fullscreen'}
+                style={{ cursor: 'pointer', padding: "8px 4px" }}
+                onClick={() => {appStore.toggleExplorerFullscreen()}}
+              />
+            </Tooltip>
+            <Tooltip title="reset">
+              <Icon
+                type="undo"
+                style={{ cursor: 'pointer', padding: "8px 4px" }}
+                onClick={() => {appStore.resetExplorer()}}
+              />
+            </Tooltip>
+          </div>
         </StyledLegendRow>
       )
     }
