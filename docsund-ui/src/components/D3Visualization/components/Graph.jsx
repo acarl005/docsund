@@ -20,7 +20,7 @@
  */
 
 import React, { Component } from 'react'
-import { Button, Icon } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { createGraph, mapRelationships, getGraphStats } from '../mapper'
 import { GraphEventHandler } from '../GraphEventHandler'
 import '../lib/visualization/index'
@@ -148,21 +148,24 @@ export class GraphComponent extends Component {
   }
 
   zoomButtons () {
-    const ButtonGroup = Button.Group
     return (
       <StyledZoomHolder>
-        <ButtonGroup>
-          <Button
-            icon='zoom-in'
-            disabled={this.state.zoomInLimitReached}
-            onClick={this.zoomInClicked.bind(this)}
-          />
-          <Button
-            icon='zoom-out'
-            disabled={this.state.zoomOutLimitReached}
-          onClick={this.zoomOutClicked.bind(this)}
-          />
-        </ButtonGroup>
+        <Button.Group>
+          <Tooltip title="zoom in">
+            <Button
+              icon='zoom-in'
+              disabled={this.state.zoomInLimitReached}
+              onClick={this.zoomInClicked.bind(this)}
+            />
+          </Tooltip>
+          <Tooltip title="zoom out">
+            <Button
+              icon='zoom-out'
+              disabled={this.state.zoomOutLimitReached}
+            onClick={this.zoomOutClicked.bind(this)}
+            />
+          </Tooltip>
+        </Button.Group>
       </StyledZoomHolder>
     )
     return null

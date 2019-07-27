@@ -7,7 +7,7 @@ import { formatDate } from "../../utils"
 const highlightedText = (key, val) => (
   <div
     style={{ color: 'black', fontWeight: 'bold' }}
-    dangerouslySetInnerHTML={{ __html: `${key}: ${val.join(', ')}` }}
+    dangerouslySetInnerHTML={{ __html: `${key}: ${val.slice(0, 3).join('... ')}` }}
   />
 )
 
@@ -39,9 +39,9 @@ export default class EmailSearchResultItem extends React.Component {
       >
         <LeftRightContainer left={this.renderByKey('from')}
                             right={formatDate(this.props.properties.date)} />
-        {this.renderByKey('to')}
-        {this.renderByKey('subject')}
-        {this.renderByKey('body')}
+        {this.renderByKey("to")}
+        {this.renderByKey("subject")}
+        {this.renderByKey("body")}
       </StyledItem>
     )
   }
