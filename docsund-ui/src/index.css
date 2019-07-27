@@ -1,6 +1,13 @@
 @import "../node_modules/antd/dist/antd.css";
 @import "./components/TopicModelingComponent.css";
 
+@font-face {
+  font-family: 'Light Sans Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Light Sans Regular'), url('../assets/Light-Sans.woff') format('woff');
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -8,7 +15,7 @@
 }
 
 body {
-  font-family: 'Nunito Sans', Helvetica, sans-serif;
+  font-family: 'Light Sans Regular', Helvetica, sans-serif;
   font-weight: 300;
 }
 
@@ -30,3 +37,6 @@ body {
   font-weight: bold;
 }
 
+.ant-pagination-item {
+  font-family: inherit;
+}
