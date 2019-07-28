@@ -9,7 +9,6 @@ const { Text } = Typography;
 
 export default class TopicExplorer extends Component {
 
-
   constructor(props) {
     super(props);
     this.state = {
@@ -19,8 +18,8 @@ export default class TopicExplorer extends Component {
     this.onMoreTopics = this.onMoreTopics.bind(this);
     this.onLessTopics = this.onLessTopics.bind(this);
     this.onDisplayTopicDocuments = this.onDisplayTopicDocuments.bind(this);
-
   }
+
   componentDidMount() {
     const defaultNumTopics = 10;
     var topicData = topicExplorer.getTopicsData(defaultNumTopics);
@@ -29,7 +28,6 @@ export default class TopicExplorer extends Component {
     topicExplorer.plotTopicData(topicData);
     topicExplorer.plotWordCloud();
   }
-
 
   onMoreTopics() {
     var maxTopicNum = topicExplorer.getMaxNumTopics();
@@ -48,7 +46,6 @@ export default class TopicExplorer extends Component {
       console.log("More topics.");
     }
   }
-
 
   onLessTopics() {
     var minTopicNum = 3;
