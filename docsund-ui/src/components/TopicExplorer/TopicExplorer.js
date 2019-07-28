@@ -72,7 +72,6 @@ export default class TopicExplorer extends Component {
     const chosenTopicNumber = parseInt(currentTopicNumber.textContent, 10);
     // console.log(chosenTopicNumber);
 
-    var TOPIC_API_URL = "http://127.0.0.1:5000";
     const data = await fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
       mode: 'cors',
       method: 'GET'

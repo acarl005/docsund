@@ -179,9 +179,8 @@ export const topicExplorer = {
             .attr("xlink:href", "data:image/png;base64," + imageByteText);
     },
     getTopicsData: function (numTopics) {
-        var rootUrl = "http://127.0.0.1:5000";
-        var setNumTopicsUrl = rootUrl + "/TM/topics/";
-        var getTopicsDataUrl = rootUrl + "/TM/topicdistributiondata";
+        var setNumTopicsUrl = TOPIC_API_URL + "/TM/topics/";
+        var getTopicsDataUrl = TOPIC_API_URL + "/TM/topicdistributiondata";
 
         // Set the number of topics
         var xhttp = new XMLHttpRequest();
@@ -197,8 +196,7 @@ export const topicExplorer = {
     },
 
     getMaxNumTopics: function () {
-        var rootUrl = "http://127.0.0.1:5000";
-        var maxNumTopicsUrl = rootUrl + "/TM/nummodels";
+        var maxNumTopicsUrl = TOPIC_API_URL + "/TM/nummodels";
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", maxNumTopicsUrl, false);
         xhttp.send();
@@ -206,6 +204,3 @@ export const topicExplorer = {
         return maxNumTopics;
     }
 };
-
-// ToDo: Figure out how to style and intuitively arrange the SVGs and input & button.
-
