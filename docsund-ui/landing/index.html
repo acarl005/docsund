@@ -1,9 +1,4 @@
 ﻿<!DOCTYPE html>
-<!--
-    Transit by TEMPLATED
-    templated.co @templatedco
-    Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
--->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -66,14 +61,17 @@
                 <h2>
                     What is an Entity?
                 </h2>
+
+<!--                TODO: why is determining them helpful? Need more info.-->
+<!--                TODO: what are the entity types? RD to review the entity code and fill this in.-->
+<!--                TODO: More info and screenshot of the Entity Explorer.-->
                 <p align="left" style="line-height: 1.5">
-                    An <emphasis>Entity</emphasis> is a person, place, or other named object found within text. (TODO:
-                    why is determining them helpful?) Docsund uses Named Entity Recognition techniques to automatically
-                    extract People, Places, Organizations, <strong>(TODO: other entity types??? RD to look over source code and
-                    fill in)</strong> from the corpus. Docsund also determines relationships between entities so users can learn
+                    An <emphasis>Entity</emphasis> is a person, place, or other named object found within text. Docsund
+                    uses Named Entity Recognition techniques to automatically extract People, Places, Organizations,
+                    from the corpus. Docsund also determines relationships between entities so users can learn
                     not just the who and what, but also the connections between them. Docsund organizes these entities
                     and relationships into a network of entities and visualizes this network in its interactive
-                    <emphasis>Entity Explorer</emphasis>. <strong>(TODO: Talk more about Entity Explorer)</strong>
+                    <emphasis>Entity Explorer</emphasis>.
                 </p>
 
                 <h2>
@@ -86,9 +84,12 @@
                     transmission.
                 </p>
 
+<!--                TODO: More info and a screenshot on the Topic Explorer-->
+<!--                TODO: Talk about the pipeline. Maybe in a separate section?-->
                 <p>
                     Docsund uses <a href="https://en.wikipedia.org/wiki/Topic_model">Topic Modeling</a> techniques
-                    to determine the topics discussed
+                    to determine the topics discussed in a corpus, and visualizes these topics to the user
+                    in its interactive <emphasis>Topic Explorer</emphasis> tool.
                 </p>
 
             </header>
@@ -117,10 +118,14 @@
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
+                                        <p>
+                                            Docsund uses <a href="https://spacy.io/">spaCy</a> to extract Entities from
+                                            the documents. spaCy uses a machine learning model trained on web data
+                                            to detect entities in documents, and returns a document's entities
+                                        </p>
                                         <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
                                     </span>
-                                    <img src="./images/flowchart.png" width="25%" height="25%" class="image-and-text_img" />
+                                    <img src="./images/spacy_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
                                 <br />
                                 <br />
@@ -134,21 +139,21 @@
                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
                                         <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
                                     </span>
-                                    <img src="./images/flowchart.png" width="25%" height="25%" class="image-and-text_img" />
+                                    <img src="./images/neo4j_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
                                 <br />
                                 <br />
                             </div>
 
                             <div class="item" style="background-color: white">
-                                <p>Topic modeling using LDA, and visualization using D3</p>
+                                <p>Topic modeling using Gensim, and visualization using D3</p>
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
                                         <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
                                     </span>
-                                    <img src="./images/flowchart.png" width="25%" height="25%" class="image-and-text_img" />
+                                    <img src="./images/gensim_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
                                 <br />
                                 <br />
@@ -269,24 +274,24 @@
             <section class="profiles">
                 <div class="row">
                     <section class="3u 6u(medium) 12u$(xsmall) profile">
-                        <img src="images/profile_placeholder.gif" alt="" />
+                        <img src="images/ryan.jpg" alt="" width="100" height="100"/>
                         <h4>Ryan Delgado</h4>
-                        <p>LinkedIn</p>
+                        <p><a href="https://www.linkedin.com/in/ryan-delgado-69544568/">LinkedIn</a></p>
                     </section>
                     <section class="3u 6u$(medium) 12u$(xsmall) profile">
-                        <img src="images/profile_placeholder.gif" alt="" />
+                        <img src="images/danielle.jpg" alt="" width="100" height="100"/>
                         <h4>Danielle O'Neil</h4>
-                        <p>LinkedIn</p>
+                        <p><a href="https://www.linkedin.com/in/danielleoneil98/">LinkedIn</a></p>
                     </section>
                     <section class="3u 6u(medium) 12u$(xsmall) profile">
-                        <img src="images/profile_placeholder.gif" alt="" />
+                        <img src="images/andy.jpg" alt="" width="100" height="100"/>
                         <h4>Andy Carlson</h4>
-                        <p>LinkedIn</p>
+                        <p><a href="https://www.linkedin.com/in/acarl005/">LinkedIn</a></p>
                     </section>
                     <section class="3u$ 6u$(medium) 12u$(xsmall) profile">
-                        <img src="images/profile_placeholder.gif" alt="" />
+                        <img src="images/matt.jpg" alt="" width="100" height="100"/>
                         <h4>Matthew Prout</h4>
-                        <p>LinkedIn</p>
+                        <p><a href="https://www.linkedin.com/in/matthew-prout-732871/">LinkedIn</a></p>
                     </section>
                 </div>
             </section>
