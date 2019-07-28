@@ -9,6 +9,18 @@ const { Text } = Typography;
 
 export default class TopicExplorer extends Component {
 
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      docIDs: []
+    };
+
+    this.onMoreTopics = this.onMoreTopics.bind(this);
+    this.onLessTopics = this.onLessTopics.bind(this);
+    this.onDisplayTopicDocuments = this.onDisplayTopicDocuments.bind(this);
+
+  }
   componentDidMount() {
     const defaultNumTopics = 10;
     var topicData = topicExplorer.getTopicsData(defaultNumTopics);
@@ -31,6 +43,8 @@ export default class TopicExplorer extends Component {
       var topicData = topicExplorer.getTopicsData(numDesiredTopics);
       topicExplorer.plotWordCloud();
       topicExplorer.plotTopicData(topicData);
+      var currentTopicSpan = document.getElementById("current-topic");
+      currentTopicSpan.textContent = "NONE SELECTED";
       console.log("More topics.");
     }
   }
@@ -48,10 +62,33 @@ export default class TopicExplorer extends Component {
       var topicData = topicExplorer.getTopicsData(numDesiredTopics);
       topicExplorer.plotWordCloud();
       topicExplorer.plotTopicData(topicData);
+      var currentTopicSpan = document.getElementById("current-topic");
+      currentTopicSpan.textContent = "NONE SELECTED";
       console.log("Less topics.");
     }
   }
 
+  async onDisplayTopicDocuments () {
+    const currentTopicNumber = document.getElementById('current-topic');
+
+    // From the perspective of the user, topics range from 1 to #topics
+    const chosenTopicNumber = parseInt(currentTopicNumber.textContent, 10);
+    // console.log(chosenTopicNumber);
+
+    var TOPIC_API_URL = "http://127.0.0.1:5000";
+    const data = await fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
+      mode: 'cors',
+      method: 'GET'
+    }).then((resp) => resp.json());
+
+    const documentIDArray = data.docIDs;
+    console.log(documentIDArray);
+
+    this.setState({docIDs: documentIDArray});
+    await appStore.fetchEmailsFromIDs(documentIDArray, 100);
+    appStore.toggleModal('topicSample');
+    appStore.setEmailModalView('list')
+  }
 
   render() {
     return (
@@ -66,20 +103,24 @@ export default class TopicExplorer extends Component {
           </Row>
           <Row>
             <Col span={3}>
-              {/*<input type="text" placeholder={"# Desired topics"} id={"topic-num-input"}/>*/}
-              {/*<button type={"button"} onClick={this.onButtonClick} >Calculate Topics</button>*/}
               <Button type="primary" onClick={this.onLessTopics}>Less Topics</Button>
             </Col>
             <Col span={3}>
               <Button type="primary" onClick={this.onMoreTopics}>More Topics</Button>
             </Col>
-
-            <Col span={6}>
-              {/*<style fontSize={12}>*/}
-                <Text> Displaying <span id={"num-topics"}>10</span> topics. </Text>
-              {/*</style>*/}
+            <Col span={3}>
+              <Button type="primary" onClick={this.onDisplayTopicDocuments}>View Topic Emails</Button>
             </Col>
           </Row>
+          <Row>
+            <Col span={6}>
+              <Text> Displaying <span id={"num-topics"}>10</span> topics. </Text>
+            </Col>
+            <Col span={6}>
+              <Text> Displaying word cloud for topic <span id={"current-topic"}>NONE SELECTED</span></Text>
+            </Col>
+          </Row>
+
         </div>
     )
   }

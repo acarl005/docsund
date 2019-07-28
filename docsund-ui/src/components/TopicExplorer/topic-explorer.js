@@ -109,6 +109,10 @@ export const topicExplorer = {
                 boundingCircle.transition()
                     .duration(transitionDuration)
                     .attr("r", d => expandedRadiusRatio * radScale(calcRadius(d.size)));
+
+                //Change the contents of the current-topic span
+                var currentTopicSpan = document.getElementById("current-topic");
+                currentTopicSpan.textContent = d.topic;
             });
 
         // Write in the topic circle labels
