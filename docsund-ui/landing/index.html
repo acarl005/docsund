@@ -25,7 +25,7 @@
         <h2>An interactive application for exploring unstructured collections of documents</h2>
         <p>
             Docsund enables journalists and researchers to quickly find important information within large collections
-            of documents. It uses Natural Language Processing techniques to automatically detect structure
+            of documents. It uses Natural Language Processing (NLP) techniques to automatically detect structure
             to unstructured corpuses, and presents this structure in intuitive exploratory tools.
         </p>
     </section>
@@ -114,16 +114,17 @@
                         <!-- Wrapper for slides -->
                         <div class="carousel-inner">
                             <div class="item active" style="background-color: white">
-                                <p>Entity extraction using Spacy</p>
+                                <p>spaCy for entity extraction</p>
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
                                         <p>
                                             Docsund uses <a href="https://spacy.io/">spaCy</a> to extract Entities from
-                                            the documents. spaCy uses a machine learning model trained on web data
-                                            to detect entities in documents, and returns a document's entities
+                                            the documents. spaCy is a Python library for common NLP tasks like
+                                            tokenization & preprocessing, Part-of-Speech tagging, and Named Entity
+                                            Recognition (NER). spaCy uses a pre-trained machine learning model to
+                                            extract entities from documents.
                                         </p>
-                                        <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
                                     </span>
                                     <img src="./images/spacy_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
@@ -132,12 +133,15 @@
                             </div>
 
                             <div class="item" style="background-color: white">
-                                <p>Neo4j for the database and entity visualizer</p>
+                                <p>Neo4j for storing and visualizing entities & relationships</p>
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
-                                        <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
+                                        <p>
+                                            The entities and relationships extracted using spaCy are stored in a Neo4j
+                                            database. Docsund's Entity Explorer is built on top of Neo4j's Browser tool.
+                                        </p>
+
                                     </span>
                                     <img src="./images/neo4j_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
@@ -146,11 +150,17 @@
                             </div>
 
                             <div class="item" style="background-color: white">
-                                <p>Topic modeling using Gensim, and visualization using D3</p>
+                                <p>Topic modeling using Gensim, and topic visualization using D3</p>
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
+                                        <p>
+                                            Topics are determined using a technique called <a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">Latent Dirichlet Allocation (LDA)</a>.
+                                            Docsund will fit many topic models with the number of topics ranging from 3 to 35.
+                                            Docsund uses the <a href="https://radimrehurek.com/gensim/">Gensim library's</a> LDA implementation
+                                            to fit these models. For each topic model, Docsund produces a "topic distribution", which visualizes
+
+                                        </p>
                                         <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
                                     </span>
                                     <img src="./images/gensim_logo.svg" width="25%" height="25%" class="image-and-text_img" />
@@ -269,7 +279,10 @@
         <div class="container">
             <header class="major">
                 <h2>Team</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio, autem.</p>
+                <p>
+                    The Docsund team is a small group of Master's students in UC Berkeley's Master of Information
+                    and Data Science program.
+                </p>
             </header>
             <section class="profiles">
                 <div class="row">
