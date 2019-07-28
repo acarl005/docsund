@@ -1,0 +1,48 @@
+@content01: content01;
+.@{content01}-wrapper {
+  background-color: #fafafa;
+  height: 446px;
+  overflow: hidden;
+  .@{content01} {
+    overflow: hidden;
+    height: 100%;
+    padding: 64px 24px;
+    > .title-wrapper {
+      margin: 0 auto;
+    }
+    .block-wrapper {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      top: 25%;
+      padding: 20px 0;
+      .block {
+        padding: 0 4%;
+        display: inline-block;
+        height: 200px;
+        margin-bottom: 48px;
+        font-size: 16px;
+        &.queue-anim-leaving {
+          position: relative !important;
+        }
+        .icon {
+          width: 100px;
+          height: 100px;
+          margin: auto;
+          display: flex;
+          align-items: center;
+        }
+        .@{content01}-title {
+          line-height: 32px;
+          margin: 10px auto;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .@{content01}-wrapper {
+    height: 880px;
+  }
+}
