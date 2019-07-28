@@ -20,15 +20,17 @@
 </head>
 <body class="landing">
     <!-- Banner -->
-    <section id="banner">
-        <h2>Docsund</h2>
-        <h2>An interactive application for exploring unstructured collections of documents</h2>
-        <p>
-            Docsund enables journalists and researchers to quickly find important information within large collections
-            of documents. It uses Natural Language Processing (NLP) techniques to automatically detect structure
-            to unstructured corpuses, and presents this structure in intuitive exploratory tools.
-        </p>
+
+    <section id="banner" style="background-image: url('./images/docsund_logo.svg'); background-repeat: no-repeat; background-size: cover; background-position: center center; opacity: 0.5;">
+            <h2>Docsund</h2>
+            <h2>An interactive application for exploring unstructured collections of documents</h2>
+            <p>
+                Docsund enables journalists and researchers to quickly find important information within large collections
+                of documents. It uses Natural Language Processing (NLP) techniques to automatically detect structure
+                to unstructured corpuses, and presents this structure in intuitive exploratory tools.
+            </p>
     </section>
+
     <!-- One -->
     <section id="one" class="wrapper style1 special" style="background-color: white">
         <div class="container">
@@ -55,12 +57,14 @@
             </header>
         </div>
     </section>
-    <section id="one" class="wrapper style1 special">
+    <section id="concets" class="wrapper style1 special">
         <div class="container">
             <header class="major">
-                <h2>
+
+                <h2>Concepts</h2>
+                <h3>
                     What is an Entity?
-                </h2>
+                </h3>
 
 <!--                TODO: why is determining them helpful? Need more info.-->
 <!--                TODO: what are the entity types? RD to review the entity code and fill this in.-->
@@ -74,9 +78,9 @@
                     <emphasis>Entity Explorer</emphasis>.
                 </p>
 
-                <h2>
+                <h3>
                     What is a Topic?
-                </h2>
+                </h3>
                 <p align="left" style="line-height: 1.5">
                     A <emphasis>Topic</emphasis> is a subject that's discussed in text. In terms of language, a topic
                     is a collection of related words that appear together more frequently in a document if that document
@@ -86,7 +90,7 @@
 
 <!--                TODO: More info and a screenshot on the Topic Explorer-->
 <!--                TODO: Talk about the pipeline. Maybe in a separate section?-->
-                <p>
+                <p align="left" style="line-height: 1.5">
                     Docsund uses <a href="https://en.wikipedia.org/wiki/Topic_model">Topic Modeling</a> techniques
                     to determine the topics discussed in a corpus, and visualizes these topics to the user
                     in its interactive <emphasis>Topic Explorer</emphasis> tool.
@@ -95,7 +99,7 @@
             </header>
         </div>
     </section>
-    <section id="one" class="wrapper style1 special" style="background-color: white">
+    <section id="technology" class="wrapper style1 special" style="background-color: white">
         <div class="container">
             <header class="major">
                 <h2>Technology</h2>
@@ -154,16 +158,23 @@
                                 <br />
                                 <div class="image-and-text">
                                     <span class="image-and-text_textleft">
+<!--                                        TODO: Just a thought, but should we actually go into detail on the landing page?-->
+<!--                                        TODO: Stack Gensim and d3 js logos-->
                                         <p>
                                             Topics are determined using a technique called <a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">Latent Dirichlet Allocation (LDA)</a>.
                                             Docsund will fit many topic models with the number of topics ranging from 3 to 35.
                                             Docsund uses the <a href="https://radimrehurek.com/gensim/">Gensim library's</a> LDA implementation
-                                            to fit these models. For each topic model, Docsund produces a "topic distribution", which visualizes
-
+                                            to fit these models. For each topic model, Docsund produces a "topic distribution", which visualizes the
+                                            similarity between topics (similar topics are closer together) and prominence (larger topics are more prominent
+                                            in the corpus), as well as word clouds for each topic.
                                         </p>
-                                        <p>Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
+                                        <p>
+                                            The Topic Distribution and word clouds are served to the users in the Topic Explorer. The Topic Explorer
+                                            is built using <a href="https://d3js.org/">D3.JS</a>.
+                                        </p>
                                     </span>
                                     <img src="./images/gensim_logo.svg" width="25%" height="25%" class="image-and-text_img" />
+                                    <img src="./images/d3_logo.svg" width="25%" height="25%" class="image-and-text_img" />
                                 </div>
                                 <br />
                                 <br />
@@ -175,10 +186,11 @@
                                 <div class="image-and-text">
                                     <span class="image-and-text_textonly">
                                         <p>
-                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.
+                                            The Search functionality is built on ElasticSearch. The documents are
+                                            ingested into an ElasticSearch server
                                         </p>
                                         <p>
-                                            Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.
+
                                         </p>
                                         <p>
                                             Aliquam erat volutpat. Donec viverra turpis ac urna fermentum, non auctor mi congue. Vestibulum condimentum urna massa, vitae iaculis ipsum elementum et. Duis quis lorem laoreet, suscipit nunc nec, euismod est. Etiam id pharetra mi. Nullam ut vestibulum est. Donec in ipsum molestie, pharetra nisi in, feugiat tellus. Fusce sed velit ac nisl sodales fringilla ut dictum mauris. Nullam massa nisi, rhoncus et malesuada at, efficitur vehicula ante. Phasellus volutpat lorem condimentum diam placerat, a facilisis urna rhoncus. Integer consectetur lacinia mollis. Sed mattis ex at tincidunt suscipit. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
@@ -240,7 +252,7 @@
         </div>
     </section>
 
-    <section id="one" class="wrapper style1 special">
+    <section id="demos" class="wrapper style1 special">
         <div class="container">
             <header class="major">
                 <h2>Demos</h2>
@@ -281,7 +293,7 @@
                 <h2>Team</h2>
                 <p>
                     The Docsund team is a small group of Master's students in UC Berkeley's Master of Information
-                    and Data Science program.
+                    and Data Science program. Docsund was developed for our Capstone project in our final semester.
                 </p>
             </header>
             <section class="profiles">
@@ -313,72 +325,12 @@
     <!-- Footer -->
     <footer id="footer">
         <div class="container">
-            <section class="links">
-                <div class="row">
-                    <section class="3u 6u(medium) 12u$(small)">
-                        <h3>Lorem ipsum dolor</h3>
-                        <ul class="unstyled">
-                            <li><a href="#">Lorem ipsum dolor sit</a></li>
-                            <li><a href="#">Nesciunt itaque, alias possimus</a></li>
-                            <li><a href="#">Optio rerum beatae autem</a></li>
-                            <li><a href="#">Nostrum nemo dolorum facilis</a></li>
-                            <li><a href="#">Quo fugit dolor totam</a></li>
-                        </ul>
-                    </section>
-                    <section class="3u 6u$(medium) 12u$(small)">
-                        <h3>Culpa quia, nesciunt</h3>
-                        <ul class="unstyled">
-                            <li><a href="#">Lorem ipsum dolor sit</a></li>
-                            <li><a href="#">Reiciendis dicta laboriosam enim</a></li>
-                            <li><a href="#">Corporis, non aut rerum</a></li>
-                            <li><a href="#">Laboriosam nulla voluptas, harum</a></li>
-                            <li><a href="#">Facere eligendi, inventore dolor</a></li>
-                        </ul>
-                    </section>
-                    <section class="3u 6u(medium) 12u$(small)">
-                        <h3>Neque, dolore, facere</h3>
-                        <ul class="unstyled">
-                            <li><a href="#">Lorem ipsum dolor sit</a></li>
-                            <li><a href="#">Distinctio, inventore quidem nesciunt</a></li>
-                            <li><a href="#">Explicabo inventore itaque autem</a></li>
-                            <li><a href="#">Aperiam harum, sint quibusdam</a></li>
-                            <li><a href="#">Labore excepturi assumenda</a></li>
-                        </ul>
-                    </section>
-                    <section class="3u$ 6u$(medium) 12u$(small)">
-                        <h3>Illum, tempori, saepe</h3>
-                        <ul class="unstyled">
-                            <li><a href="#">Lorem ipsum dolor sit</a></li>
-                            <li><a href="#">Recusandae, culpa necessita nam</a></li>
-                            <li><a href="#">Cupiditate, debitis adipisci blandi</a></li>
-                            <li><a href="#">Tempore nam, enim quia</a></li>
-                            <li><a href="#">Explicabo molestiae dolor labore</a></li>
-                        </ul>
-                    </section>
-                </div>
-            </section>
             <div class="row">
                 <div class="8u 12u$(medium)">
                     <ul class="copyright">
-                        <li>&copy; Untitled. All rights reserved.</li>
+                        <li>&copy; Docsund 2019. All rights reserved.</li>
                         <li>Design: <a href="http://templated.co">TEMPLATED</a></li>
                         <li>Images: <a href="http://unsplash.com">Unsplash</a></li>
-                    </ul>
-                </div>
-                <div class="4u$ 12u$(medium)">
-                    <ul class="icons">
-                        <li>
-                            <a class="icon rounded fa-facebook"><span class="label">Facebook</span></a>
-                        </li>
-                        <li>
-                            <a class="icon rounded fa-twitter"><span class="label">Twitter</span></a>
-                        </li>
-                        <li>
-                            <a class="icon rounded fa-google-plus"><span class="label">Google+</span></a>
-                        </li>
-                        <li>
-                            <a class="icon rounded fa-linkedin"><span class="label">LinkedIn</span></a>
-                        </li>
                     </ul>
                 </div>
             </div>
