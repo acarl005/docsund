@@ -1,10 +1,10 @@
 from flask import Flask, json, jsonify, g, request, session, make_response, send_file
 from flask_cors import CORS, cross_origin
 import os
-from TopicModeling import TopicModeling, DocumentTypeEnum
+from TopicModeling import TopicModeling2, DocumentTypeEnum
 
 # Topic modeling state
-tm = TopicModeling()
+tm = TopicModeling2()
 
 # The Flask application
 app = Flask(__name__)
@@ -120,7 +120,7 @@ def GetTopicDistributionData():
     if not result:
         return json_response({}, 400)
     else:
-        return json_response(imageData)
+        return json_response(list(imageData.values()))
 
 
 @app.route("/TM/topics/<int:topic_id>/documents", methods=["GET"])
@@ -133,5 +133,15 @@ def GetDocIDsForTopic(topic_id):
     else:
         return json_response({'docIDs': docIDs})
 
+
+@app.route("/TM/nummodels", methods=["GET"])
+@cross_origin()
+def get_num_models():
+    """Fetches the total number of topic models (i.e. the max
+    number of topics the user can choose)"""
+    return str(len(tm.topic_data['models']) + 2)  # +2 because the minimum topic number is 3.
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+

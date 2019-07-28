@@ -11,53 +11,16 @@ export default class TopicExplorer extends Component {
 
   componentDidMount() {
     const defaultNumTopics = 10;
-    var topicApi = topicExplorer.api();
-    var topicData = topicApi.getTopicsData(defaultNumTopics).coordinates;
-    // console.log(topicData);
+    var topicData = topicExplorer.getTopicsData(defaultNumTopics);
 
     topicExplorer.createWordCloud();
-    // topicExplorer.createTopicPlot();
     topicExplorer.plotTopicData(topicData);
     topicExplorer.plotWordCloud();
   }
 
-  fetchTopicData(numTopics) {
-    var topicApi = topicExplorer.api();
-    return topicApi.getTopicsData(numTopics).coordinates;
-  }
-
-  drawTopicExplorer() {
-    // Create the div to house the topic explorer
-
-    // Fit initial topic model with 10 topics & 20 top words
-
-
-    // this.myWordCloud = topicExplorer.wordCloud();
-    // this.myTopicPlot = topicExplorer.topicPlot()
-    //     .wordCloud(this.myWordCloud);
-    //
-    // console.log(this.allTopicsData);
-    // var topicData = this.allTopicsData[defaultNumTopics].coordinates;
-    // this.myTopicPlot.plotTopicData(topicData);
-
-  }
-
-  onButtonClick() {
-    // console.log("Button clicked!");
-    var numDesiredTopics = document.getElementById("topic-num-input").value;
-    // console.log(numDesiredTopics);
-    var topicApi = topicExplorer.api();
-    var topicData = topicApi.getTopicsData(numDesiredTopics).coordinates;
-    topicExplorer.plotWordCloud();
-    topicExplorer.plotTopicData(topicData);
-    // var newTopicData = fetchTopicData(numTopics);
-    // topicExplorer.plotTopicData(newTopicData);
-    // this.myTopicPlot.plotTopicData(newTopicData);
-    // this.myWordCloud.clearImage();
-  }
 
   onMoreTopics() {
-    var maxTopicNum = 20;
+    var maxTopicNum = topicExplorer.getMaxNumTopics();
     var numTopicsSpan = document.getElementById("num-topics");
     var currentNumTopics = parseInt(numTopicsSpan.textContent, 10);
     if (currentNumTopics === maxTopicNum) {
@@ -65,13 +28,13 @@ export default class TopicExplorer extends Component {
     } else {
       var numDesiredTopics = currentNumTopics + 1;
       numTopicsSpan.textContent = numDesiredTopics;
-      var topicApi = topicExplorer.api();
-      var topicData = topicApi.getTopicsData(numDesiredTopics).coordinates;
+      var topicData = topicExplorer.getTopicsData(numDesiredTopics);
       topicExplorer.plotWordCloud();
       topicExplorer.plotTopicData(topicData);
       console.log("More topics.");
     }
   }
+
 
   onLessTopics() {
     var minTopicNum = 3;
@@ -82,8 +45,7 @@ export default class TopicExplorer extends Component {
     } else {
       var numDesiredTopics = currentNumTopics - 1;
       numTopicsSpan.textContent = numDesiredTopics;
-      var topicApi = topicExplorer.api();
-      var topicData = topicApi.getTopicsData(numDesiredTopics).coordinates;
+      var topicData = topicExplorer.getTopicsData(numDesiredTopics);
       topicExplorer.plotWordCloud();
       topicExplorer.plotTopicData(topicData);
       console.log("Less topics.");
@@ -114,7 +76,7 @@ export default class TopicExplorer extends Component {
 
             <Col span={6}>
               {/*<style fontSize={12}>*/}
-                <Text level={4}> Displaying <span id={"num-topics"}>10</span> topics. </Text>
+                <Text> Displaying <span id={"num-topics"}>10</span> topics. </Text>
               {/*</style>*/}
             </Col>
           </Row>
