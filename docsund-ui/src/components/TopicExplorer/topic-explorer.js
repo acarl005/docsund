@@ -67,7 +67,7 @@ export const topicExplorer = {
         var transitionDuration = 100;
         var standardStrokeWidth = 1.5;
         var hoveredStrokeWidth = 6;
-        var expandedRadiusRatio = 1.2;
+        var expandedRadiusRatio = 1.4;
 
         // Plot the topic circles
         var topicCircles = topicPlotSvg.selectAll("circle")
@@ -174,84 +174,33 @@ export const topicExplorer = {
         var wordCloudImg = wordCloudSvg.select("image")
             .attr("xlink:href", "data:image/png;base64," + imageByteText);
     },
-    api: function () {
-        // ToDo: Add labels to the plots
+    getTopicsData: function (numTopics) {
         var rootUrl = "http://127.0.0.1:5000";
-        var setNumTopicsUrl = rootUrl + "/tm/setnumtopics/";
-        var setNumTopWordsUrl = rootUrl + "/tm/setnumtopwords/";
-        var buildTopicModelUrl = rootUrl + "/tm/buildmodel";
-        var getWordCloudUrl = rootUrl + "/tm/wordcloud/";
-        var getTopicsCoordinatesUrl = rootUrl + "/tm/topiccoords";
-        var getTopicsDataUrl = rootUrl + "/tm/topicsdata/";
+        var setNumTopicsUrl = rootUrl + "/TM/topics/";
+        var getTopicsDataUrl = rootUrl + "/TM/topicdistributiondata";
 
-        var setNumTopics_ = function (numTopics) {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", setNumTopicsUrl + numTopics, false);
-            xhttp.send();
-            return JSON.parse(xhttp.responseText);
-        };
+        // Set the number of topics
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", setNumTopicsUrl + numTopics, false);
+        xhttp.send();
 
-        var setNumTopWords_ = function (numTopWords) {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", setNumTopWordsUrl + numTopWords, false);
-            xhttp.send();
-            return JSON.parse(xhttp.responseText);
-        };
+        // Retrieve the topic data
+        var xhttp2 = new XMLHttpRequest();
+        xhttp2.open("GET", getTopicsDataUrl, false);
+        xhttp2.send();
+        var topicsData = JSON.parse(xhttp2.responseText);
+        return topicsData;
+    },
 
-        var buildTopicModel_ = function () {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", buildTopicModelUrl, false);
-            xhttp.send();
-            return JSON.parse(xhttp.responseText);
-        };
-
-        var getWordCloudImage_ = function (topicNum) {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", getWordCloudUrl + topicNum, false);
-            xhttp.send();
-            var wordCloudEncodedImage = JSON.parse(xhttp.responseText);
-            return wordCloudEncodedImage;
-        };
-
-        var getTopicsCoordinates_ = function () {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", getTopicsCoordinatesUrl, false);
-            xhttp.send();
-            var topicCoordinates = JSON.parse(xhttp.responseText);
-            return topicCoordinates;
-        };
-
-        var getTopicsData_ = function (numTopics) {
-            var topicDataUrl = getTopicsDataUrl + numTopics;
-            // fetch(topicDataUrl, {
-            //     mode: 'cors',
-            //     method: 'GET'
-            // })
-            // .then(function(response) {
-            //     return JSON.stringify(response.json());
-            // });
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", topicDataUrl, false);
-            xhttp.send();
-            var topicsData = JSON.parse(xhttp.responseText);
-            return topicsData;
-
-
-        };
-
-
-        var public_ = {
-            "setNumTopics": setNumTopics_,
-            "setNumTopWords": setNumTopWords_,
-            "buildTopicModel": buildTopicModel_,
-            "getWordCloudImage": getWordCloudImage_,
-            "getTopicCoordinates": getTopicsCoordinates_,
-            "getTopicsData": getTopicsData_
-        };
-
-        return public_;
+    getMaxNumTopics: function () {
+        var rootUrl = "http://127.0.0.1:5000";
+        var maxNumTopicsUrl = rootUrl + "/TM/nummodels";
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", maxNumTopicsUrl, false);
+        xhttp.send();
+        var maxNumTopics = parseInt(xhttp.responseText, 10);
+        return maxNumTopics;
     }
-
 };
 
 // ToDo: Figure out how to style and intuitively arrange the SVGs and input & button.

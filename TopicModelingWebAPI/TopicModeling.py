@@ -353,7 +353,7 @@ class TopicModeling2:
         for topic_id in topics_dict.keys():
             data[topic_id] = {'size': topics_dict[topic_id]['size'], 'topic': topic_id, 'wordcloud': topics_dict[topic_id]['wordcloud'], 'x': topics_dict[topic_id]['x'], 'y': topics_dict[topic_id]['y']}
 
-        return True, json.dumps(data)
+        return True, data
 
     def getDocIDsForTopic(self, topicNumber):
         print('getDocIDsForTopic')
