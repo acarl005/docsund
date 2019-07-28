@@ -7,7 +7,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Transit by TEMPLATED</title>
+    <title>Docsund</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -27,25 +27,70 @@
     <!-- Banner -->
     <section id="banner">
         <h2>Docsund</h2>
-        <h2>An interactive application for exploring large collections of documents</h2>
-        <p>Docsund uses modern technology to allow journalists and researchers to quickly find important stories within large collections of unstructured documents.</p>
+        <h2>An interactive application for exploring unstructured collections of documents</h2>
+        <p>
+            Docsund enables journalists and researchers to quickly find important information within large collections
+            of documents. It uses Natural Language Processing techniques to automatically detect structure
+            to unstructured corpuses, and presents this structure in intuitive exploratory tools.
+        </p>
     </section>
     <!-- One -->
     <section id="one" class="wrapper style1 special" style="background-color: white">
         <div class="container">
             <header class="major">
                 <h2>Our Vision</h2>
-                <p align="left" style="line-height: 1.5">Document dumps of emails from organizations and individuals have become more common in recent years.  Journalists and researchers face the daunting task of sifting through these documents, often under the pressure of a short deadline.  An obstacle to searching these documents is that the software tools (text editors) used by these groups are not well suited for this task.  Rather than performing an exploration of the data, they resort to searching for key words which may be relevant.</p>
-                <p align="left" style="line-height: 1.5">Docsund offers a solution for handling these types of document collections.  Docsund is an interactive, web based tool to allow the rapid exploration of large, unstructured document collections.  It provides a full search feature to quickly search for words within all the documents, and an intuitive browser for viewing results.  The entity browser shows the relationship between entities (people, organizations, money, and time) in the document.  Finally, the topic explorer automatically finds latent topics within the documents, giving the user an high level overview of the documents, and also starting points for further exploration.</p>
+                <p align="left" style="line-height: 1.5">
+                    Document dumps of emails from organizations and individuals have become more common in recent years.
+                    Journalists and researchers face the daunting task of sifting through these documents, often under
+                    the pressure of a short deadline.  An obstacle to searching these documents is that the software
+                    tools (text editors) used by these groups are not well suited for this task.  Rather than performing
+                    an exploration of the data, they resort to searching for key words which may be relevant.
+                </p>
+
+                <p align="left" style="line-height: 1.5">
+                    Docsund offers a solution for handling these types of document collections.  Docsund is an
+                    interactive, web based tool to allow the rapid exploration of large, unstructured document
+                    collections.  It provides a full search feature to quickly search for words within all the
+                    documents, and an intuitive browser for viewing results.  The entity browser shows the
+                    relationship between entities (people, organizations, money, and time) in the document.
+                    Finally, the topic explorer automatically finds latent topics within the documents, giving
+                    the user an high level overview of the documents, and also starting points for further
+                    exploration.
+                </p>
             </header>
         </div>
     </section>
     <section id="one" class="wrapper style1 special">
         <div class="container">
             <header class="major">
-                <h2>What are Entities?</h2>
-                <p align="left" style="line-height: 1.5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla blandit risus id consectetur tincidunt. Mauris eget eros gravida, tempus arcu in, aliquet nulla. Morbi sit amet arcu nec elit faucibus imperdiet. Praesent scelerisque vestibulum quam nec scelerisque. Fusce rhoncus augue sit amet feugiat blandit. Vestibulum molestie, velit quis dapibus commodo, ipsum ligula ultricies ex, et ornare libero felis a velit. Vivamus ornare, orci ac laoreet hendrerit, risus metus vulputate sem, vitae elementum elit elit quis nisl.</p>
-                <p align="left" style="line-height: 1.5">Donec at facilisis lorem, at sollicitudin metus. Cras tincidunt lectus vitae erat gravida, ut vehicula justo aliquam. Duis scelerisque enim non venenatis blandit. Nulla eu magna lobortis, mattis mi eget, accumsan lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer id tortor molestie, accumsan tellus vel, tristique sem. Nulla ac justo quam. Curabitur at hendrerit libero. Nam non leo dui.</p>
+                <h2>
+                    What is an Entity?
+                </h2>
+                <p align="left" style="line-height: 1.5">
+                    An <emphasis>Entity</emphasis> is a person, place, or other named object found within text. (TODO:
+                    why is determining them helpful?) Docsund uses Named Entity Recognition techniques to automatically
+                    extract People, Places, Organizations, <strong>(TODO: other entity types??? RD to look over source code and
+                    fill in)</strong> from the corpus. Docsund also determines relationships between entities so users can learn
+                    not just the who and what, but also the connections between them. Docsund organizes these entities
+                    and relationships into a network of entities and visualizes this network in its interactive
+                    <emphasis>Entity Explorer</emphasis>. <strong>(TODO: Talk more about Entity Explorer)</strong>
+                </p>
+
+                <h2>
+                    What is a Topic?
+                </h2>
+                <p align="left" style="line-height: 1.5">
+                    A <emphasis>Topic</emphasis> is a subject that's discussed in text. In terms of language, a topic
+                    is a collection of related words that appear together more frequently in a document if that document
+                    is about that topic. For example, a topic about cars may contain words like engine, wheels, or
+                    transmission.
+                </p>
+
+                <p>
+                    Docsund uses <a href="https://en.wikipedia.org/wiki/Topic_model">Topic Modeling</a> techniques
+                    to determine the topics discussed
+                </p>
+
             </header>
         </div>
     </section>
