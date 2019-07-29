@@ -1,69 +1,50 @@
-@banner0: banner0;
-.@{banner0} {
-  // 如果在第一屏且导航位置为 relative, 一屏为 height: calc(~"100vh - 64px");
+.document {
+  background: black;
+  position: absolute;
+  border: 4px solid #8059ff;
+  border-radius: 6px;
+  width: 200px;
+  height: 260px;
+  padding: 20px;
+  transform: translateX(1200px) translateY(800px) rotate3d(-1, -.5, -0.5, 75deg);
+  animation: slide-in 0.5s forwards;
+  opacity: 0;
+}
+
+@keyframes slide-in {
+  100% {
+    opacity: 1;
+    transform: rotate3d(-1, -.5, -0.5, 75deg);
+  }
+}
+
+.line {
+  border: 2px solid #8059ff;
+  margin: 20px 0;
+}
+
+.line:first-child {
+  border: 1px solid transparent;
+}
+
+.document.d0 {
+  top: 0;
+  left: 0;
+}
+
+.document.d1 {
+  top: 50%;
+  left: 20%;
+  animation-delay: 0.5s;
+}
+
+.hero {
+  background: black;
   width: 100%;
   height: 100vh;
   position: relative;
-  text-align: center;
-  border-color: #666;
-  background-image: url("https://zos.alipayobjects.com/rmsportal/gGlUMYGEIvjDOOw.jpg");
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
-  & &-text-wrapper {
-    display: inline-block;
-    position: absolute;
-    top: 20%;
-    margin: auto;
-    left: 0;
-    right: 0;
-    font-size: 14px;
-    color: @template-text-color-light;
-    width: 750px;
-    >.queue-anim-leaving {
-      position: relative !important;
-    }
-  }
-  & &-title {
-    line-height: 1em;
-    text-align: center;
-    min-height: 60px;
-    display: inline-block;
-    font-size: 40px;
-    position: relative;
-    & div {
-      margin-bottom: 24px;
-    }
-  }
-  & &-content {
-    margin-bottom: 20px;
-    word-wrap: break-word;
-    min-height: 24px;
-    font-size: 16px;
-  }
-  & &-button {
-    border: 1px solid #fff;
-    color: #fff;
-    background: transparent;
-    box-shadow: 0 0 0 transparent;
-    line-height: 40px;
-    font-size: 16px;
-    height: 40px;
-    transition: background .45s @ease-out, box-shadow .45s @ease-out;
-    &:hover {
-      color: #fff;
-      border-color: #fff;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 10px rgba(50, 250, 255, 0.75);
-    }
-    &:focus {
-      color: #fff;
-      border-color: #fff;
-    }
-    &.queue-anim-leaving {
-      width: auto;
-    }
-  }
+  overflow-x: hidden;
+  overflow-y: hidden;
   & &-icon {
     bottom: 20px;
     font-size: 24px;
@@ -71,18 +52,50 @@
     left: 50%;
     margin-left: -12px;
     color: @template-text-color-light;
+    z-index: 300;
+    cursor: pointer;
   }
 }
 
-@media screen and (max-width: 767px) {
-  .@{banner0} {
-    background-attachment: inherit;
-    & &-text-wrapper {
-      width: 90%;
-    }
-    & &-title {
-      width: 90%;
-      left: 0;
-    }
-  }
+#screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(315deg, rgba(162,118,255,1) 0%, rgba(80,52,142,1) 15%, rgba(1,54,142,1) 85%, rgba(43,123,252,1) 100%);
+  opacity: 0.35;
+  z-index: 200;
+}
+
+#title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: 10%;
+}
+
+#title * {
+  animation: fade-in 2s; 
+  flex-grow: 1;
+  text-align: center;
+  color: white;
+}
+
+#title h1 {
+  font-size: 500%;
+}
+
+#title h3 {
+  font-size: 35px;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

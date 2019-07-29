@@ -103,11 +103,11 @@ export const Content01DataSource = {
           content: {
             children: (
               <>
-                <Col md={12} xs={24}>
+                <Col md={12} xs={24} style={{ padding: "0 10px" }}>
                   <h3 style={{marginBottom: 8}}>What is an Entity?</h3>
                   An Entity is a person, place, or other named object found within text. Docsund uses Named Entity Recognition techniques to automatically extract People, Places, Organizations, from the corpus. Docsund also determines relationships between entities so users can learn not just the who and what, but also the connections between them. Docsund organizes these entities and relationships into a network of entities and visualizes this network in its interactive Entity Explorer.
                 </Col>
-                <Col md={12} xs={24}>
+                <Col md={12} xs={24} style={{ padding: "0 10px" }}>
                   <h3 style={{marginBottom: 8}}>What is a Topic?</h3>
                   A Topic is a subject that's discussed in text. In terms of language, a topic is a collection of related words that appear together more frequently in a document if that document is about that topic. For example, a topic about cars may contain words like engine, wheels, or transmission.
                   <br />
@@ -161,22 +161,20 @@ export const DemosDataSource = {
         className: 'block',
         children: {
           content: {
-            children: (
-              <>
-                <Col md={8} xs={24}>
-                  <h4>Demo: Search</h4>
-                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </Col>
-                <Col md={8} xs={24}>
-                  <h4>Demo: Entity Explorer</h4>
-                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </Col>
-                <Col md={8} xs={24}>
-                  <h4>Demo: Topic Explorer</h4>
-                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </Col>
-              </>
-            )
+            children: <div style={{ textAlign: "center" }}>
+              <Col md={8} xs={24}>
+                <h4>Demo: Search</h4>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </Col>
+              <Col md={8} xs={24}>
+                <h4>Demo: Entity Explorer</h4>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </Col>
+              <Col md={8} xs={24}>
+                <h4>Demo: Topic Explorer</h4>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </Col>
+            </div>
           },
         },
       },
@@ -198,7 +196,7 @@ export const Content30DataSource = {
       {
         name: 'content',
         className: 'title-content',
-        children: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio, autem.',
+        children: 'Meet the engineers behind the project!',
       },
     ],
   },
@@ -219,7 +217,10 @@ export const Content30DataSource = {
           title: { className: 'content3-title', children: 'Ryan Delgado' },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/ryan-delgado-69544568/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
+            children: <a href='https://www.linkedin.com/in/ryan-delgado-69544568/' target='_blank'>
+              <Icon type='linkedin' style={{paddingRight: 4}}/>
+              Linkedin
+            </a>
           },
         },
       },
@@ -237,7 +238,10 @@ export const Content30DataSource = {
           title: { className: 'content3-title', children: "Danielle O'Neil" },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/danielleoneil98/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
+            children: <a href='https://www.linkedin.com/in/danielleoneil98/' target='_blank'>
+              <Icon type='linkedin' style={{paddingRight: 4}}/>
+              Linkedin
+            </a>
           },
         },
       },
@@ -255,7 +259,17 @@ export const Content30DataSource = {
           title: { className: 'content3-title', children: 'Andrew Carlson' },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/acarl005/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
+            children: <>
+              <a href='https://www.linkedin.com/in/acarl005/' target='_blank'>
+                <Icon type='linkedin' style={{paddingRight: 4}}/>
+              </a>
+              <a href='https://github.com/acarl005' target='_blank'>
+                <Icon type='github' style={{paddingRight: 4}}/>
+              </a>
+              <a href='https://twitter.com/acarl005' target='_blank'>
+                <Icon type='twitter' style={{paddingRight: 4}}/>
+              </a>
+            </>
           },
         },
       },
@@ -273,7 +287,10 @@ export const Content30DataSource = {
           title: { className: 'content3-title', children: 'Matthew Prout' },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/matthew-prout-732871/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
+            children: <a href='https://www.linkedin.com/in/matthew-prout-732871/' _target='blank'>
+              <Icon type='linkedin' style={{paddingRight: 4}}/>
+              Linkedin
+            </a>
           },
         },
       },
