@@ -35,28 +35,11 @@ class Footer extends React.Component {
     const childrenToRender = this.getLiChildren(dataSource.block.children);
     return (
       <div {...props} {...dataSource.wrapper}>
-        <OverPack {...dataSource.OverPack}>
-          <QueueAnim
-            type="bottom"
-            key="ul"
-            leaveReverse
-            component={Row}
-            {...dataSource.block}
-          >
-            {childrenToRender}
-          </QueueAnim>
-          <TweenOne
-            animation={{ y: '+=30', opacity: 0, type: 'from' }}
-            key="copyright"
-            {...dataSource.copyrightWrapper}
-          >
-            <div {...dataSource.copyrightPage}>
-              <div {...dataSource.copyright}>
-                {dataSource.copyright.children}
-              </div>
-            </div>
-          </TweenOne>
-        </OverPack>
+        <div {...dataSource.copyrightPage}>
+          <div {...dataSource.copyright}>
+            {dataSource.copyright.children}
+          </div>
+        </div>
       </div>
     );
   }
