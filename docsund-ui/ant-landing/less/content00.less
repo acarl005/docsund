@@ -1,0 +1,46 @@
+@content00: content00;
+.@{content00}-wrapper {
+  height: 446px;
+  overflow: hidden;
+  .@{content00} {
+    overflow: hidden;
+    height: 100%;
+    padding: 64px 24px;
+    > .title-wrapper {
+      margin: 0 auto;
+    }
+    .block-wrapper {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      top: 25%;
+      padding: 20px 0;
+      .block {
+        padding: 0 4%;
+        height: 200px;
+        margin-bottom: 48px;
+        font-size: 16px;
+        &.queue-anim-leaving {
+          position: relative !important;
+        }
+        .icon {
+          width: 100px;
+          height: 100px;
+          margin: auto;
+          display: flex;
+          align-items: center;
+        }
+        .@{content00}-title {
+          line-height: 32px;
+          margin: 10px auto;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .@{content00}-wrapper {
+    height: 880px;
+  }
+}
