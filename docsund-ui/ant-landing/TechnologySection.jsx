@@ -37,6 +37,12 @@ const CONTENT = {
   },
 }
 
+const selectedStyle = {
+  borderRight: '3px solid #1890ff',
+  background: '#e6f7ff',
+  color: '#1890ff',
+}
+
 export function TechnologySection() {
   const [selectedKey, setSelectedKey] = useState('spacy')
   return <>
@@ -46,7 +52,10 @@ export function TechnologySection() {
         onSelect={({ key }) => setSelectedKey(key)}
       >
         {MENU_ITEMS.map((item) => (
-          <Menu.Item key={item.key}>
+          <Menu.Item
+            key={item.key}
+            style={item.key === selectedKey ? selectedStyle : {}}
+          >
             {item.label}
           </Menu.Item>
         ))}
