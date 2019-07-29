@@ -164,15 +164,15 @@ export const DemosDataSource = {
             children: <div style={{ textAlign: "center" }}>
               <Col md={8} xs={24}>
                 <h4>Demo: Search</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
               </Col>
               <Col md={8} xs={24}>
                 <h4>Demo: Entity Explorer</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
               </Col>
               <Col md={8} xs={24}>
                 <h4>Demo: Topic Explorer</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
               </Col>
             </div>
           },
@@ -211,7 +211,7 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children: require('../landing/images/ryan.jpg'),
+            children: require('../assets/ryan.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Ryan Delgado' },
@@ -232,7 +232,7 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children: require('../landing/images/danielle.jpg'),
+            children: require('../assets/danielle.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: "Danielle O'Neil" },
@@ -253,7 +253,7 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children: require('../landing/images/andy.jpg'),
+            children: require('../assets/andy.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Andrew Carlson' },
@@ -281,7 +281,7 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children: require('../landing/images/matt.jpg'),
+            children: require('../assets/matt.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Matthew Prout' },
