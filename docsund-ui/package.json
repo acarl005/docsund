@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node --experimental-modules server.mjs",
     "dev": "parcel src/index.html",
+    "landing": "parcel index.html",
     "build": "rm -rf dist && API_URL=/api TOPIC_API_URL=/topic-api parcel build src/index.html",
     "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
