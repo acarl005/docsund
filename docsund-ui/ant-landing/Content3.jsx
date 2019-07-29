@@ -1,7 +1,7 @@
 import React from 'react';
 import QueueAnim from 'rc-queue-anim';
 import TweenOne from 'rc-tween-one';
-import { Row, Col } from 'antd';
+import { Avatar, Row, Col } from 'antd';
 import OverPack from 'rc-scroll-anim/lib/ScrollOverPack';
 import { getChildrenToRender } from './utils';
 
@@ -49,7 +49,7 @@ class Content3 extends React.PureComponent {
             key="img"
             {...childObj.icon}
           >
-            <img src={childObj.icon.children} width="100%" alt="img" />
+            <Avatar src={childObj.icon.children} width="100%" alt="img" />
           </TweenOne>
           <div {...childObj.textWrapper}>
             <TweenOne

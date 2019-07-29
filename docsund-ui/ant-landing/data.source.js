@@ -1,12 +1,13 @@
 import React from 'react'
-import { Icon } from 'antd'
+import { Avatar, Col, Icon, Menu } from 'antd'
+import { TechnologySection } from './TechnologySection'
 
 export const Nav00DataSource = {
   wrapper: { className: 'header0 home-page-wrapper' },
   page: { className: 'home-page' },
   logo: {
     className: 'header0-logo',
-    children: 'https://os.alipayobjects.com/rmsportal/mlcYmsRilwraoAe.svg',
+    children: require('../assets/logo.png'),
   },
   Menu: {
     className: 'header0-menu',
@@ -90,7 +91,7 @@ export const Content01DataSource = {
   OverPack: { playScale: 0.3, className: '' },
   titleWrapper: {
     className: 'title-wrapper',
-    children: [{ name: 'title', children: 'What are Entities?' }],
+    children: [{ name: 'title', children: 'Key Concepts' }],
   },
   block: {
     className: 'block-wrapper',
@@ -102,6 +103,78 @@ export const Content01DataSource = {
           content: {
             children: (
               <>
+                <Col md={12} xs={24}>
+                  <h3 style={{marginBottom: 8}}>What is an Entity?</h3>
+                  An Entity is a person, place, or other named object found within text. Docsund uses Named Entity Recognition techniques to automatically extract People, Places, Organizations, from the corpus. Docsund also determines relationships between entities so users can learn not just the who and what, but also the connections between them. Docsund organizes these entities and relationships into a network of entities and visualizes this network in its interactive Entity Explorer.
+                </Col>
+                <Col md={12} xs={24}>
+                  <h3 style={{marginBottom: 8}}>What is a Topic?</h3>
+                  A Topic is a subject that's discussed in text. In terms of language, a topic is a collection of related words that appear together more frequently in a document if that document is about that topic. For example, a topic about cars may contain words like engine, wheels, or transmission.
+                  <br />
+                  <br />
+                  Docsund uses Topic Modeling techniques to determine the topics discussed in a corpus, and visualizes these topics to the user in its interactive Topic Explorer tool.
+                </Col>
+              </>
+            )
+          },
+        },
+      },
+    ],
+  },
+};
+export const Content02DataSource = {
+  wrapper: { className: 'home-page-wrapper content00-wrapper' },
+  page: { className: 'home-page content00' },
+  OverPack: { playScale: 0.3, className: '' },
+  titleWrapper: {
+    className: 'title-wrapper',
+    children: [{ name: 'title', children: 'Technology' }],
+  },
+  block: {
+    className: 'block-wrapper',
+    children: [
+      {
+        name: 'block0',
+        className: 'block',
+        children: {
+          content: {
+            children: <TechnologySection />
+          },
+        },
+      },
+    ],
+  },
+};
+export const DemosDataSource = {
+  wrapper: { className: 'home-page-wrapper content01-wrapper' },
+  page: { className: 'home-page content01' },
+  OverPack: { playScale: 0.3, className: '' },
+  titleWrapper: {
+    className: 'title-wrapper',
+    children: [{ name: 'title', children: 'Demos' }],
+  },
+  block: {
+    className: 'block-wrapper',
+    children: [
+      {
+        name: 'block0',
+        className: 'block',
+        children: {
+          content: {
+            children: (
+              <>
+                <Col md={8} xs={24}>
+                  <h4>Demo: Search</h4>
+                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </Col>
+                <Col md={8} xs={24}>
+                  <h4>Demo: Entity Explorer</h4>
+                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </Col>
+                <Col md={8} xs={24}>
+                  <h4>Demo: Topic Explorer</h4>
+                  <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </Col>
               </>
             )
           },
@@ -140,14 +213,13 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children:
-              'https://zos.alipayobjects.com/rmsportal/ScHBSdwpTkAHZkJ.png',
+            children: require('../landing/images/ryan.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Ryan Delgado' },
           content: {
             className: 'content3-content',
-            children: 'Linkedin',
+            children: <a href='https://www.linkedin.com/in/ryan-delgado-69544568/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
           },
         },
       },
@@ -159,14 +231,13 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children:
-              'https://zos.alipayobjects.com/rmsportal/NKBELAOuuKbofDD.png',
+            children: require('../landing/images/danielle.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: "Danielle O'Neil" },
           content: {
             className: 'content3-content',
-            children: 'Linkedin',
+            children: <a href='https://www.linkedin.com/in/danielleoneil98/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
           },
         },
       },
@@ -178,14 +249,13 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children:
-              'https://zos.alipayobjects.com/rmsportal/xMSBjgxBhKfyMWX.png',
+            children: require('../landing/images/andy.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Andrew Carlson' },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/acarl005/' _target='blank'>Linkedin</a>
+            children: <a href='https://www.linkedin.com/in/acarl005/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
           },
         },
       },
@@ -197,14 +267,13 @@ export const Content30DataSource = {
         children: {
           icon: {
             className: 'content3-icon',
-            children:
-              'https://zos.alipayobjects.com/rmsportal/MNdlBNhmDBLuzqp.png',
+            children: require('../landing/images/matt.jpg'),
           },
           textWrapper: { className: 'content3-text' },
           title: { className: 'content3-title', children: 'Matthew Prout' },
           content: {
             className: 'content3-content',
-            children: 'Linkedin',
+            children: <a href='https://www.linkedin.com/in/matthew-prout-732871/' _target='blank'><Icon type='linkedin' style={{paddingRight: 4}}/>Linkedin</a>
           },
         },
       },

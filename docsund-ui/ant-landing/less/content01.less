@@ -1,8 +1,8 @@
-@content00: content00;
-.@{content00}-wrapper {
-  height: 446px;
+@content01: content01;
+.@{content01}-wrapper {
+  background-color: #fafafa;
   overflow: hidden;
-  .@{content00} {
+  .@{content01} {
     overflow: hidden;
     height: 100%;
     padding: 64px 24px;
@@ -17,8 +17,6 @@
       padding: 20px 0;
       .block {
         padding: 0 4%;
-        display: inline-block;
-        height: 200px;
         margin-bottom: 48px;
         font-size: 16px;
         &.queue-anim-leaving {
@@ -31,7 +29,7 @@
           display: flex;
           align-items: center;
         }
-        .@{content00}-title {
+        .@{content01}-title {
           line-height: 32px;
           margin: 10px auto;
         }
@@ -41,7 +39,6 @@
 }
 
 @media screen and (max-width: 767px) {
-  .@{content00}-wrapper {
-    height: 880px;
+  .@{content01}-wrapper {
   }
 }
