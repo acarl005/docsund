@@ -17,7 +17,21 @@ import { TransparentButton } from "./styled"
 let { Header, Content } = Layout
 
 Content = styled(Content)`
-  padding: 0 12%;
+  @media screen and (min-width: 400px) {
+    padding: 0 3%;
+  }
+  @media screen and (min-width: 700px) {
+    padding: 0 6%;
+  }
+  @media screen and (min-width: 850px) {
+    padding: 0 8%;
+  }
+  @media screen and (min-width: 1000px) {
+    padding: 0 10%;
+  }
+  @media screen and (min-width: 1500px) {
+    padding: 0 15%;
+  }
   > * {
     margin: 24px;
   }
@@ -120,7 +134,6 @@ export default class Main extends Component {
             <Menu.Item key="2">About</Menu.Item>
             <Menu.Item key="3">Enron Emails</Menu.Item>
             <Menu.Item key="4">Sony Emails</Menu.Item>
-            <Menu.Item key="5" onClick={() => this.setState({ joyride: true })}>Walk-through</Menu.Item>
           </Menu>
         </Header>
         <Content>

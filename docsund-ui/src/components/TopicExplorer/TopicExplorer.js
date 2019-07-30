@@ -1,123 +1,119 @@
-import React, {Component} from 'react';
-import {Row, Col, Button, Typography} from 'antd';
-import './TopicExplorer.css';
-import 'antd/dist/antd.css';
-import {select} from 'd3-selection';
-import {topicExplorer} from './topic-explorer';
+import React, { Component } from 'react';
+import { Row, Col, Button, Typography, Slider, Alert, Form, Spin } from 'antd';
+import { topicExplorer } from './topic-explorer';
+import { fetchJSON } from '../../utils'
 
 const { Text } = Typography;
 
 export default class TopicExplorer extends Component {
 
+  // we hard-code the minimum number of topics, but we'll fetch the maximum from the API later...
+  static minTopicNum = 3
+
+  state = {
+    loading: false,
+    docIDs: [],
+    numTopics: 10,
+    selectedTopic: null
+  }
+
   constructor(props) {
     super(props);
-    this.state = {
-      docIDs: []
-    };
+    if (TopicExplorer.maxTopicNum === undefined) {
+      try {
+        TopicExplorer.maxTopicNum = topicExplorer.getMaxNumTopics();
+      } catch (err) {
+        console.error(err)
+        TopicExplorer.maxTopicNum = null
+      }
+    }
 
-    this.onMoreTopics = this.onMoreTopics.bind(this);
-    this.onLessTopics = this.onLessTopics.bind(this);
     this.onDisplayTopicDocuments = this.onDisplayTopicDocuments.bind(this);
   }
 
   componentDidMount() {
-    const defaultNumTopics = 10;
-    var topicData = topicExplorer.getTopicsData(defaultNumTopics);
-
     topicExplorer.createWordCloud();
-    topicExplorer.plotTopicData(topicData);
+    this.renderTopicViz()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.numTopics !== this.state.numTopics) {
+      this.renderTopicViz()
+    }
+  }
+
+  onTopicNumberChange(numTopics) {
+    this.setState({ numTopics, selectedTopic: null })
+  }
+
+  onTopicSelect(selectedTopic) {
+    this.setState({ selectedTopic })
+  }
+
+  async renderTopicViz() {
+    this.setState({ loading: true })
+    var topicData = await topicExplorer.getTopicsData(this.state.numTopics);
+
+    topicExplorer.plotTopicData(topicData, this.onTopicSelect.bind(this));
     topicExplorer.plotWordCloud();
-  }
-
-  onMoreTopics() {
-    var maxTopicNum = topicExplorer.getMaxNumTopics();
-    var numTopicsSpan = document.getElementById("num-topics");
-    var currentNumTopics = parseInt(numTopicsSpan.textContent, 10);
-    if (currentNumTopics === maxTopicNum) {
-      console.log("Nope not going above the max.");
-    } else {
-      var numDesiredTopics = currentNumTopics + 1;
-      numTopicsSpan.textContent = numDesiredTopics;
-      var topicData = topicExplorer.getTopicsData(numDesiredTopics);
-      topicExplorer.plotWordCloud();
-      topicExplorer.plotTopicData(topicData);
-      var currentTopicSpan = document.getElementById("current-topic");
-      currentTopicSpan.textContent = "NONE SELECTED";
-      console.log("More topics.");
-    }
-  }
-
-  onLessTopics() {
-    var minTopicNum = 3;
-    var numTopicsSpan = document.getElementById("num-topics");
-    var currentNumTopics = parseInt(numTopicsSpan.textContent, 10);
-    if (currentNumTopics === minTopicNum) {
-      console.log("Nope not going below the min.");
-    } else {
-      var numDesiredTopics = currentNumTopics - 1;
-      numTopicsSpan.textContent = numDesiredTopics;
-      var topicData = topicExplorer.getTopicsData(numDesiredTopics);
-      topicExplorer.plotWordCloud();
-      topicExplorer.plotTopicData(topicData);
-      var currentTopicSpan = document.getElementById("current-topic");
-      currentTopicSpan.textContent = "NONE SELECTED";
-      console.log("Less topics.");
-    }
+    this.setState({ loading: false })
   }
 
   async onDisplayTopicDocuments () {
-    const currentTopicNumber = document.getElementById('current-topic');
+    const data = await fetchJSON(`${TOPIC_API_URL}/TM/topics/${this.state.selectedTopic}/documents`)
 
-    // From the perspective of the user, topics range from 1 to #topics
-    const chosenTopicNumber = parseInt(currentTopicNumber.textContent, 10);
-    // console.log(chosenTopicNumber);
-
-    const data = await fetch(TOPIC_API_URL + '/TM/topics/' + chosenTopicNumber.toString() + '/documents', {
-      mode: 'cors',
-      method: 'GET'
-    }).then((resp) => resp.json());
-
-    const documentIDArray = data.docIDs;
-    console.log(documentIDArray);
-
-    this.setState({docIDs: documentIDArray});
-    await appStore.fetchEmailsFromIDs(documentIDArray, 100);
+    const { docIDs } = data
+    this.setState({ docIDs });
+    await appStore.fetchEmailsFromIDs(docIDs, 500);
     appStore.toggleModal('topicSample');
     appStore.setEmailModalView('list')
   }
 
   render() {
+    if (TopicExplorer.maxTopicNum === null) {
+      return <Alert message="Error" type="error" />
+    }
     return (
-        <div className="svg-container" id="topic-explorer">
+      <div className="svg-container" id="topic-explorer">
+        <Spin spinning={this.state.loading} tip="loading..." size="large">
           <Row>
-            <Col span={12}>
+            <Col span={12} style={{ padding: "15px" }}>
               <svg id="word-cloud" viewBox={"0 0 500 500"} preserveAspectRatio={"xMidYMid meet"} width={"100%"}></svg>
             </Col>
-            <Col span={12}>
+            <Col span={12} style={{ padding: "15px" }}>
               <svg id="topic-plot" viewBox={"0 0 500 500"} preserveAspectRatio={"xMidYMid meet"} width={"100%"}></svg>
             </Col>
           </Row>
-          <Row>
-            <Col span={3}>
-              <Button type="primary" onClick={this.onLessTopics}>Less Topics</Button>
-            </Col>
-            <Col span={3}>
-              <Button type="primary" onClick={this.onMoreTopics}>More Topics</Button>
-            </Col>
-            <Col span={3}>
-              <Button type="primary" onClick={this.onDisplayTopicDocuments}>View Topic Emails</Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={6}>
-              <Text> Displaying <span id={"num-topics"}>10</span> topics. </Text>
-            </Col>
-            <Col span={6}>
-              <Text> Displaying word cloud for topic <span id={"current-topic"}>NONE SELECTED</span></Text>
-            </Col>
-          </Row>
-
+        </Spin>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
+          <div style={{ display: "inline-block", width: "80px" }}>
+            <label htmlFor="topic-num-slider">
+              # of topics:
+            </label>
+          </div>
+          <div style={{ display: "inline-block", width: "calc(100% - 100px)" }}>
+            <Slider
+              id="topic-num-slider"
+              defaultValue={10}
+              tooltipVisible
+              onAfterChange={this.onTopicNumberChange.bind(this)}
+              min={TopicExplorer.minTopicNum}
+              max={TopicExplorer.maxTopicNum}
+              getTooltipPopupContainer={() => document.getElementById('topic-explorer-tab')}
+            />
+          </div>
         </div>
+        <Row>
+          <Col span={3}>
+            <Button type="primary" onClick={this.onDisplayTopicDocuments} disabled={this.state.selectedTopic === null}>
+              {this.state.selectedTopic !== null ?
+                `Get emails from topic ${this.state.selectedTopic} (of ${this.state.numTopics})` :
+                "Select a topic"
+              }
+            </Button>
+          </Col>
+        </Row>
+      </div>
     )
   }
 }
