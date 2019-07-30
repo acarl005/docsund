@@ -33,10 +33,6 @@ max_topic_size = 35
 # Download File: http://mallet.cs.umass.edu/dist/mallet-2.0.8.zip
 # Mallet is Java based, so make sure Java is installed
 
-# Set the paths to Mallet
-mallet_distribution = os.environ["MALLET_HOME"]
-mallet_binary = os.path.join(mallet_distribution, 'bin', 'mallet')
-
 
 class DocumentTypeEnum(IntEnum):
     unknownType = 0
@@ -83,8 +79,8 @@ class createModelThread(threading.Thread):
                 optimalTopicsOnly = True
 
             # Set paths needed by Mallet
-            os.environ.update({'MALLET_HOME': mallet_distribution})
-            self.mallet_path = mallet_binary
+            self.mallet_distribution = os.environ["MALLET_HOME"]
+            self.mallet_path = os.path.join(self.mallet_distribution, 'bin', 'mallet')
 
             # Compute the coherence values using Mallet
             model_list, coherence_values = self.compute_coherence_values(dictionary=self.tm.dictionary,\
