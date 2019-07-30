@@ -116,7 +116,7 @@ export default class EntityDetailsModal extends Component {
                       onClick={() => this.onEntityClick(item)}
                     >
                       <List.Item.Meta title={item.propertyMap.name} />
-                      <div>{item.count} cooccurences</div>
+                      <div>{item.count} co-occurences</div>
                     </StyledListItem>
                   )}
                 />

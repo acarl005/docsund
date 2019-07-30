@@ -1,5 +1,5 @@
-@import "../node_modules/antd/dist/antd.css";
-@import "./components/TopicModelingComponent.css";
+@import "antd/dist/antd.css";
+@import "./components/TopicExplorer/TopicExplorer.css";
 
 @font-face {
   font-family: 'Light Sans Regular';
@@ -17,6 +17,10 @@
 body {
   font-family: 'Light Sans Regular', Helvetica, sans-serif;
   font-weight: 300;
+}
+
+circle {
+  cursor: pointer;
 }
 
 .ant-table-row:hover {

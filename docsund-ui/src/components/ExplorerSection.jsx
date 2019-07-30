@@ -6,7 +6,6 @@ import qs from "querystring"
 import { fetchJSON, deepEquals, computeNodeScaleFactor, computeRelationshipScaleFactor } from "../utils"
 import Card from './Card'
 import appStore from "../stores/AppStore"
-import TopicModelingComponent from "./TopicModelingComponent"
 import Explorer from "./D3Visualization"
 import { ExplorerContainer, LoadingWidgetContainer } from "./styled"
 import TopicExplorer from "./TopicExplorer"
@@ -125,8 +124,8 @@ export default class ExplorerSection extends React.Component {
 
     return (
       <Card>
-        <Tabs animated={false}>
-          <TabPane tab="Entity Explorer" key="1">
+        <Tabs animated={false} defaultActiveKey="1">
+          <TabPane tab="Entity Explorer" key="1" id="entity-explorer-tab">
             <Input
               prefix={<Icon type="search" />}
               style={{marginBottom: 8}}
@@ -143,7 +142,7 @@ export default class ExplorerSection extends React.Component {
               { maybeExplorer }
             </ExplorerContainer>
           </TabPane>
-          <TabPane tab="Topic Explorer" key="2">
+          <TabPane tab="Topic Explorer" key="2" id="topic-explorer-tab">
             <TopicExplorer />
           </TabPane>
         </Tabs>
