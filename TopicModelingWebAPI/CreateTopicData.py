@@ -44,8 +44,8 @@ class CreateTopicData:
         current_topic_size = 0
 
         # Load the topic data file if it exists
-        if os.path.isfile('./TopicData/topic_data.json'):
-            with open('./TopicData/topic_data.json', 'r') as f:
+        if os.path.isfile('./state/TopicData/topic_data.json'):
+            with open('./state/TopicData/topic_data.json', 'r') as f:
                 self.topic_data = json.load(f)
 
             # Get current model data
@@ -112,7 +112,7 @@ class CreateTopicData:
 
             print('Saving topic_data.json')
 
-            with open('./TopicData/topic_data.json', 'w') as f:
+            with open('./state/TopicData/topic_data.json', 'w') as f:
                 json.dump(self.topic_data, f)
 
             topics_changed = True
@@ -132,7 +132,7 @@ class CreateTopicData:
 
         print('Saving topic_data.json')
 
-        with open('./TopicData/topic_data.json', 'w') as f:
+        with open('./state/TopicData/topic_data.json', 'w') as f:
             json.dump(self.topic_data, f)
 
     def createWordCloudForTopic(self, topicNumber):
@@ -153,7 +153,7 @@ class CreateTopicData:
         plt.axis("off")
 
         # Save the image to a temp folder to be sent by Flask
-        filePath = os.path.join('./Temp', 'wordcloud.png')
+        filePath = os.path.join('./state/Temp', 'wordcloud.png')
         plt.savefig(filePath)
         plt.close(fig)
 

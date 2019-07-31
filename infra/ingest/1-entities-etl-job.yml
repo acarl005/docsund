@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: entities-etl
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: docsund-etl
+          image: acarl005/docsund-etl:0.1.5
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: secret_access_key
+            - name: AWS_S3_CSV_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: s3_csv_path
+          resources:
+            requests:
+              cpu: 6
+              memory: 8Gi
+            limits:
+              cpu: 8
+          volumeMounts:
+            - name: neo4j-data-volume
+              mountPath: /data
+            - name: neo4j-plugin-volume
+              mountPath: /plugins
+      volumes:
+        - name: neo4j-data-volume
+          persistentVolumeClaim:
+            claimName: neo4j-data-volume-claim
+        - name: neo4j-plugin-volume
+          persistentVolumeClaim:
+            claimName: neo4j-plugin-volume-claim

@@ -130,7 +130,7 @@ class createModelThread(threading.Thread):
         self.tm.sub_df['topic'] = topicSeries
 
         # Write the data frame (with topic assignment) to disk so it can be read when the user switches the number of topics
-        self.tm.sub_df.to_csv('./TopicData/topic_{0}.csv'.format(self.tm.numberOfTopics), index=False)
+        self.tm.sub_df.to_csv('./state/TopicData/topic_{0}.csv'.format(self.tm.numberOfTopics), index=False)
 
         self.tm.modelBuilt = True
 
@@ -139,7 +139,7 @@ class createModelThread(threading.Thread):
 
     def createStopWordList(self, df):
 
-        stop_words_path = './TopicData/stopwords.json'
+        stop_words_path = './state/TopicData/stopwords.json'
 
         # Read stop words from a file if it already exists
         if os.path.isfile(stop_words_path):
@@ -192,7 +192,7 @@ class createModelThread(threading.Thread):
         global optimum_sample_size
 
         # Load the entire email corpus
-        emails_df = pd.read_csv('email_data.csv')
+        emails_df = pd.read_csv('email_data.csv').dropna(subset=["body"])
         emails_df.columns = emails_df.columns.str.lower()
 
         # Adjust the sample size if necessary

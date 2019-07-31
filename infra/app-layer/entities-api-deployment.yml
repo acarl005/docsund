@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: docsund-entities-api
-          image: acarl005/docsund-entities-api:0.1.8
+          image: acarl005/docsund-entities-api:0.1.9
           env:
             - name: NEO4J_DATABASE_PASSWORD
               valueFrom:

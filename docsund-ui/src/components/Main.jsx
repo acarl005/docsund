@@ -14,7 +14,7 @@ import ExplorerSection from "./ExplorerSection"
 import Joyride, { ACTIONS, STATUS } from "react-joyride"
 import { TransparentButton } from "./styled"
 
-let { Header, Content } = Layout
+let { Content } = Layout
 
 Content = styled(Content)`
   @media screen and (min-width: 400px) {
@@ -115,27 +115,6 @@ export default class Main extends Component {
           showProgress={true}
           steps={joyrideSteps}
         />
-        <Header className="header">
-          <div className="logo" style={{
-            marginRight: "30px",
-            float: "left",
-            width: "40px"
-          }}>
-            <img src={ require("../../assets/logo.png") } style={{ width: "100%" }} />
-          </div>
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['3']}
-            style={{ lineHeight: '64px', marginBottom: '64px' }}
-            id="main-menu"
-          >
-            <Menu.Item key="1">Home</Menu.Item>
-            <Menu.Item key="2">About</Menu.Item>
-            <Menu.Item key="3">Enron Emails</Menu.Item>
-            <Menu.Item key="4">Sony Emails</Menu.Item>
-          </Menu>
-        </Header>
         <Content>
           <div style={{ marginBottom: "-20px", textAlign: "right" }}>
             <TransparentButton icon="question-circle" onClick={() => this.setState({ joyride: true })}>Help</TransparentButton>

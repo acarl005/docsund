@@ -32,5 +32,5 @@ ENV MALLET_HOME /app/mallet-2.0.8
 
 EXPOSE 5000 
 
-CMD ["./start-prod"]
+CMD ["python3", "TopicModelingAPI.py"]
 

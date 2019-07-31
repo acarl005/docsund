@@ -19,7 +19,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  #storageClassName: topology-aware-standard
+  storageClassName: topology-aware-standard
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -33,4 +33,18 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  #storageClassName: topology-aware-standard
+  storageClassName: topology-aware-standard
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: topics-volume-claim
+  labels:
+    app: topics-volume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: topology-aware-standard

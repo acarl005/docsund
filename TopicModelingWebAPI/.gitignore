@@ -1,4 +1,4 @@
 mallet-2.0.8*
-Temp/*.png
-TopicData/*
-!TopicData/.gitkeep
+state/Temp/*.png
+state/TopicData/*.json
+state/TopicData/*.csv

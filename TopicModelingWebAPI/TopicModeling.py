@@ -120,7 +120,7 @@ class TopicModeling:
         plt.axis("off")
 
         # Save the image to a temp folder to be sent by Flask
-        filePath = os.path.join('./Temp', 'wordcloud.png')
+        filePath = os.path.join('./state/Temp', 'wordcloud.png')
         plt.savefig(filePath)
         plt.close(fig)
 
@@ -200,7 +200,7 @@ class TopicModeling:
             plt.text(x_values[i], y_values[i], str(i+1), fontsize=9)
 
         # Save the image to a temp folder to be sent by Flask
-        filePath = os.path.join('./Temp', 'topicdistribution.png')
+        filePath = os.path.join('./state/Temp', 'topicdistribution.png')
         plt.savefig(filePath)
         plt.close(fig)
 
@@ -254,8 +254,8 @@ class TopicModeling2:
         current_topic_size = 0
 
         # Load the topic data file if it exists
-        if os.path.isfile('./TopicData/topic_data.json'):
-            with open('./TopicData/topic_data.json', 'r') as f:
+        if os.path.isfile('./state/TopicData/topic_data.json'):
+            with open('./state/TopicData/topic_data.json', 'r') as f:
                 self.topic_data = json.load(f)
         else:
             print('Failed to open topic_data.json')
@@ -290,7 +290,7 @@ class TopicModeling2:
         self.numberOfTopics = numTopics
 
         # Switch to the correct data set in order to read document IDs
-        self.sub_df = pd.read_csv('./TopicData/topic_{0}.csv'.format(numTopics))
+        self.sub_df = pd.read_csv('./state/TopicData/topic_{0}.csv'.format(numTopics))
 
         return True
 

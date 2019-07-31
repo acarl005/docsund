@@ -1,13 +1,15 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: etl
+  name: topics-etl
 spec:
   template:
     spec:
+      restartPolicy: OnFailure
       containers:
         - name: docsund-etl
-          image: acarl005/docsund-etl:0.1.5
+          image: acarl005/docsund-topics-api:0.1.4
+          command: ["./create-topic-data"]
           env:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
@@ -26,20 +28,12 @@ spec:
                   key: s3_csv_path
           resources:
             requests:
-              cpu: 3
-              memory: 4Gi
-            limits:
-              cpu: 4
+              cpu: 1
+              memory: 1Gi
           volumeMounts:
-            - name: neo4j-data-volume
-              mountPath: /data
-            - name: neo4j-plugin-volume
-              mountPath: /plugins
+            - name: topics-volume
+              mountPath: /app/state
       volumes:
-        - name: neo4j-data-volume
+        - name: topics-volume
           persistentVolumeClaim:
-            claimName: neo4j-data-volume-claim
-        - name: neo4j-plugin-volume
-          persistentVolumeClaim:
-            claimName: neo4j-plugin-volume-claim
-      restartPolicy: OnFailure
+            claimName: topics-volume-claim
