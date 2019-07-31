@@ -17,7 +17,7 @@ const CONTENT = {
   },
   neo4j: {
     imgUrl: require("../assets/neo4j-logo.png"),
-    text: "The entities and relationships extracted using spaCy are stored in a Neo4j database. Docsund's Entity Explorer is built on top of Neo4j's Browser tool.",
+    text: "The entities and relationships extracted using spaCy are stored in a Neo4j database. Its graph data model makes it ideal for Docsund's entity graph. It also has plugins for algorithms like PageRank to help us find important entities. Docsund's entity explorer component is forked from the official, open-source Neo4j web client."
   },
   gensim: {
     imgUrl: require("../assets/gensim-logo.png"),
@@ -25,15 +25,15 @@ const CONTENT = {
   },
   elasticsearch: {
     imgUrl: require("../assets/elasticsearch-logo.png"),
-    text: 'TODO: write about Elasticsearch.',
+    text: "Elasticsearch powers the email search feature. Answering unstructured queries in sub-second response times is a crucial part of the exploration experience. Elasticsearch's design allows it to search millions of documents quickly and effectively.",
   },
   reactjs: {
     imgUrl: require("../assets/react-logo.png"),
-    text: 'TODO: write about React.',
+    text: "React is Facebook's JavaScript library for building dynamic user interfaces with a reactive functional programming paradigm. It allows us to build fast, reponsive web pages for seamless data exploration.",
   },
   kubernetes: {
     imgUrl: require("../assets/kubernetes-logo.png"),
-    text: 'TODO: write about Kubernetes.',
+    text: ["Docsund's compute cluster is deployed via Kubernetes. Each of the individual jobs and services are containerized with Docker. This not only streamlines the deployment for us, it facilitates the distribution of the software to users so that they can easily host it on their own cluster. See intructions for deploying your own Docsund cluster ", <a href="https://github.com/acarl005/docsund/blob/master/infra/README.md" target="_blank">here.</a>],
   },
 }
 

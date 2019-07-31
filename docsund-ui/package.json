@@ -8,8 +8,10 @@
   "scripts": {
     "start": "node --experimental-modules server.mjs",
     "dev": "parcel src/index.html",
-    "landing": "parcel ant-landing/index.html",
     "build": "rm -rf dist && API_URL=/api TOPIC_API_URL=/topic-api parcel build src/index.html",
+    "landing-dev": "parcel ant-landing/index.html",
+    "landing-build": "rm -rf dist && parcel build ant-landing/index.html",
+    "landing-deploy": "npm run landing-build && for f in dist/*; do aws s3 cp $f s3://docsund-public-assets; done",
     "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

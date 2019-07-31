@@ -32,7 +32,7 @@ class Content3 extends React.PureComponent {
           animation={liAnim}
           key={item.name}
           {...item}
-          componentProps={{ md: item.md, xs: item.xs }}
+          componentProps={{ xxl: item.xxl, xl: item.xl, lg: item.lg, md: item.md, sm: item.sm, xs: item.xs }}
           className={
             !clearFloatNum
               ? `${item.className || ''} clear-both`.trim()

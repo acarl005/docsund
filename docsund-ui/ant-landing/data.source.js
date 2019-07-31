@@ -1,6 +1,15 @@
 import React from 'react'
-import { Avatar, Col, Icon, Menu } from 'antd'
+import { Col, Icon, Menu } from 'antd'
 import { TechnologySection } from './TechnologySection'
+
+const iframeProps = {
+  frameBorder: 0,
+  style: {
+    width: "100%",
+    height: "100vh",
+    marginTop: "48px"
+  }
+}
 
 export const Nav00DataSource = {
   wrapper: { className: 'header0 home-page-wrapper' },
@@ -12,11 +21,26 @@ export const Nav00DataSource = {
   Menu: {
     className: 'header0-menu',
     children: [
-      { name: 'item0', a: { children: 'Home', href: '' } },
-      { name: 'item1', a: { children: 'Enron Emails', href: '' } },
-      { name: 'item2', a: { children: 'Sony Emails', href: '' } },
-      { name: 'item3', a: { children: 'DNC Emails', href: '' } },
-      { name: 'item4', a: { children: 'Clinton Emails', href: '' } },
+      {
+        path: "/enron",
+        display: "Enron Emails",
+        component: () => <iframe src="http://enron.docsund.info" {...iframeProps}></iframe>
+      },
+      {
+        path: "/clinton",
+        display: "Clinton Emails",
+        component: () => <iframe src="http://clinton.docsund.info" {...iframeProps}></iframe>
+      },
+      {
+        path: "/dnc",
+        display: "DNC Emails",
+        component: () => <iframe src="http://dnc.docsund.info" {...iframeProps}></iframe>
+      },
+      {
+        path: "/sony",
+        display: "Sony Emails",
+        component: () => <iframe src="http://sony.docsund.info" {...iframeProps}></iframe>
+      }
     ],
   },
   mobileMenu: { className: 'header0-mobile-menu' },
@@ -39,13 +63,8 @@ export const Banner01DataSource = {
     children: 'Docsund uses modern technology to allow journalists and researchers to quickly find important stories within large collections of unstructured documents.',
   },
   button: {
-    onClick: () => {
-      const a = document.createElement('a')
-      a.href = 'http://enron.docsund.info'
-      a.target = 'blank'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+    onClick: (e, history) => {
+      history.push("/enron")
     },
     className: 'banner0-button',
     children: (
@@ -207,6 +226,7 @@ export const Content30DataSource = {
         name: 'block0',
         className: 'content3-block',
         md: 6,
+        sm: 12,
         xs: 24,
         children: {
           icon: {
@@ -228,6 +248,7 @@ export const Content30DataSource = {
         name: 'block1',
         className: 'content3-block',
         md: 6,
+        sm: 12,
         xs: 24,
         children: {
           icon: {
@@ -249,6 +270,7 @@ export const Content30DataSource = {
         name: 'block2',
         className: 'content3-block',
         md: 6,
+        sm: 12,
         xs: 24,
         children: {
           icon: {
@@ -277,6 +299,7 @@ export const Content30DataSource = {
         name: 'block3',
         className: 'content3-block',
         md: 6,
+        sm: 12,
         xs: 24,
         children: {
           icon: {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Icon } from 'antd';
 import QueueAnim from 'rc-queue-anim';
 import TweenOne from 'rc-tween-one';
+import { withRouter } from 'react-router-dom';
 import { isImg } from './utils';
 
 function Line(props) {
@@ -9,7 +10,7 @@ function Line(props) {
 }
 
 function Document(props) {
-  const numLines = 5 + Math.floor(Math.random() * 5)
+  const numLines = 5 + Math.floor(Math.random() * 4)
   const lines = Array(numLines).fill(null).map((_, i) => {
     const style = {
       width: `${60 + Math.random() * 40}%`
@@ -37,6 +38,12 @@ class Banner extends React.PureComponent {
       return <Document style={style} key={i} />
     })
 
+    let RoutableButton = withRouter(({ history }) => (
+      <Button ghost key="button" {...dataSource.button} onClick={e =>dataSource.button.onClick(e, history)}>
+        {dataSource.button.children}
+      </Button>
+    ))
+
     return <div className="hero">
       {documents}
       <div {...currentProps} {...dataSource.wrapper} id="title">
@@ -46,6 +53,7 @@ class Banner extends React.PureComponent {
             An interactive application for journalists to explore large collections of
             emails to quickly find important stories.
           </h3>
+          <RoutableButton />
         </div>
       </div>
       <div id="screen"></div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import TweenOne from 'rc-tween-one';
 import { Menu } from 'antd';
+import { Link } from "react-router-dom";
 
 const Item = Menu.Item;
 
@@ -13,13 +14,6 @@ class Header extends React.Component {
     };
     this.menu = React.createRef();
   }
-
-  /*
-  componentDidMount() {
-    // 如果是 react 16.3 以下版本请使用 findDOMNode;
-    this.menuDom = findDOMNode(this.menu);
-  }
-  */
 
   phoneClick = () => {
     const phoneOpen = !this.state.phoneOpen;
@@ -36,17 +30,16 @@ class Header extends React.Component {
     delete props.isMobile;
     const { menuHeight, phoneOpen } = this.state;
     const navData = dataSource.Menu.children;
-    const navChildren = Object.keys(navData).map((key, i) => (
-      <Item key={i.toString()} {...navData[key]}>
-        <a
-          {...navData[key].a}
-          href={navData[key].a.href}
-          target={navData[key].a.target}
-        >
-          {navData[key].a.children}
-        </a>
-      </Item>
-    ));
+    const navChildren = [
+      <Item key="-1">
+        <Link to="/">Home</Link>
+      </Item>,
+      ...Object.keys(navData).map((key, i) => (
+        <Item key={i.toString()}>
+          <Link to={navData[key].path}>{navData[key].display}</Link>
+        </Item>
+      ))
+    ];
     return (
       <TweenOne
         component="header"
@@ -84,7 +77,7 @@ class Header extends React.Component {
           >
             <Menu
               mode={isMobile ? 'inline' : 'horizontal'}
-              defaultSelectedKeys={['0']}
+              defaultSelectedKeys={[navData.findIndex(item => item.path === location.pathname).toString()]}
               theme={isMobile ? 'dark' : 'default'}
             >
               {navChildren}
