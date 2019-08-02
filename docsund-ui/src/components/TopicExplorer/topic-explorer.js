@@ -127,7 +127,7 @@ export const topicExplorer = {
             // Add your code below this line
             .text(d => d.topic)
             .attr("text-anchor", "middle")
-            .attr("font-family", "sans-serif")
+            .attr("font-family", "Light Sans Regular")
             .attr("font-size", "10px")
             .attr("x", d => d.x)
             .attr("y",  d => d.y);
