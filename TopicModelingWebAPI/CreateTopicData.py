@@ -145,10 +145,10 @@ class CreateTopicData:
 
         # Generate a word cloud image
         wordFreqDict = dict(word_frequencies)
-        wordcloud = WordCloud().fit_words(wordFreqDict)
+        wordcloud = WordCloud(width=600, height=600).fit_words(wordFreqDict)
         wordcloud.background_color = 'white'
 
-        fig = plt.figure(figsize=(10,8))
+        fig = plt.figure(figsize=(6,6))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
 
