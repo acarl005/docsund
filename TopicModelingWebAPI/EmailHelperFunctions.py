@@ -7,6 +7,8 @@ from nltk.stem.wordnet import WordNetLemmatizer
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+# Max word length
+max_word_length = 20
 
 def get_text_from_email(msg):
     '''To get the content from email objects'''
@@ -34,6 +36,9 @@ def clean_email(text, userStopList):
 
     exclude = set(string.punctuation) 
     lemma = WordNetLemmatizer()
+
+    # Remove long words - these are most likely base64 strings
+    text = ' '.join([word for word in text.split() if (len(word) <= max_word_length)])
 
     text=text.rstrip()
     text = re.sub(r'[^a-zA-Z]', ' ', text)
