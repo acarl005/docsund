@@ -373,7 +373,6 @@ def neo4j_search_emails():
 @app.route("/nodes/central", methods=["GET"])
 @cross_origin()
 def central_nodes():
-    limit = request.args.get("limit", type=int, default=3)
     with driver.session() as sesh:
         centrality_query = """
         CALL algo.pageRank.stream('Person', 'EMAILS_TO', {iterations:20, dampingFactor:0.85})
@@ -381,23 +380,22 @@ def central_nodes():
 
         RETURN algo.asNode(nodeId) AS person, score
         ORDER BY score DESC
-        LIMIT 1
+        LIMIT 3
         """
-        result = sesh.run(centrality_query, limit=limit).single()[0]
-        center = neo4j_node_to_dict(result)
-        neighbours_query = """
-        MATCH (center:Person)-[e:EMAILS_TO]-(neighbour:Person)
-        WHERE ID(center) = $center_id
-        RETURN neighbour, e
-        ORDER BY e.count DESC
-        LIMIT $limit
-        """
-        results = sesh.run(neighbours_query, center_id=center["id"], limit=limit).values()
-    nodes = [center]
-    relationships = []
-    for record in results:
-        nodes.append(neo4j_node_to_dict(record[0]))
-        relationships.append(neo4j_edge_to_dict(record[1]))
+        nodes = [neo4j_node_to_dict(result[0]) for result in sesh.run(centrality_query).values()]
+        relationships = []
+        for center in [*nodes]:
+            neighbours_query = """
+            MATCH (center:Person)-[e:EMAILS_TO]-(neighbour:Person)
+            WHERE ID(center) = $center_id
+            RETURN neighbour, e
+            ORDER BY e.count DESC
+            LIMIT 3
+            """
+            results = sesh.run(neighbours_query, center_id=center["id"]).values()
+            for record in results:
+                nodes.append(neo4j_node_to_dict(record[0]))
+                relationships.append(neo4j_edge_to_dict(record[1]))
     return jsonify(nodes=nodes, relationships=relationships)
 
 
