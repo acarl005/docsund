@@ -77,7 +77,7 @@ class AppStore {
       }
       this.initialRelationships = relationships
       this.initialNodes = nodes
-    })
+    }, 'entitiesLoading')
   }
 
   @action
