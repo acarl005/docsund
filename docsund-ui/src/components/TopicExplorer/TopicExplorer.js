@@ -12,7 +12,6 @@ export default class TopicExplorer extends Component {
 
   state = {
     loading: false,
-    docIDs: [],
     numTopics: 10,
     selectedTopic: null
   }
@@ -63,7 +62,6 @@ export default class TopicExplorer extends Component {
     const data = await fetchJSON(`${TOPIC_API_URL}/TM/topics/${this.state.selectedTopic}/documents`)
 
     const { docIDs } = data
-    this.setState({ docIDs });
     await appStore.fetchEmailsFromIDs(docIDs, 500);
     appStore.toggleModal('topicSample');
     appStore.setEmailModalView('list')

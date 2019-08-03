@@ -77,7 +77,7 @@ class AppStore {
       }
       this.initialRelationships = relationships
       this.initialNodes = nodes
-    })
+    }, 'entitiesLoading')
   }
 
   @action
@@ -185,8 +185,17 @@ class AppStore {
   // TODO hook this up!
   @action
   async fetchEmailsFromIDs(ids, sample) {
-    const response = await fetchJSON(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
-    this.topicEmails = response
+    const sampledIds = ids.slice(0, sample)
+    const response = await fetchJSON(`${API_URL}/emails?email_ids=${sampledIds.join(",")}`)
+    const emailOrderMap = {}
+    for (let [i, id] of ids.entries()) {
+      emailOrderMap[id] = i
+    }
+    const topicEmails = new Array(sampledIds.length)
+    for (let email of response) {
+      topicEmails[emailOrderMap[email.properties.emailId]] = email
+    }
+    this.topicEmails = topicEmails
   }
 
   @action setEmailModalView(view) {

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: docsund-ui
-          image: acarl005/docsund-ui:0.1.11
+          image: acarl005/docsund-ui:0.1.12
           ports:
             - containerPort: 1234
       nodeSelector:

@@ -115,15 +115,22 @@ class createModelThread(threading.Thread):
         #
         topic_token_count = [0 for i in range(0,self.tm.numberOfTopics)]
         topicSeries = []
+        probabilitySeries = []
 
         # Note: Must use len(text_clean) because len(text_clean) <= sample_size because some documents may have been removed (e.g. were HTML)
         for i in range(0,len(self.tm.text_clean)):
-            assignedTopic = self.assigned_topic(self.get_candidate_topics(i))
+            assignedTopic, topicProbability = self.assigned_topic(self.get_candidate_topics(i))
             topic_token_count[assignedTopic] += len(self.tm.text_term_matrix[i])
             topicSeries.append(assignedTopic)
+            probabilitySeries.append(topicProbability)
 
         self.tm.token_count_proportions = np.array(topic_token_count) / sum(topic_token_count)
         self.tm.sub_df['topic'] = topicSeries
+        self.tm.sub_df['probability'] = probabilitySeries
+
+        # Sort by probability
+        self.tm.sub_df.sort_values(by=['probability'], ascending=False, inplace=True)
+        self.tm.sub_df.drop(columns=['probability'], inplace=True)
 
         # Write the data frame (with topic assignment) to disk so it can be read when the user switches the number of topics
         self.tm.sub_df.to_csv('./state/TopicData/topic_{0}.csv'.format(self.tm.numberOfTopics), index=False)
@@ -273,7 +280,7 @@ class createModelThread(threading.Thread):
         for topic in candidateTopics:
             if topic[1] > largest[1]:
                 largest = topic
-        return largest[0]
+        return largest
 
     def get_candidate_topics(self, index):
         return self.tm.ldamodel.get_document_topics(self.tm.text_term_matrix[index])

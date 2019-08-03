@@ -32,6 +32,7 @@
     "d3": "^3.5.17",
     "d3v5": "npm:d3@5.9.7",
     "deepmerge": "^3.2.0",
+    "enquire-js": "^0.2.1",
     "eslint": "^6.0.1",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-plugin-import": "^2.18.0",
@@ -42,6 +43,9 @@
     "mobx-react": "^6.1.1",
     "moment": "^2.24.0",
     "parcel": "^1.12.3",
+    "rc-queue-anim": "^1.6.12",
+    "rc-scroll-anim": "^2.5.9",
+    "rc-tween-one": "^2.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-joyride": "^2.1.1",
@@ -50,12 +54,7 @@
     "styled-components": "^4.2.0"
   },
   "dependencies": {
-    "d3-selection": "^1.4.0",
-    "enquire-js": "^0.2.1",
     "express": "^4.17.1",
-    "http-proxy-middleware": "^0.19.1",
-    "rc-queue-anim": "^1.6.12",
-    "rc-scroll-anim": "^2.5.9",
-    "rc-tween-one": "^2.4.1"
+    "http-proxy-middleware": "^0.19.1"
   }
 }
