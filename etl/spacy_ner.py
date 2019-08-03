@@ -19,7 +19,7 @@ from sklearn.linear_model import LogisticRegression
 from collections import Counter
 from joblib import load
 
-#csv.field_size_limit(sys.maxsize)
+csv.field_size_limit(sys.maxsize)
 ENTITIES_OF_INTEREST = ["PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", "DATE", "TIME", "MONEY", "QUANTITY"]
 DESIRED_COLUMNS = ["body", "date", "from", "id", "subject", "to"]
 spacy_nlp = spacy.load("en_core_web_sm", disable=["parser", "textcat"])
