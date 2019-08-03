@@ -10,17 +10,16 @@ export default class TopicExplorer extends Component {
   // we hard-code the minimum number of topics, but we'll fetch the maximum from the API later...
   static minTopicNum = 3
 
-  state = {
-    loading: false,
-    numTopics: 10,
-    selectedTopic: null
-  }
-
   constructor(props) {
     super(props);
     if (TopicExplorer.maxTopicNum === undefined) {
       try {
         TopicExplorer.maxTopicNum = topicExplorer.getMaxNumTopics();
+        this.state = {
+          loading: false,
+          numTopics: topicExplorer.getOptimalNumTopics(),
+          selectedTopic: null
+        }
       } catch (err) {
         console.error(err)
         TopicExplorer.maxTopicNum = null
@@ -59,12 +58,12 @@ export default class TopicExplorer extends Component {
   }
 
   async onDisplayTopicDocuments () {
-    const data = await fetchJSON(`${TOPIC_API_URL}/TM/topics/${this.state.selectedTopic}/documents`)
+    const data = await fetchJSON(`${TOPIC_API_URL}/TM/topics/${this.state.selectedTopic}/documents?numTopics=${this.state.numTopics}`)
 
     const { docIDs } = data
-    await appStore.fetchEmailsFromIDs(docIDs, 500);
     appStore.toggleModal('topicSample');
     appStore.setEmailModalView('list')
+    await appStore.fetchEmailsFromIDs(docIDs, 250);
   }
 
   render() {
@@ -92,7 +91,7 @@ export default class TopicExplorer extends Component {
           <div style={{ display: "inline-block", width: "calc(100% - 100px)" }}>
             <Slider
               id="topic-num-slider"
-              defaultValue={10}
+              defaultValue={this.state.numTopics}
               tooltipVisible
               onAfterChange={this.onTopicNumberChange.bind(this)}
               min={TopicExplorer.minTopicNum}

@@ -57,6 +57,7 @@ def GetNumberOfTopics():
 @app.route("/TM/topics/<int:num_topics>", methods=["POST"])
 @cross_origin()
 def SetNumberOfTopics(num_topics):
+    raise Exception("route retired")
     success = tm.setNumberOfTopics(num_topics)
     if not success:
         return json_response({}, 400)
@@ -78,7 +79,8 @@ def SetStopWords():
 @app.route("/TM/topics/<int:topic_id>", methods=["GET"])
 @cross_origin()
 def GetWordCloudForTopic(topic_id):
-    numTopics = request.args.get("numTopics", type=int, default=10)
+    numTopics = request.args.get("numTopics", type=int)
+    assert numTopics is not None
 
     result, encodedImage = tm.getWordCloudForTopic(numTopics, topic_id)
 
@@ -117,7 +119,8 @@ def GetTopicDistribution():
 @app.route("/TM/topicdistributiondata", methods=["GET"])
 @cross_origin()
 def GetTopicDistributionData():
-    numTopics = request.args.get("numTopics", type=int, default=10)
+    numTopics = request.args.get("numTopics", type=int)
+    assert numTopics is not None
     result, imageData = tm.getTopicDistributionData(numTopics)
 
     if not result:
@@ -129,7 +132,8 @@ def GetTopicDistributionData():
 @app.route("/TM/topics/<int:topic_id>/documents", methods=["GET"])
 @cross_origin()
 def GetDocIDsForTopic(topic_id):
-    numTopics = request.args.get("numTopics", type=int, default=10)
+    numTopics = request.args.get("numTopics", type=int)
+    assert numTopics is not None
     result, docIDs = tm.getDocIDsForTopic(numTopics, topic_id)
 
     if not result:
