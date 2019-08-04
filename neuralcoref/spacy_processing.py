@@ -8,10 +8,101 @@ import multiprocessing as mp
 import numpy as np
 import time
 import re
+import nltk
+from sklearn.base import BaseEstimator, TransformerMixin
+from scipy.sparse import csr_matrix
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score
+from collections import Counter
+from joblib import load
 
 ENTITIES_OF_INTEREST = ['PERSON', 'NORP', 'FAC', 'ORG', 'GPE', 'LOC', 'PRODUCT', 'EVENT', 'WORK_OF_ART', 'LAW',
                         'LANGUAGE', 'DATE', 'TIME', 'PERCENT', 'MONEY', 'QUANTITY', 'ORDINAL', 'CARDINAL']
 NLP = spacy.load('en_core_web_sm', disable=['parser', 'textcat'])
+LOG_CLF = load('spam_detector.joblib')
+
+class EmailToWords(BaseEstimator, TransformerMixin):
+    def __init__(self, stripHeaders=True, lowercaseConversion=True, punctuationRemoval=True,
+                 urlReplacement=True, numberReplacement=True, stemming=True):
+        self.stripHeaders = stripHeaders
+        self.lowercaseConversion = lowercaseConversion
+        self.punctuationRemoval = punctuationRemoval
+        self.urlReplacement = urlReplacement
+        self.numberReplacement = numberReplacement
+        self.stemming = stemming
+        self.stemmer = nltk.PorterStemmer()
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None):
+        X_to_words = []
+        for text in X:
+            if text is None:
+                text = 'empty'
+            if self.lowercaseConversion:
+                text = text.lower()
+
+            if self.punctuationRemoval:
+                text = text.replace('.', '')
+                text = text.replace(',', '')
+                text = text.replace('!', '')
+                text = text.replace('?', '')
+
+            word_counts = Counter(text.split())
+            if self.stemming:
+                stemmed_word_count = Counter()
+                for word, count in word_counts.items():
+                    stemmed_word = self.stemmer.stem(word)
+                    stemmed_word_count[stemmed_word] += count
+                word_counts = stemmed_word_count
+            X_to_words.append(word_counts)
+        return np.array(X_to_words)
+
+
+class WordCountToVector(BaseEstimator, TransformerMixin):
+    def __init__(self, vocabulary_size=1000):
+        self.vocabulary_size = vocabulary_size
+
+    def fit(self, X, y=None):
+        total_word_count = Counter()
+        for word_count in X:
+            for word, count in word_count.items():
+                total_word_count[word] += min(count, 10)
+        self.most_common = total_word_count.most_common()[:self.vocabulary_size]
+        self.vocabulary_ = {word: index + 1 for index, (word, count) in enumerate(self.most_common)}
+        return self
+
+    def transform(self, X, y=None):
+        rows = []
+        cols = []
+        data = []
+        for row, word_count in enumerate(X):
+            for word, count in word_count.items():
+                rows.append(row)
+                cols.append(self.vocabulary_.get(word, 0))
+                data.append(count)
+        return csr_matrix((data, (rows, cols)), shape=(len(X), self.vocabulary_size + 1))
+
+def apply_model(df, email_pipeline, filter_spam=True, log_clf=LOG_CLF):
+    X_ = np.array(df.body)
+    X_augmented_ = email_pipeline.fit_transform(X_)
+
+    y_pred_ = log_clf.predict(X_augmented_)
+    y_proba_ = log_clf.predict_proba(X_augmented_)
+
+    final_df = pd.concat([df.reset_index(drop=True),
+                          pd.Series(y_pred_, name='prediction'),
+                          pd.DataFrame(y_proba_, columns=log_clf.classes_.tolist())],
+                         axis=1, sort=False)
+
+    if filter_spam:
+        final_df = final_df.loc[final_df['prediction'] == 'ham']
+        final_df = final_df.drop(columns=['prediction', 'ham', 'spam'])
+
+    return final_df
 
 
 def load_data(data="enron.csv", nrows=5000, skiprows=0):
@@ -94,8 +185,15 @@ def process_emails(df, nlp=NLP, entity_list=ENTITIES_OF_INTEREST):
 
 def main(neuralcoref=False, nrows=5000):
     start_time = time.time()
+
+    email_pipeline = Pipeline([
+        ("Email to Words", EmailToWords()),
+        ("Wordcount to Vector", WordCountToVector()),
+    ])
+
     base_df = load_data(nrows=nrows)
-    processed_df = parallelize_df(base_df, process_emails)
+    filtered_df = apply_model(base_df, email_pipeline)
+    processed_df = parallelize_df(filtered_df, process_emails)
     if neuralcoref:
         parallelize_df(processed_df, process_neuralcoref, True, 'processed_emails.pkl')
     else:
