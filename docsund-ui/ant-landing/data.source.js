@@ -7,7 +7,6 @@ const iframeProps = {
   style: {
     width: "100%",
     height: "100vh",
-    marginTop: "48px"
   }
 }
 
@@ -142,7 +141,7 @@ export const Content01DataSource = {
   },
 };
 export const Content02DataSource = {
-  wrapper: { className: 'home-page-wrapper content00-wrapper' },
+  wrapper: { className: 'home-page-wrapper content02-wrapper' },
   page: { className: 'home-page content00' },
   OverPack: { playScale: 0.3, className: '' },
   titleWrapper: {
@@ -182,16 +181,28 @@ export const DemosDataSource = {
           content: {
             children: <div style={{ textAlign: "center" }}>
               <Col md={8} xs={24}>
-                <h4>Demo: Search</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                <h4>Demo: Entity Explorer</h4>
+                <div style={{ padding: "0 8px" }}>
+                  <div className="vid-container">
+                    <iframe src="https://www.youtube.com/embed/OYIVy6CQeys" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                  </div>
+                </div>
               </Col>
               <Col md={8} xs={24}>
-                <h4>Demo: Entity Explorer</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                <h4>Demo: Search</h4>
+                <div style={{ padding: "0 8px" }}>
+                  <div className="vid-container">
+                    <iframe src="https://www.youtube.com/embed/TxZVmN-LC2M" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                  </div>
+                </div>
               </Col>
               <Col md={8} xs={24}>
                 <h4>Demo: Topic Explorer</h4>
-                <iframe src="https://www.youtube.com/embed/bxi0sfYbXAs" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                <div style={{ padding: "0 8px" }}>
+                  <div className="vid-container">
+                    <iframe src="https://www.youtube.com/embed/Id9xXILpht0" frameBorder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                  </div>
+                </div>
               </Col>
             </div>
           },
@@ -310,7 +321,7 @@ export const Content30DataSource = {
           title: { className: 'content3-title', children: 'Matthew Prout' },
           content: {
             className: 'content3-content',
-            children: <a href='https://www.linkedin.com/in/matthew-prout-732871/' _target='blank'>
+            children: <a href='https://www.linkedin.com/in/matthew-prout/' _target='blank'>
               <Icon type='linkedin' style={{paddingRight: 4}}/>
               Linkedin
             </a>
@@ -325,18 +336,47 @@ export const Footer10DataSource = {
   OverPack: { className: 'footer1', playScale: 0.2 },
   block: {
     className: 'home-page',
-    children: []
+    children: [
+      {
+        name: 'block0',
+        xs: 24,
+        md: 24,
+        className: 'block',
+        title: {
+          className: 'logo',
+          children: <>
+            <Icon type="file-text" />
+            License
+          </>
+        },
+        content: {
+          className: 'license',
+          children: <p>
+            Docsund is free software: you can redistribute it and/or modify
+            it under the terms of the GNU General Public License as published by
+            the Free Software Foundation, either version 3 of the License, or
+            (at your option) any later version.
+           
+            This program is distributed in the hope that it will be useful,
+            but WITHOUT ANY WARRANTY; without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+            GNU General Public License for more details.
+           
+            For more details, see <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">here</a>.
+          </p>
+,
+        },
+      }
+    ]
   },
   copyrightWrapper: { className: 'copyright-wrapper' },
   copyrightPage: { className: 'home-page' },
   copyright: {
     className: 'copyright',
-    children: (
-      <>
-        <span>
-          ©2019 by Team Docsund all rights reserved.
-        </span>
-      </>
-    ),
+    children: <>
+      <p>
+        ©2019 by Team Docsund all rights reserved. Created for the final Capstone Project.
+      </p>
+    </>
   },
 };
