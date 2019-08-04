@@ -151,6 +151,9 @@ class AppStore {
     return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails/${email.id}/entities`)
       this.initialRelationships = []
+      for (let node of response) {
+        computeNodeScaleFactor(node)
+      }
       this.initialNodes = response
       this.entitySearchQuery = `explore-${email.id}`
     }, "entitiesLoading")

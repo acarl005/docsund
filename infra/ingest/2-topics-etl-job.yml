@@ -8,7 +8,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: docsund-etl
-          image: acarl005/docsund-topics-api:0.1.4
+          image: acarl005/docsund-topics-api:0.1.6
           command: ["./create-topic-data"]
           env:
             - name: AWS_ACCESS_KEY_ID

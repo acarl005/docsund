@@ -46,5 +46,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 4Gi
   storageClassName: topology-aware-standard
