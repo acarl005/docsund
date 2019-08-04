@@ -182,13 +182,8 @@ export const topicExplorer = {
         var wordCloudImg = wordCloudSvg.select("image")
             .attr("xlink:href", "data:image/png;base64," + imageByteText);
     },
-    async getTopicsData (numTopics) {
-        await fetch(`${TOPIC_API_URL}/TM/topics/${numTopics}`, {
-            method: "POST"
-        })
-
-        const topicsData = await fetchJSON(`${TOPIC_API_URL}/TM/topicdistributiondata`)
-        return topicsData;
+    getTopicsData (numTopics) {
+        return fetchJSON(`${TOPIC_API_URL}/TM/topicdistributiondata?numTopics=${numTopics}`)
     },
 
     getMaxNumTopics() {
@@ -198,5 +193,14 @@ export const topicExplorer = {
         xhttp.send();
         var maxNumTopics = parseInt(xhttp.responseText, 10);
         return maxNumTopics;
+    },
+
+    getOptimalNumTopics() {
+        const optimalNumTopicsUrl = TOPIC_API_URL + "/TM/topics"
+        const xhttp = new XMLHttpRequest()
+        xhttp.open("GET", optimalNumTopicsUrl, false)
+        xhttp.send()
+        const resp = JSON.parse(xhttp.responseText)
+        return resp.numberOfTopics
     }
 };

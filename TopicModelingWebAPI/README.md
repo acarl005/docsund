@@ -84,23 +84,21 @@ Example:<br>
 
 The API should be callable using REST calls from the website.
 
-**Set the number of topics manually**<br>
-POST	/TM/topics/\<num topics\>
-
-**Determine the number of topics. By default, the number of topics is the optimal number of topics for that model.**<br>
+**Determine the optimal number of topics.**<br>
 GET	/TM/topics<br>
 
 **Get a word cloud for a topic**<br>
-GET	/TM/topics/\<id\>
-
-**Get top n word probabilities for a topic**<br>
-GET	/TM/topics/\<id\>/words
+GET	/TM/topics/\<id\>?numTopics=\<model size\><br>
 
 **Get a visualization of the topic distribution data. Returns a JSON array of data points representing the topic distribution.**<br>
-GET	/TM/topicdistributiondata<br>
+GET	/TM/topicdistributiondata<br>?numTopics=\<model size\><br>
 
 **Get the documents Ids for a topic. These IDs can be passed to the email viewer to display emails for a topic.**<br>
-GET	/TM/topics/\<id\>/documents
+GET	/TM/topics/\<id\>/documents?numTopics=\<model size\><br>
 
 Example:<br>
-/TM/topics/0/documents
+/TM/topics/0/documents<br>
+
+**Get the number of models.**<br>
+GET	/TM/nummodels<br>
+

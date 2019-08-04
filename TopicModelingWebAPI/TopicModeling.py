@@ -245,13 +245,9 @@ class TopicModeling:
 class TopicModeling2:
     def __init__(self):
         self.documentType = DocumentTypeEnum.emailType		# TODO: Email processing by default
-        self.sub_df = None
-        self.numberOfTopics = 0
+        self.optimalNumberOfTopics = 0
         self.topic_data = {}
         self.dataLoaded = False
-
-        # Determine the number of topics to calculate
-        current_topic_size = 0
 
         # Load the topic data file if it exists
         if os.path.isfile('./state/TopicData/topic_data.json'):
@@ -262,16 +258,12 @@ class TopicModeling2:
             return
 
         # Set the number of topics to the optimum number by default
-        self.numberOfTopics = int(self.topic_data['optimalnumber'])
+        self.optimalNumberOfTopics = int(self.topic_data['optimalnumber'])
         self.dataLoaded = True
 
     def startBuildingModel(self):
         print('startBuildingModel')
-
-        if not self.dataLoaded:
-            return False
-
-        return True
+        return False
 
     def getNumberOfTopics(self):
         print('getNumberOfToipcs')
@@ -279,40 +271,31 @@ class TopicModeling2:
         if not self.dataLoaded:
             return False, 0
 
-        return True, self.numberOfTopics
+        return True, self.optimalNumberOfTopics
 
     def setNumberOfTopics(self, numTopics):
         print('setNumberOfTopics')
-
-        if not self.dataLoaded:
-            return False
-
-        self.numberOfTopics = numTopics
-
-        # Switch to the correct data set in order to read document IDs
-        self.sub_df = pd.read_csv('./state/TopicData/topic_{0}.csv'.format(numTopics))
-
-        return True
+        return False
 
     def setUserStopList(self, userStopList):
         print('setUserStopList')
-        return True
+        return False
 
     def modelBuilding(self):
         print('modelBuilding')
-        return self.dataLoaded == False
+        return False
 
     def getModelBuilt(self):
         print('getModelBuilt')
-        return self.dataLoaded
+        return False
 
-    def getWordCloudForTopic(self, topicNumber):
-        print('getWordCloudForTopic: {}'.format(topicNumber))
+    def getWordCloudForTopic(self, numTopics, topicNumber):
+        print('getWordCloudForTopic: {0}, {1}'.format(numTopics, topicNumber))
 
         if not self.dataLoaded:
             return False, ''
 
-        if (topicNumber < 0) or (topicNumber >= self.numberOfTopics):
+        if (topicNumber < 0) or (topicNumber >= numTopics):
             return False, ''
 
         # Get the models dictionary
@@ -320,7 +303,7 @@ class TopicModeling2:
 
         # Get the dictionary for topics found for the model built with
         # 'numberOfTopics'
-        topics_dict = model_dict[str(self.numberOfTopics)]
+        topics_dict = model_dict[str(numTopics)]
 
         # Get the dictionary for the chosen topic in this model
         chosen_topic_dict = topics_dict[str(topicNumber)]
@@ -335,8 +318,8 @@ class TopicModeling2:
         print('getTopicDistribution')
         return False, ''
 
-    def getTopicDistributionData(self):
-        print('getTopicDistributionData')
+    def getTopicDistributionData(self, numTopics):
+        print('getTopicDistributionData: {}'.format(numTopics))
 
         if not self.dataLoaded:
             return False, ''
@@ -345,8 +328,8 @@ class TopicModeling2:
         model_dict = self.topic_data['models']
 
         # Get the dictionary for topics found for the model built with
-        # 'numberOfTopics'
-        topics_dict = model_dict[str(self.numberOfTopics)]
+        # 'numTopics'
+        topics_dict = model_dict[str(numTopics)]
 
         # Output the data
         data = {}
@@ -355,14 +338,17 @@ class TopicModeling2:
 
         return True, data
 
-    def getDocIDsForTopic(self, topicNumber):
-        print('getDocIDsForTopic')
+    def getDocIDsForTopic(self, numTopics, topicNumber):
+        print('getDocIDsForTopic: {0}, {1}'.format(numTopics, topicNumber))
 
         if not self.dataLoaded:
             return False, []
 
+        # Load the data set to read document IDs
+        sub_df = pd.read_csv('./state/TopicData/topic_{0}.csv'.format(numTopics))
+
         # Filter by topic
-        messageIDs = self.sub_df[self.sub_df['topic'] == topicNumber]
+        messageIDs = sub_df[sub_df['topic'] == topicNumber]
 
         if self.documentType == DocumentTypeEnum.emailType:
             return True, messageIDs['id'].tolist()

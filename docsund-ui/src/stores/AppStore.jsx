@@ -31,6 +31,7 @@ class AppStore {
   @observable loadingNodeDetails = false
   @observable loadingRelationshipEmails = false
   @observable loadingEmailSearch = false
+  @observable topicSampleLoading = false
   @observable entitySearchQuery
   @observable entitiesLoading = false
   @observable initialNodes = []
@@ -66,8 +67,8 @@ class AppStore {
   }
 
   @action
-  async getCentralNodes() {
-    this.tryLoading(async () => {
+  getCentralNodes() {
+    return this.tryLoading(async () => {
       const { nodes, relationships } = await fetchJSON(`${API_URL}/nodes/central`)
       for (let node of nodes) {
         computeNodeScaleFactor(node)
@@ -81,8 +82,8 @@ class AppStore {
   }
 
   @action
-  async entitySearch(searchQuery) {
-    this.tryLoading(async () => {
+  entitySearch(searchQuery) {
+    return this.tryLoading(async () => {
       let searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
         q: searchQuery
       }))
@@ -96,8 +97,8 @@ class AppStore {
   }
 
   @action
-  async getEmailsBetween(fromNode, toNode) {
-    this.tryLoading(async () => {
+  getEmailsBetween(fromNode, toNode) {
+    return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails?between=${toNode.id},${fromNode.id}`)
       this.activeRelationship = {
         toNode,
@@ -108,8 +109,8 @@ class AppStore {
   }
 
   @action
-  async getEmailsAbout(person, entity) {
-    this.tryLoading(async () => {
+  getEmailsAbout(person, entity) {
+    return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/entities/${entity.id}/emails?person_id=${person.id}`)
       this.activeRelationship = {
         toNode: entity,
@@ -120,8 +121,8 @@ class AppStore {
   }
 
   @action
-  async getEmailsMentioning(fromNode, toNode) {
-    this.tryLoading(async () => {
+  getEmailsMentioning(fromNode, toNode) {
+    return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/entities/${toNode.id}/emails?entity_id=${fromNode.id}`)
       this.activeRelationship = {
         toNode,
@@ -132,10 +133,10 @@ class AppStore {
   }
 
   @action
-  async getNodeDetails(node) {
+  getNodeDetails(node) {
     const type = node.labels[0] == "Person" ? "person" : "entities"
     this.activeNode = null
-    this.tryLoading(async () => {
+    return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
       this.activeNode = {
         node,
@@ -150,6 +151,9 @@ class AppStore {
     return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails/${email.id}/entities`)
       this.initialRelationships = []
+      for (let node of response) {
+        computeNodeScaleFactor(node)
+      }
       this.initialNodes = response
       this.entitySearchQuery = `explore-${email.id}`
     }, "entitiesLoading")
@@ -184,9 +188,20 @@ class AppStore {
 
   // TODO hook this up!
   @action
-  async fetchEmailsFromIDs(ids, sample) {
-    const response = await fetchJSON(`${API_URL}/emails?email_ids=${ids.slice(0, sample).join(",")}`)
-    this.topicEmails = response
+  fetchEmailsFromIDs(ids, sample) {
+    const sampledIds = ids.slice(0, sample)
+    return this.tryLoading(async () => {
+      const response = await fetchJSON(`${API_URL}/emails?email_ids=${sampledIds.join(",")}`)
+      const emailOrderMap = {}
+      for (let [i, id] of ids.entries()) {
+        emailOrderMap[id] = i
+      }
+      const topicEmails = new Array(sampledIds.length)
+      for (let email of response) {
+        topicEmails[emailOrderMap[email.properties.emailId]] = email
+      }
+      this.topicEmails = topicEmails
+    }, "topicSampleLoading")
   }
 
   @action setEmailModalView(view) {
