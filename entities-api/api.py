@@ -432,9 +432,33 @@ def es_search_emails():
             "includes": ["id", "to", "from", "subject", "body", "date"]
         },
         "query": {
-            "query_string": {
-                "query": search_query
-            }
+            "bool": {
+                "should": [
+                    {
+                        "simple_query_string": {
+                            "query": search_query,
+                            "fields": ["id", "to", "from", "subject^1.5", "body", "date"],
+                            "lenient": True
+                        }
+                    },
+                    {
+                        "fuzzy": {
+                            "subject": {
+                                "value": search_query,
+                                "fuzziness": 1
+                            }
+                        }
+                    },
+                    {
+                        "fuzzy": {
+                            "body": {
+                                "value": search_query,
+                                "fuzziness": 1
+                            }
+                        }
+                    }
+                ]
+            },
         },
         "from": (page_num - 1) * page_size,
         "size": page_size,
