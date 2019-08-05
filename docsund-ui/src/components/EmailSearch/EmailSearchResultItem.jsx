@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react"
 import { StyledItem } from "./styled"
 import { LeftRightContainer } from "../styled"
 import { formatDate } from "../../utils"
@@ -6,27 +6,29 @@ import { formatDate } from "../../utils"
 
 const highlightedText = (key, val) => (
   <div
-    style={{ color: 'black', fontWeight: 'bold' }}
-    dangerouslySetInnerHTML={{ __html: `${key}: ${val.slice(0, 3).join('... ')}` }}
+    style={{ color: "black", fontWeight: "bold" }}
+    dangerouslySetInnerHTML={{ __html: `${key}: ${val.slice(0, 3).join("... ")}` }}
   />
 )
 
 const originalText = (key, val) => (
   <div
     style={{
-      width: '100%',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
+      width: "100%",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
     }}
   >
-    {key}: {val}
+    {key}
+:
+    {val}
   </div>
 )
 
 export default class EmailSearchResultItem extends React.Component {
   renderByKey(key) {
-    const { highlight, properties } = this.props;
+    const { highlight, properties } = this.props
     return key in highlight
       ? highlightedText(key, highlight[key])
       : originalText(key, properties[key])
@@ -37,8 +39,10 @@ export default class EmailSearchResultItem extends React.Component {
       <StyledItem
         onClick={() => this.props.onItemClick(this.props.id)}
       >
-        <LeftRightContainer left={this.renderByKey('from')}
-                            right={formatDate(this.props.properties.date)} />
+        <LeftRightContainer
+          left={this.renderByKey("from")}
+          right={formatDate(this.props.properties.date)}
+        />
         {this.renderByKey("to")}
         {this.renderByKey("subject")}
         {this.renderByKey("body")}

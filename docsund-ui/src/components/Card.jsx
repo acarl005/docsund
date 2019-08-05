@@ -1,5 +1,5 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from "react"
+import styled from "styled-components"
 
 const Wrapper = styled.div`
   padding: 16px;
@@ -7,12 +7,10 @@ const Wrapper = styled.div`
   background-color: white;
 `
 
-export default class Card extends React.Component {
-  render() {
-    return (
-      <Wrapper>
-        {this.props.children}
-      </Wrapper>
-    )
-  }
+export default function Card(props) {
+  return (
+    <Wrapper>
+      {props.children}
+    </Wrapper>
+  )
 }

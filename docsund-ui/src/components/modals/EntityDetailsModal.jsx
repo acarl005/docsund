@@ -1,11 +1,14 @@
 import React, { Component } from "react"
 import { observer } from "mobx-react"
-import { Skeleton, Row, Col, List, Modal, Typography, Tag } from "antd"
-const { Title } = Typography
+import {
+  Skeleton, Row, Col, List, Modal, Typography, Tag
+} from "antd"
 
 import appStore from "../../stores/AppStore"
 import { deepEquals } from "../../utils"
 import { StyledListItem } from "./styled"
+
+const { Title } = Typography
 
 @observer
 export default class EntityDetailsModal extends Component {
@@ -27,7 +30,7 @@ export default class EntityDetailsModal extends Component {
     const { activeNode } = appStore
     const { neighbours, relationships } = activeNode.details
     const relationshipMap = {}
-    for (let rel of relationships) {
+    for (const rel of relationships) {
       relationshipMap[rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId] = rel
     }
     return neighbours
@@ -46,7 +49,7 @@ export default class EntityDetailsModal extends Component {
     const { activeNode } = appStore
     const { neighbours, relationships } = activeNode.details
     const relationshipMap = {}
-    for (let rel of relationships) {
+    for (const rel of relationships) {
       relationshipMap[rel.startNodeId === activeNode.node.id ? rel.endNodeId : rel.startNodeId] = rel
     }
     return neighbours
@@ -71,21 +74,24 @@ export default class EntityDetailsModal extends Component {
         visible
         width="75%"
         title={
-          appStore.activeNode ?
-            <Tag color="blue">{appStore.activeNode.node.propertyMap.name}</Tag> :
-            "..."
+          appStore.activeNode
+            ? <Tag color="blue">{appStore.activeNode.node.propertyMap.name}</Tag>
+            : "..."
         }
         footer={null}
       >
         <Row>
           <Col span={12} style={{ paddingRight: "10px" }}>
             {appStore.loadingNodeDetails
-              ? <Skeleton
+              ? (
+                <Skeleton
                   paragraph={{ rows: 20 }}
                   loading
                   active
                 />
-              : <List
+              )
+              : (
+                <List
                   header={<Title level={4}>Mentioned by</Title>}
                   pagination={{ pageSize: 10 }}
                   dataSource={this.formattedPersonDetails()}
@@ -94,20 +100,28 @@ export default class EntityDetailsModal extends Component {
                       onClick={() => this.onPersonClick(item)}
                     >
                       <List.Item.Meta title={item.propertyMap.email} />
-                      <div>{item.count} mentions</div>
+                      <div>
+                        {item.count}
+                        {" "}
+mentions
+                      </div>
                     </StyledListItem>
                   )}
                 />
+              )
             }
           </Col>
           <Col span={12} style={{ paddingLeft: "10px" }}>
             {appStore.loadingNodeDetails
-              ? <Skeleton
+              ? (
+                <Skeleton
                   paragraph={{ rows: 20 }}
                   loading
                   active
                 />
-              : <List
+              )
+              : (
+                <List
                   header={<Title level={4}>Mentioned with</Title>}
                   pagination={{ pageSize: 10 }}
                   dataSource={this.formattedEntityDetails()}
@@ -116,10 +130,15 @@ export default class EntityDetailsModal extends Component {
                       onClick={() => this.onEntityClick(item)}
                     >
                       <List.Item.Meta title={item.propertyMap.name} />
-                      <div>{item.count} co-occurences</div>
+                      <div>
+                        {item.count}
+                        {" "}
+co-occurences
+                      </div>
                     </StyledListItem>
                   )}
                 />
+              )
             }
           </Col>
         </Row>
@@ -127,4 +146,3 @@ export default class EntityDetailsModal extends Component {
     )
   }
 }
-

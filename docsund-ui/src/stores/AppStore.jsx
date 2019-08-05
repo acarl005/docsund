@@ -2,7 +2,9 @@ import React from "react"
 import { action, computed, observable } from "mobx"
 import qs from "querystring"
 import { notification } from "antd"
-import { fetchJSON, deepEquals, computeNodeScaleFactor, computeRelationshipScaleFactor } from "../utils"
+import {
+  fetchJSON, computeNodeScaleFactor, computeRelationshipScaleFactor
+} from "../utils"
 
 
 function notifyError(err) {
@@ -17,29 +19,46 @@ class AppStore {
     relationshipEmails: false,
     topicSample: false,
     emailSearchResult: false,
-    nodeDetails: false,
+    nodeDetails: false
   }
-  @observable emailModalView = 'list'
+
+  @observable emailModalView = "list"
+
   @observable activeEmailId
+
   @observable activeRelationship
+
   @observable activeNode
+
   @observable activeSearchEmailId
+
   @observable explorerFullscreen = false
+
   @observable emailSearchQuery
+
   @observable emailSearchResults = []
+
   @observable topicEmails = []
+
   @observable loadingNodeDetails = false
+
   @observable loadingRelationshipEmails = false
+
   @observable loadingEmailSearch = false
+
   @observable topicSampleLoading = false
+
   @observable entitySearchQuery
+
   @observable entitiesLoading = false
+
   @observable initialNodes = []
+
   @observable initialRelationships = []
 
   @computed
   get activeSearchEmail() {
-    return this.emailSearchResults.hits.find((email) => email.id === this.activeSearchEmailId)
+    return this.emailSearchResults.hits.find(email => email.id === this.activeSearchEmailId)
   }
 
   async tryLoading(failureProneThing, loadingKey) {
@@ -59,7 +78,7 @@ class AppStore {
   }
 
   resetExplorer() {
-    const entitySearchQuery = this.entitySearchQuery
+    const { entitySearchQuery } = this
     this.entitySearchQuery = ""
     setTimeout(() => {
       this.entitySearchQuery = entitySearchQuery
@@ -70,24 +89,24 @@ class AppStore {
   getCentralNodes() {
     return this.tryLoading(async () => {
       const { nodes, relationships } = await fetchJSON(`${API_URL}/nodes/central`)
-      for (let node of nodes) {
+      for (const node of nodes) {
         computeNodeScaleFactor(node)
       }
-      for (let relationship of relationships) {
+      for (const relationship of relationships) {
         computeRelationshipScaleFactor(relationship)
       }
       this.initialRelationships = relationships
       this.initialNodes = nodes
-    }, 'entitiesLoading')
+    }, "entitiesLoading")
   }
 
   @action
   entitySearch(searchQuery) {
     return this.tryLoading(async () => {
-      let searchResults = await fetchJSON(`${API_URL}/search?` + qs.stringify({
+      const searchResults = await fetchJSON(`${API_URL}/search?${qs.stringify({
         q: searchQuery
-      }))
-      for (let node of searchResults) {
+      })}`)
+      for (const node of searchResults) {
         computeNodeScaleFactor(node)
       }
       this.initialRelationships = []
@@ -134,7 +153,7 @@ class AppStore {
 
   @action
   getNodeDetails(node) {
-    const type = node.labels[0] == "Person" ? "person" : "entities"
+    const type = node.labels[0] === "Person" ? "person" : "entities"
     this.activeNode = null
     return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/${type}/${node.id}/graph-neighbours`)
@@ -151,7 +170,7 @@ class AppStore {
     return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails/${email.id}/entities`)
       this.initialRelationships = []
-      for (let node of response) {
+      for (const node of response) {
         computeNodeScaleFactor(node)
       }
       this.initialNodes = response
@@ -163,14 +182,15 @@ class AppStore {
   async submitEmailSearch(searchTerm, pageSize, pageNum = 1) {
     this.emailSearchQuery = null
     this.tryLoading(async () => {
-      const response = await fetchJSON(`${API_URL}/elasticsearch?` + qs.stringify({
+      const response = await fetchJSON(`${API_URL}/elasticsearch?${qs.stringify({
         q: searchTerm,
         page_num: pageNum,
         page_size: pageSize
-      }))
+      })}`)
       this.emailSearchResults = {
         ...response,
         hits: response.hits.map(hit => ({
+          /* eslint-disable no-underscore-dangle */
           id: hit._source.id,
           highlight: hit.highlight,
           properties: {
@@ -179,6 +199,7 @@ class AppStore {
             subject: hit._source.subject,
             body: hit._source.body,
             date: hit._source.date
+          /* eslint-enable no-underscore-dangle */
           }
         }))
       }
@@ -193,11 +214,11 @@ class AppStore {
     return this.tryLoading(async () => {
       const response = await fetchJSON(`${API_URL}/emails?email_ids=${sampledIds.join(",")}`)
       const emailOrderMap = {}
-      for (let [i, id] of ids.entries()) {
+      for (const [i, id] of ids.entries()) {
         emailOrderMap[id] = i
       }
       const topicEmails = new Array(sampledIds.length)
-      for (let email of response) {
+      for (const email of response) {
         topicEmails[emailOrderMap[email.properties.emailId]] = email
       }
       this.topicEmails = topicEmails

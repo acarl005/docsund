@@ -9,6 +9,10 @@
   "env": {
     "browser": true
   },
+  "globals": {
+    "API_URL": "writable",
+    "TOPIC_API_URL": "writable"
+  },
   "rules": {
     "semi": [2, "never"],
     "quotes": [2, "double", { "avoidEscape": true }],
@@ -17,6 +21,17 @@
     "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
     "max-len": [2, { code: 200 }],
     "global-require": 0,
-    "react/jsx-closing-tag-location": 0
+    "class-methods-use-this": 0,
+    "no-return-assign": 0,
+    "no-restricted-syntax": 0,
+    "no-console": [2, { allow: ["warn", "error"] }],
+    "react/jsx-closing-tag-location": 0,
+    "react/prop-types": 0,
+    "react/destructuring-assignment": 0,
+    "react/sort-comp": 0,
+    "react/no-access-state-in-setstate": 0,
+    "react/no-danger": 0,
+    "react/no-unescaped-entities": 0,
+    "react/jsx-no-bind": 0
   }
 }

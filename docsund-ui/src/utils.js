@@ -42,6 +42,7 @@ export async function fetchJSON(...args) {
 }
 
 export function computeNodeScaleFactor(node) {
+  /* eslint-disable no-param-reassign */
   if (deepEquals(node.labels, ["Person"])) {
     const messages = node.properties.incoming + node.properties.outgoing
     if (messages <= 500) {
@@ -50,10 +51,13 @@ export function computeNodeScaleFactor(node) {
       node.scaleFactor = Math.min(1 + Math.log(messages / 500) / Math.log(7), 2.5)
     }
   }
+  /* eslint-enable no-param-reassign */
 }
 
 export function computeRelationshipScaleFactor(relationship) {
+  /* eslint-disable no-param-reassign */
   if (relationship.type === "EMAILS_TO") {
     relationship.scaleFactor = relationship.properties.count ** 0.4
   }
+  /* eslint-enable no-param-reassign */
 }

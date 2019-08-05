@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import { StyledListItem as BaseStyledListItem } from "../styled"
 
+// eslint-disable-next-line import/prefer-default-export
 export const StyledListItem = styled(BaseStyledListItem)`
   padding-left: 5px;
   padding-right: 5px;

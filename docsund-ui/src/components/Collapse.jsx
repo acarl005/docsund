@@ -1,11 +1,10 @@
-import React from 'react'
-import styled from 'styled-components'
-import { Button } from 'antd'
+import React from "react"
+import { Button } from "antd"
 
 const collapsedStyle = {
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis"
 }
 
 export default class Collapse extends React.Component {
@@ -15,11 +14,11 @@ export default class Collapse extends React.Component {
   }
 
   isEllipsisActive(e) {
-    return e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth;
+    return e.offsetHeight < e.scrollHeight || e.offsetWidth < e.scrollWidth
   }
 
   componentDidMount() {
-    this.setState({ overflowActive: this.isEllipsisActive(this.span) });
+    this.setState({ overflowActive: this.isEllipsisActive(this.span) })
   }
 
   onClick = () => {
@@ -35,13 +34,15 @@ export default class Collapse extends React.Component {
         >
           {this.props.children}
         </div>
-        {this.state.overflowActive &&
+        {this.state.overflowActive
+          && (
           <Button
-            type='link'
+            type="link"
             onClick={this.onClick}
           >
-            {this.state.collapsed ? '+ Expand' : '- Collapse'}
+            {this.state.collapsed ? "+ Expand" : "- Collapse"}
           </Button>
+          )
         }
       </div>
     )

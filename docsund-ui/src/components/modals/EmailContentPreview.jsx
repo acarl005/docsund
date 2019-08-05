@@ -1,5 +1,5 @@
-import React from 'react'
-import styled from 'styled-components'
+import React from "react"
+import styled from "styled-components"
 
 const Wrapper = styled.div`
   overflow: hidden;
@@ -20,7 +20,7 @@ export default function EmailContentPreview(props) {
   return (
     <Wrapper>
       <Subject>{props.subject}</Subject>
-      <span>{' - '}</span>
+      <span> - </span>
       <Body>{props.body}</Body>
     </Wrapper>
   )

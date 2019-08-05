@@ -249,7 +249,7 @@ export const DemosDataSource = {
     ]
   }
 }
-export const Content30DataSource = {
+export const Content03DataSource = {
   wrapper: { className: "home-page-wrapper content3-wrapper" },
   page: { className: "home-page content3" },
   OverPack: { playScale: 0.3 },
@@ -400,7 +400,10 @@ export const Footer10DataSource = {
             MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
             GNU General Public License for more details.
 
-            For more details, see <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">here</a>.
+            For more details, see
+            {" "}
+            <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">here</a>
+.
           </p>
         }
       },

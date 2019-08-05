@@ -15,11 +15,13 @@ const LeftRightWrapper = styled.div`
   width: 100%;
 `
 export function LeftRightContainer(props) {
-  return <LeftRightWrapper>
-    <Left>{props.left}</Left>
-    <Right>{props.right}</Right>
-    <ClearFloat />
-  </LeftRightWrapper>
+  return (
+    <LeftRightWrapper>
+      <Left>{props.left}</Left>
+      <Right>{props.right}</Right>
+      <ClearFloat />
+    </LeftRightWrapper>
+  )
 }
 
 export const StyledListItem = styled(List.Item)`
@@ -46,7 +48,7 @@ export const LoadingWidgetContainer = styled.div`
 `
 
 export const ExplorerContainer = styled.div`
-  ${props => props.fullscreen ? `
+  ${props => (props.fullscreen ? `
     top: 0;
     bottom: 0;
     left: 0;
@@ -56,8 +58,8 @@ export const ExplorerContainer = styled.div`
   ` : `
     height: 600px;
     position: relative;
-  `
-  }
+  `)
+}
 `
 export const TransparentButton = styled(Button)`
   background: transparent;

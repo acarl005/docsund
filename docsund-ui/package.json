@@ -12,7 +12,7 @@
     "landing-dev": "parcel ant-landing/index.html",
     "landing-build": "rm -rf dist && parcel build ant-landing/index.html",
     "landing-deploy": "npm run landing-build && for f in dist/*; do aws s3 cp $f s3://docsund.info; done",
-    "lint": "eslint src",
+    "lint": "eslint --ext .js,.jsx src ant-landing",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {

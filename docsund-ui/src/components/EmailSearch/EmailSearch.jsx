@@ -1,10 +1,12 @@
-import React from 'react'
-import { observer } from 'mobx-react'
-import { Skeleton, Icon, Input, List, Row, Col, Pagination } from 'antd'
+import React from "react"
+import { observer } from "mobx-react"
+import {
+  Skeleton, Icon, Input, List, Pagination
+} from "antd"
 
-import appStore from '../../stores/AppStore'
-import Card from '../Card'
-import EmailSearchResultItem from './EmailSearchResultItem'
+import appStore from "../../stores/AppStore"
+import Card from "../Card"
+import EmailSearchResultItem from "./EmailSearchResultItem"
 import { StyledListItem } from "../styled"
 
 const PAGE_SIZE = 5
@@ -23,10 +25,10 @@ export default class EmailSearch extends React.Component {
 
   onItemClick(id) {
     appStore.setActiveSearchEmail(id)
-    appStore.toggleModal('emailSearchResult')
+    appStore.toggleModal("emailSearchResult")
   }
 
-  onPageChange = async (pageNum, pageSize) => {
+  onPageChange = async pageNum => {
     this.setState({ pageNum })
     await appStore.submitEmailSearch(appStore.emailSearchQuery, PAGE_SIZE, pageNum)
   }
@@ -34,31 +36,35 @@ export default class EmailSearch extends React.Component {
   render() {
     let maybeContent = null
     if (appStore.emailSearchQuery) {
-      maybeContent = <>
-        <div style={{ margin: '16px 0' }}>
-          <List
-            bordered
-            dataSource={appStore.emailSearchResults.hits}
-            renderItem={item => (
-              <StyledListItem>
-                <EmailSearchResultItem
-                  id={item.id}
-                  highlight={item.highlight}
-                  properties={item.properties}
-                  onItemClick={this.onItemClick}
-                />
-              </StyledListItem>
-            )}
-          />
-        </div>
-        {/* the page window has a hard maximum at 10,000 set by elasticsearch */}
-        {appStore.emailSearchResults.hits.length > 0 ? <Pagination
-          pageSize={PAGE_SIZE}
-          current={this.state.pageNum}
-          total={Math.min(appStore.emailSearchResults.total, 10000)}
-          onChange={this.onPageChange}
-        /> : null}
-      </>
+      maybeContent = (
+        <>
+          <div style={{ margin: "16px 0" }}>
+            <List
+              bordered
+              dataSource={appStore.emailSearchResults.hits}
+              renderItem={item => (
+                <StyledListItem>
+                  <EmailSearchResultItem
+                    id={item.id}
+                    highlight={item.highlight}
+                    properties={item.properties}
+                    onItemClick={this.onItemClick}
+                  />
+                </StyledListItem>
+              )}
+            />
+          </div>
+          {/* the page window has a hard maximum at 10,000 set by elasticsearch */}
+          {appStore.emailSearchResults.hits.length > 0 ? (
+            <Pagination
+              pageSize={PAGE_SIZE}
+              current={this.state.pageNum}
+              total={Math.min(appStore.emailSearchResults.total, 10000)}
+              onChange={this.onPageChange}
+            />
+          ) : null}
+        </>
+      )
     } else if (appStore.loadingEmailSearch) {
       maybeContent = <SkeletonList />
     }
@@ -81,7 +87,7 @@ function SkeletonList() {
   return (
     <List
       dataSource={new Array(4).fill({})}
-      renderItem={item => (
+      renderItem={() => (
         <List.Item>
           <Skeleton active loading />
         </List.Item>

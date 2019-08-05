@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import styled from "styled-components"
-import qs from "querystring"
 import { observer } from "mobx-react"
-import { Layout, Tabs, Menu, Icon, Button } from "antd"
+import { Layout } from "antd"
+import Joyride, { ACTIONS, STATUS } from "react-joyride"
 import appStore from "../stores/AppStore"
 import RelationshipEmailsModal from "./modals/RelationshipEmailsModal"
 import PersonDetailsModal from "./modals/PersonDetailsModal"
@@ -11,7 +11,6 @@ import TopicSampleModal from "./modals/TopicSampleModal"
 import EmailSearchResultModal from "./EmailSearch/EmailSearchResultModal"
 import EmailSearch from "./EmailSearch"
 import ExplorerSection from "./ExplorerSection"
-import Joyride, { ACTIONS, STATUS } from "react-joyride"
 import { TransparentButton } from "./styled"
 
 let { Content } = Layout
@@ -62,27 +61,34 @@ const joyrideSteps = [
   },
   {
     content: <p align="left">
-      <strong>Single-click</strong> or <strong>double-click</strong> a node to see some cool stuff.
+      <strong>Single-click</strong>
+      {" "}
+or
+      <strong>double-click</strong>
+      {" "}
+a node to see some cool stuff.
     </p>,
-    target: ".node",
-    //disableOverlayClose: true,
-    //hideCloseButton: true,
-    //hideFooter: true,
-    //spotlightClicks: true,
+    target: ".node"
+    // disableOverlayClose: true,
+    // hideCloseButton: true,
+    // hideFooter: true,
+    // spotlightClicks: true,
   },
   {
     content: <p align="left">
-      <strong>Double-click</strong> an arrow to see emails between entities.
+      <strong>Double-click</strong>
+      {" "}
+an arrow to see emails between entities.
     </p>,
     target: ".relationship"
-  },
-  //{
+  }
+  // {
   //  content: <p align="left">
   //    Close the list.
   //  </p>,
   //  placement: "bottom-start",
   //  target: ".ant-modal-close"
-  //}
+  // }
 ]
 
 @observer
@@ -93,7 +99,7 @@ export default class Main extends Component {
 
   joyrideEvent(e) {
     const { action, status } = e
-    if (action === ACTIONS.RESET && status == STATUS.READY) {
+    if (action === ACTIONS.RESET && status === STATUS.READY) {
       this.setState({ joyride: false })
     }
   }
@@ -108,11 +114,11 @@ export default class Main extends Component {
         {appStore.modalVisibility.entityDetails && <EntityDetailsModal />}
         <Joyride
           callback={this.joyrideEvent.bind(this)}
-          continuous={true}
+          continuous
           run={this.state.joyride}
-          scrollToFirstStep={true}
-          disableScrolling={true}
-          showProgress={true}
+          scrollToFirstStep
+          disableScrolling
+          showProgress
           steps={joyrideSteps}
           styles={{ options: { primaryColor: "#1890FF" } }}
         />
@@ -127,4 +133,3 @@ export default class Main extends Component {
     )
   }
 }
-
