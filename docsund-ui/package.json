@@ -11,7 +11,7 @@
     "build": "rm -rf dist && API_URL=/api TOPIC_API_URL=/topic-api parcel build src/index.html",
     "landing-dev": "parcel ant-landing/index.html",
     "landing-build": "rm -rf dist && parcel build ant-landing/index.html",
-    "landing-deploy": "npm run landing-build && for f in dist/*; do aws s3 cp $f s3://docsund.info; done",
+    "landing-deploy": "npm run landing-build && aws s3 cp dist/__/assets/site.webmanifest s3://docsund.info/__/assets/site.webmanifest && for f in dist/*; do aws s3 cp $f s3://docsund.info; done",
     "lint": "eslint --ext .js,.jsx src ant-landing",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
