@@ -1,15 +1,26 @@
 import React from "react"
-import { Col, Icon } from "antd"
+import { Col, Icon, Spin } from "antd"
 import TechnologySection from "./TechnologySection"
 import ArchitecturePage from "./ArchitecturePage"
+
 
 const iframeProps = {
   frameBorder: 0,
   style: {
     width: "100%",
-    height: "100vh"
-  }
+    height: "100vh",
+    background: "#F0F2F5",
+    display: "block"
+  },
+  onLoad: () => document.getElementById("iframe-loading").style.display = "none"
 }
+
+const loadingWidget = (
+  <div id="iframe-loading" style={{ background: "#F0F2F5", textAlign: "center", paddingTop: "40px" }}>
+    <Spin tip="loading..." indicator={<Icon type="loading" style={{ fontSize: 64 }} spin />} />
+  </div>
+)
+
 
 export const Nav00DataSource = {
   wrapper: { className: "header0 home-page-wrapper" },
@@ -29,22 +40,42 @@ export const Nav00DataSource = {
       {
         path: "/enron",
         display: "Enron Emails",
-        component: () => <iframe src="http://enron.docsund.info" title="enron dataset" {...iframeProps} />
+        component: () => (
+          <>
+            {loadingWidget}
+            <iframe src="http://enron.docsund.info" title="enron dataset" {...iframeProps} />
+          </>
+        )
       },
       {
         path: "/clinton",
         display: "Clinton Emails",
-        component: () => <iframe src="http://clinton.docsund.info" title="clinton dataset" {...iframeProps} />
+        component: () => (
+          <>
+            {loadingWidget}
+            <iframe src="http://clinton.docsund.info" title="clinton dataset" {...iframeProps} />
+          </>
+        )
       },
       {
         path: "/dnc",
         display: "DNC Emails",
-        component: () => <iframe src="http://dnc.docsund.info" title="dnc dataset" {...iframeProps} />
+        component: () => (
+          <>
+            {loadingWidget}
+            <iframe src="http://dnc.docsund.info" title="dnc dataset" {...iframeProps} />
+          </>
+        )
       },
       {
         path: "/sony",
         display: "Sony Emails",
-        component: () => <iframe src="http://sony.docsund.info" title="sony dataset" {...iframeProps} />
+        component: () => (
+          <>
+            {loadingWidget}
+            <iframe src="http://sony.docsund.info" title="sony dataset" {...iframeProps} />
+          </>
+        )
       }
     ]
   },
@@ -136,7 +167,7 @@ export const Content01DataSource = {
           content: {
             children: (
               <>
-                <Col md={12} xs={24} style={{ padding: "0 10px" }}>
+                <Col md={12} xs={24} style={{ padding: "0 10px", marginBottom: "20px" }}>
                   <h3 style={{ marginBottom: 8 }}>What is an Entity?</h3>
                   An Entity is a person, place, or other named object found within text.
                   Docsund uses Named Entity Recognition techniques to automatically extract People, Places, Organizations, from the corpus.
@@ -369,7 +400,7 @@ export const Content03DataSource = {
     ]
   }
 }
-export const Footer10DataSource = {
+export const FooterDataSource = {
   wrapper: { className: "home-page-wrapper footer1-wrapper" },
   OverPack: { className: "footer1", playScale: 0.2 },
   block: {
@@ -424,8 +455,8 @@ export const Footer10DataSource = {
           children: <ul>
             <li><a href="https://www.kaggle.com/wcukierski/enron-email-dataset">Enron Emails</a></li>
             <li><a href="https://www.kaggle.com/kaggle/hillary-clinton-emails">Hillary Clinton Emails</a></li>
-            <li><a href="https://wikileaks.org//sony/emails/">Sony Emails</a></li>
-            <li><a href="https://wikileaks.org//dnc-emails/">DNC Emails</a></li>
+            <li><a href="https://wikileaks.org/sony/emails/">Sony Emails</a></li>
+            <li><a href="https://wikileaks.org/dnc-emails/">DNC Emails</a></li>
           </ul>
         }
       }

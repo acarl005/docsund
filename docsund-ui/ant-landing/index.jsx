@@ -19,7 +19,7 @@ import {
   Content02DataSource,
   DemosDataSource,
   Content03DataSource,
-  Footer10DataSource
+  FooterDataSource
 } from "./data.source"
 import "./less/antMotionStyle.less"
 
@@ -95,12 +95,6 @@ export default class Home extends React.Component {
             dataSource={Content03DataSource}
             isMobile={this.state.isMobile}
           />
-          <Footer1
-            id="Footer1_0"
-            key="Footer1_0"
-            dataSource={Footer10DataSource}
-            isMobile={this.state.isMobile}
-          />
         </>
       )
     }
@@ -113,7 +107,13 @@ export default class Home extends React.Component {
         dataSource={Nav00DataSource}
         isMobile={this.state.isMobile}
       />,
-      ...navMenuPaths.map(item => <Route path={item.path} exact component={item.component} key={item.path} />)
+      ...navMenuPaths.map(item => <Route path={item.path} exact component={item.component} key={item.path} />),
+      <Footer1
+        id="Footer1_0"
+        key="Footer1_0"
+        dataSource={FooterDataSource}
+        isMobile={this.state.isMobile}
+      />
     ]
     return (
       <Router>
