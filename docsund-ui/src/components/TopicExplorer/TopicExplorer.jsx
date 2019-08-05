@@ -1,20 +1,21 @@
-import React, { Component } from 'react';
-import { Row, Col, Button, Typography, Slider, Alert, Form, Spin } from 'antd';
-import { topicExplorer } from './topic-explorer';
-import { fetchJSON } from '../../utils'
+import React, { Component } from "react"
+import {
+  Row, Col, Button, Slider, Alert, Spin
+} from "antd"
+import topicExplorer from "./topic-explorer"
+import { fetchJSON } from "../../utils"
+import appStore from "../../stores/AppStore"
 
-const { Text } = Typography;
 
 export default class TopicExplorer extends Component {
-
   // we hard-code the minimum number of topics, but we'll fetch the maximum from the API later...
   static minTopicNum = 3
 
   constructor(props) {
-    super(props);
+    super(props)
     if (TopicExplorer.maxTopicNum === undefined) {
       try {
-        TopicExplorer.maxTopicNum = topicExplorer.getMaxNumTopics();
+        TopicExplorer.maxTopicNum = topicExplorer.getMaxNumTopics()
         this.state = {
           loading: false,
           numTopics: topicExplorer.getOptimalNumTopics(),
@@ -26,11 +27,11 @@ export default class TopicExplorer extends Component {
       }
     }
 
-    this.onDisplayTopicDocuments = this.onDisplayTopicDocuments.bind(this);
+    this.onDisplayTopicDocuments = this.onDisplayTopicDocuments.bind(this)
   }
 
   componentDidMount() {
-    topicExplorer.createWordCloud();
+    topicExplorer.createWordCloud()
     this.renderTopicViz()
   }
 
@@ -50,20 +51,20 @@ export default class TopicExplorer extends Component {
 
   async renderTopicViz() {
     this.setState({ loading: true })
-    var topicData = await topicExplorer.getTopicsData(this.state.numTopics);
+    const topicData = await topicExplorer.getTopicsData(this.state.numTopics)
 
-    topicExplorer.plotTopicData(topicData, this.onTopicSelect.bind(this));
-    topicExplorer.plotWordCloud();
+    topicExplorer.plotTopicData(topicData, this.onTopicSelect.bind(this))
+    topicExplorer.plotWordCloud()
     this.setState({ loading: false })
   }
 
-  async onDisplayTopicDocuments () {
+  async onDisplayTopicDocuments() {
     const data = await fetchJSON(`${TOPIC_API_URL}/TM/topics/${this.state.selectedTopic}/documents?numTopics=${this.state.numTopics}`)
 
     const { docIDs } = data
-    appStore.toggleModal('topicSample');
-    appStore.setEmailModalView('list')
-    await appStore.fetchEmailsFromIDs(docIDs, 250);
+    appStore.toggleModal("topicSample")
+    appStore.setEmailModalView("list")
+    await appStore.fetchEmailsFromIDs(docIDs, 250)
   }
 
   render() {
@@ -75,10 +76,10 @@ export default class TopicExplorer extends Component {
         <Spin spinning={this.state.loading} tip="loading..." size="large">
           <Row>
             <Col span={12} style={{ padding: "15px" }}>
-              <svg id="word-cloud" viewBox={"0 0 500 500"} preserveAspectRatio={"xMidYMid meet"} width={"100%"}></svg>
+              <svg id="word-cloud" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" width="100%" />
             </Col>
             <Col span={12} style={{ padding: "15px" }}>
-              <svg id="topic-plot" viewBox={"0 0 500 500"} preserveAspectRatio={"xMidYMid meet"} width={"100%"}></svg>
+              <svg id="topic-plot" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet" width="100%" />
             </Col>
           </Row>
         </Spin>
@@ -96,16 +97,16 @@ export default class TopicExplorer extends Component {
               onAfterChange={this.onTopicNumberChange.bind(this)}
               min={TopicExplorer.minTopicNum}
               max={TopicExplorer.maxTopicNum}
-              getTooltipPopupContainer={() => document.getElementById('topic-explorer-tab')}
+              getTooltipPopupContainer={() => document.getElementById("topic-explorer-tab")}
             />
           </div>
         </div>
         <Row>
           <Col span={3}>
             <Button type="primary" onClick={this.onDisplayTopicDocuments} disabled={this.state.selectedTopic === null}>
-              {this.state.selectedTopic !== null ?
-                `Get emails from topic ${this.state.selectedTopic} (of ${this.state.numTopics})` :
-                "Select a topic"
+              {this.state.selectedTopic !== null
+                ? `Get emails from topic ${this.state.selectedTopic} (of ${this.state.numTopics})`
+                : "Select a topic"
               }
             </Button>
           </Col>
