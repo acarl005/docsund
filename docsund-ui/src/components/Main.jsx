@@ -114,6 +114,7 @@ export default class Main extends Component {
           disableScrolling={true}
           showProgress={true}
           steps={joyrideSteps}
+          styles={{ options: { primaryColor: "#1890FF" } }}
         />
         <Content>
           <div style={{ marginBottom: "-20px", textAlign: "right" }}>
