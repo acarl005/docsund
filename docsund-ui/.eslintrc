@@ -12,6 +12,11 @@
   "rules": {
     "semi": [2, "never"],
     "quotes": [2, "double", { "avoidEscape": true }],
-    "arrow-parens": [2, "as-needed"]
+    "arrow-parens": [2, "as-needed"],
+    "comma-dangle": [2, "never"],
+    "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
+    "max-len": [2, { code: 200 }],
+    "global-require": 0,
+    "react/jsx-closing-tag-location": 0
   }
 }

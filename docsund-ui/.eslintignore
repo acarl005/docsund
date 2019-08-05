@@ -1,1 +1,3 @@
 src/components/D3Visualization/
+src/components/TopicExplorer/topic-explorer.js
+src/components/TopicExplorer/TopicExplorer.js

@@ -53,8 +53,7 @@ export function computeNodeScaleFactor(node) {
 }
 
 export function computeRelationshipScaleFactor(relationship) {
-  if (relationship.type == "EMAILS_TO") {
+  if (relationship.type === "EMAILS_TO") {
     relationship.scaleFactor = relationship.properties.count ** 0.4
   }
 }
-

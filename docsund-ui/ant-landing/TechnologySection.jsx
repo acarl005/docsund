@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Col, Menu } from 'antd'
 
 const MENU_ITEMS = [
-  {key: 'spacy', label: 'spaCy'},
-  {key: 'neo4j', label: 'Neo4j'},
-  {key: 'gensim', label: 'Gensim'},
-  {key: 'elasticsearch', label: 'Elasticsearch'},
-  {key: 'reactjs', label: 'ReactJS'},
-  {key: 'kubernetes', label: 'Kubernetes'},
+  { key: 'spacy', label: 'spaCy' },
+  { key: 'neo4j', label: 'Neo4j' },
+  { key: 'gensim', label: 'Gensim' },
+  { key: 'elasticsearch', label: 'Elasticsearch' },
+  { key: 'reactjs', label: 'ReactJS' },
+  { key: 'kubernetes', label: 'Kubernetes' },
 ]
 
 const CONTENT = {
@@ -43,7 +43,7 @@ const selectedStyle = {
   color: '#1890ff',
 }
 
-export function TechnologySection() {
+export default function TechnologySection() {
   const [selectedKey, setSelectedKey] = useState('spacy')
   return <>
     <Col span={6}>
