@@ -35,6 +35,7 @@ export const Nav00DataSource = {
       {
         path: "/architecture",
         display: "About",
+        footer: true,
         component: ArchitecturePage
       },
       {

@@ -57,6 +57,7 @@ export default class Home extends React.Component {
     const navHomePath = {
       path: "/",
       display: "Home",
+      footer: true,
       component: () => (
         <>
           <Banner0
@@ -100,6 +101,14 @@ export default class Home extends React.Component {
     }
 
     const navMenuPaths = [navHomePath, ...Nav00DataSource.Menu.children]
+    const footer = (
+      <Footer1
+        id="Footer1_0"
+        key="Footer1_0"
+        dataSource={FooterDataSource}
+        isMobile={this.state.isMobile}
+      />
+    )
     const children = [
       <Nav0
         id="Nav0_0"
@@ -107,13 +116,14 @@ export default class Home extends React.Component {
         dataSource={Nav00DataSource}
         isMobile={this.state.isMobile}
       />,
-      ...navMenuPaths.map(item => <Route path={item.path} exact component={item.component} key={item.path} />),
-      <Footer1
-        id="Footer1_0"
-        key="Footer1_0"
-        dataSource={FooterDataSource}
-        isMobile={this.state.isMobile}
-      />
+      ...navMenuPaths.map(item => (
+        <Route
+          path={item.path}
+          exact
+          component={item.footer ? () => [item.component(), footer] : item.component}
+          key={item.path}
+        />
+      )),
     ]
     return (
       <Router>
